@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scoreboard</title>
+<link rel="stylesheet" href="scoreboard.css">
+
+<!-- <style>
+  body {
+    margin:0;
+    padding:50px;
+    background: rgba(0,0,0,0.8);
+    color:white;
+    font-family: Arial, sans-serif;
+    width:1920px;
+    height:1080px;
+    display:flex;
+    gap:20px;
+    align-items:flex-start;
+  }
+
+  .player {
+    border:1px solid #4d0101;
+    padding:10px;
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    gap:10px;
+    min-width:300px;
+  }
+
+  .score {
+    font-size:2em;
+    font-weight:bold;
+  }
+
+  .player-info {
+    display:flex;
+    flex-direction:column;
+  }
+
+  .name { font-weight:bold; }
+  .team, .controller { font-size:0.8em; color:#aaa; }
+</style> -->
+</head>
+<body>
+<div id="p1-card" class="player">
+  <div class="score" id="s1">0</div>
+  <div class="player-info">
+    <div class="name">Player 1</div>
+    <div class="team">Team 1</div>
+    <div class="controller">Controller 1</div>
+  </div>
+</div>
+
+<div id="p2-card" class="player">
+  <div class="score" id="s2">0</div>
+  <div class="player-info">
+    <div class="name">Player 2</div>
+    <div class="team">Team 2</div>
+    <div class="controller">Controller 2</div>
+  </div>
+</div>
+
+<div id="p3-card" class="player" style="display:none;">
+  <div class="score" id="s3">0</div>
+  <div class="player-info">
+    <div class="name">Player 3</div>
+    <div class="team">Team 3</div>
+    <div class="controller">Controller 3</div>
+  </div>
+</div>
+
+<div id="p4-card" class="player" style="display:none;">
+  <div class="score" id="s4">0</div>
+  <div class="player-info">
+    <div class="name">Player 4</div>
+    <div class="team">Team 4</div>
+    <div class="controller">Controller 4</div>
+  </div>
+</div>
+
+<script>
+async function loadScoreboard() {
+  try {
+    const resp = await fetch("scoreboard.json");
+    if (!resp.ok) throw new Error("Failed to fetch scoreboard.json");
+    const data = await resp.json();
+
+    // map your JSON game values to CSS body classes used in scoreboard.css
+    const gameClassMap = { sf: "sf", dbfz: "dbfz", tekken: "tekken", "2xko": "_2XKO" };
+    // clear old classes then add the one for current game
+    document.body.classList.remove("sf","dbfz","tekken","_2XKO");
+    if (gameClassMap[data.game]) document.body.classList.add(gameClassMap[data.game]);
+
+    ["p1","p2","p3","p4"].forEach((p,i) => {
+      const card = document.getElementById(`p${i+1}-card`);
+      const visible = (i<2) ? true : !!data[`visible${i+1}`];
+      card.style.display = visible ? "flex" : "none";
+
+      card.querySelector(".name").textContent = data[`player${i+1}`] || `Player ${i+1}`;
+      card.querySelector(".team").textContent = data[`team${i+1}`] || `Team ${i+1}`;
+      card.querySelector(".controller").textContent = data[`controller${i+1}`] || `Controller ${i+1}`;
+      card.querySelector(".score").textContent = data[`score${i+1}`] || 0;
+    });
+
+  } catch (err) {
+    console.error("Error loading scoreboard.json:", err);
+  }
+}
+
+// Refresh every second
+setInterval(loadScoreboard, 1000);
+loadScoreboard();
+</script>
+</body>
+</html>

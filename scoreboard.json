@@ -1,0 +1,21 @@
+{
+  "game": "sf",
+  "player1": "wwww",
+  "team1": "",
+  "controller1": "",
+  "score1": 2,
+  "visible1": false,
+  "player2": "aa",
+  "team2": "",
+  "controller2": "",
+  "score2": 1,
+  "visible2": false,
+  "player3": "",
+  "team3": "",
+  "controller3": "",
+  "visible3": true,
+  "player4": "",
+  "team4": "",
+  "controller4": "",
+  "visible4": true
+}

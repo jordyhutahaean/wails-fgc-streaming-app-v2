@@ -1,0 +1,17 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "scoreboard-wails",
+  "outputfilename": "scoreboard-wails",
+  "frontend": {
+    "install": "npm install",
+    "build": "npm run build",
+    "dev": {
+      "watcher": "npm run dev",
+      "serverUrl": "auto"
+    }
+  },
+  "author": {
+    "name": "giogio555",
+    "email": "jordyhutahaean555@gmail.com"
+  }
+}

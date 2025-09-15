@@ -1,0 +1,67 @@
+body {
+  font-family: Arial, sans-serif;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  width: 1920px;
+  height: 1080px;
+  position: relative;
+}
+
+.player {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  border: 1px solid #4d0101;
+  width: 300px;   /* fixed width prevents auto-stretch issues */
+  height: auto;
+}
+
+.player .score {
+  font-size: 2em;
+  margin-right: 10px;
+}
+
+.player .player-info {
+  display: flex;
+  flex-direction: row;
+}
+
+.name { font-weight: bold; }
+.team, .controller { font-size: 0.8em; color: #aaa; }
+ 
+
+/* ---------- Street Fighter ---------- */
+.sf .player { flex-direction: row; }
+
+.sf #p1-card { 
+    top: 40px; 
+    left: 460px; 
+}
+
+.sf #p2-card { 
+    top: 40px; 
+    right: 460px; 
+    left: auto;
+}
+/* ---------- Dragon Ball FighterZ ---------- */
+.dbfz .player { flex-direction: row; }     /* choose as needed */
+
+.dbfz #p1-card { top: 50px; left: 50px; }
+.dbfz #p2-card { top: 50px; right: 50px; }
+
+/* ---------- Tekken ---------- */
+.tekken .player { flex-direction: row-reverse; } /* score right */
+
+.tekken #p1-card { top: 100px; left: 25%;  }
+.tekken #p2-card { top: 100px; right: 25%;   }
+
+/* ---------- 2XKO (2v2) ---------- */
+._2XKO .player { flex-direction: row; }    /* choose per team */
+
+._2XKO #p1-card { top: 50px; left: 50px; }
+._2XKO #p2-card { top: 50px; right: 50px; }
+._2XKO #p3-card { bottom: 50px; left: 50px; }
+._2XKO #p4-card { bottom: 50px; right: 50px; }

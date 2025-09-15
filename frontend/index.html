@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scoreboard Control</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  .top-buttons { margin-bottom: 20px; }
+  button { margin: 5px; padding: 5px 10px; }
+  .player-block { border: 1px solid #ccc; padding: 10px; margin: 10px 0; display: flex; gap: 10px; align-items: center; }
+  .player-block input { padding: 5px; width: 120px; }
+  label { display: flex; flex-direction: column; font-size: 0.9em; }
+</style>
+</head>
+<body>
+<h1>Fighting Game Scoreboard Control</h1>
+
+<div class="top-buttons">
+  <button onclick="updateScoreboard()">Save</button>
+  <button onclick="resetScoreboard()">Reset</button>
+</div>
+
+<label for="game">Game: </label>
+<select id="game" onchange="toggleGameMode()">
+  <option value="sf">Street Fighter</option>
+  <option value="dbfz">Dragon Ball FighterZ</option>
+  <option value="tekken">Tekken</option>
+  <option value="2xko">2XKO</option>
+</select>
+
+<!-- Player 1 -->
+<div class="player-block">
+  <label>Name: <input id="p1" type="text" placeholder="Player 1"></label>
+  <label>Team: <input id="t1" type="text" placeholder="Team 1"></label>
+  <label>Controller: <input id="c1" type="text" placeholder="Controller 1"></label>
+  <label>Score: <input id="s1" type="number" value="0"></label>
+</div>
+
+<!-- Player 2 -->
+<div class="player-block">
+  <label>Name: <input id="p2" type="text" placeholder="Player 2"></label>
+  <label>Team: <input id="t2" type="text" placeholder="Team 2"></label>
+  <label>Controller: <input id="c2" type="text" placeholder="Controller 2"></label>
+  <label>Score: <input id="s2" type="number" value="0"></label>
+</div>
+
+<!-- Player 3 (2XKO only) -->
+<div class="player-block" id="p3block" style="display:none;">
+  <label>Visible <input type="checkbox" id="v3"></label>
+  <label>Name: <input id="p3" type="text" placeholder="Player 3"></label>
+  <label>Team: <input id="t3" type="text" placeholder="Team 3"></label>
+  <label>Controller: <input id="c3" type="text" placeholder="Controller 3"></label>
+  <label>Score: <input id="s3" type="number" value="0"></label>
+</div>
+
+<!-- Player 4 (2XKO only) -->
+<div class="player-block" id="p4block" style="display:none;">
+  <label>Visible <input type="checkbox" id="v4"></label>
+  <label>Name: <input id="p4" type="text" placeholder="Player 4"></label>
+  <label>Team: <input id="t4" type="text" placeholder="Team 4"></label>
+  <label>Controller: <input id="c4" type="text" placeholder="Controller 4"></label>
+  <label>Score: <input id="s4" type="number" value="0"></label>
+</div>
+
+<script>
+function toggleGameMode() {
+  const game = document.getElementById("game").value;
+  document.getElementById("p3block").style.display = (game === "2xko") ? "flex" : "none";
+  document.getElementById("p4block").style.display = (game === "2xko") ? "flex" : "none";
+}
+
+async function updateScoreboard() {
+  const data = {
+    game: document.getElementById("game").value,
+    player1: document.getElementById("p1").value,
+    team1: document.getElementById("t1").value,
+    controller1: document.getElementById("c1").value,
+    score1: parseInt(document.getElementById("s1").value, 10),
+
+    player2: document.getElementById("p2").value,
+    team2: document.getElementById("t2").value,
+    controller2: document.getElementById("c2").value,
+    score2: parseInt(document.getElementById("s2").value, 10),
+
+    player3: document.getElementById("p3")?.value || "",
+    team3: document.getElementById("t3")?.value || "",
+    controller3: document.getElementById("c3")?.value || "",
+    score3: parseInt(document.getElementById("s3")?.value || 0, 10),
+    visible3: document.getElementById("v3")?.checked ?? false,
+
+    player4: document.getElementById("p4")?.value || "",
+    team4: document.getElementById("t4")?.value || "",
+    controller4: document.getElementById("c4")?.value || "",
+    score4: parseInt(document.getElementById("s4")?.value || 0, 10),
+    visible4: document.getElementById("v4")?.checked ?? false
+  };
+
+  try {
+    await window.go.main.App.SaveScoreboardJSON(data);
+ 
+  } catch (err) {
+    console.error(err);
+    alert("Error saving JSON!");
+  }
+}
+
+function resetScoreboard() {
+  document.querySelectorAll("input[type=text], input[type=number]").forEach(el => el.value = "");
+  document.getElementById("v1").checked = true;  // if Player 1 should stay visible
+  document.getElementById("v2").checked = true;  // if Player 2 should stay visible
+  document.getElementById("v3").checked = false; // default not visible
+  document.getElementById("v4").checked = false; // default not visible
+  updateScoreboard();
+}
+
+</script>
+</body>
+</html>

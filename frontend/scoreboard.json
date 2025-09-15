@@ -1,0 +1,24 @@
+{
+  "game": "sf",
+  "player1": "Ryu",
+  "team1": "Team 1",
+  "controller1": "P1",
+  "score1": 0,
+  
+  "player2": "Ken",
+  "team2": "Team 2",
+  "controller2": "P2",
+  "score2": 0,
+  
+  "player3": "Chun-Li",
+  "team3": "Team 3",
+  "controller3": "P3",
+  "score3": 0,
+  "visible3": false,
+  
+  "player4": "Guile",
+  "team4": "Team 4",
+  "controller4": "P4",
+  "score4": 0,
+  "visible4": false
+}
