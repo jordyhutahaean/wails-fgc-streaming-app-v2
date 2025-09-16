@@ -76,11 +76,13 @@ async function updateScoreboard() {
     team1: document.getElementById("t1").value,
     controller1: document.getElementById("c1").value,
     score1: parseInt(document.getElementById("s1").value, 10),
+    visible1: true,
 
     player2: document.getElementById("p2").value,
     team2: document.getElementById("t2").value,
     controller2: document.getElementById("c2").value,
     score2: parseInt(document.getElementById("s2").value, 10),
+    visible2: true,
 
     player3: document.getElementById("p3")?.value || "",
     team3: document.getElementById("t3")?.value || "",
@@ -97,7 +99,6 @@ async function updateScoreboard() {
 
   try {
     await window.go.main.App.SaveScoreboardJSON(data);
- 
   } catch (err) {
     console.error(err);
     alert("Error saving JSON!");
@@ -106,13 +107,10 @@ async function updateScoreboard() {
 
 function resetScoreboard() {
   document.querySelectorAll("input[type=text], input[type=number]").forEach(el => el.value = "");
-  document.getElementById("v1").checked = true;  // if Player 1 should stay visible
-  document.getElementById("v2").checked = true;  // if Player 2 should stay visible
-  document.getElementById("v3").checked = false; // default not visible
-  document.getElementById("v4").checked = false; // default not visible
+  document.getElementById("v3").checked = false;
+  document.getElementById("v4").checked = false;
   updateScoreboard();
 }
-
 </script>
 </body>
 </html>
