@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Commentary Control</title>
+  <link rel="stylesheet" href="commentary.css">
+</head>
+<body>
+  <h1>Commentary Control</h1>
+
+  <div class="toolbar">
+    <button onclick="updateCommentary()">💾 Save</button>
+    <button onclick="resetCommentary()">🔄 Reset</button>
+    <button onclick="toggleCommentary('show')">▶ Show</button>
+    <button onclick="toggleCommentary('hide')">⏹ Hide</button>
+  </div>
+
+  <!-- Commentator 1 -->
+  <div class="commentator-block">
+    <label>Name:
+      <input id="c1name" type="text" placeholder="Commentator 1">
+    </label>
+    <label>Description:
+      <input id="c1desc" type="text" placeholder="FGC Expert, EVO Winner, etc.">
+    </label>
+  </div>
+
+  <!-- Commentator 2 -->
+  <div class="commentator-block">
+    <label>Name:
+      <input id="c2name" type="text" placeholder="Commentator 2">
+    </label>
+    <label>Description:
+      <input id="c2desc" type="text" placeholder="FGC Expert, EVO Winner, etc.">
+    </label>
+  </div>
+
+  <script>
+    async function updateCommentary() {
+      const data = {
+        commentator1: document.getElementById("c1name").value,
+        description1: document.getElementById("c1desc").value,
+        commentator2: document.getElementById("c2name").value,
+        description2: document.getElementById("c2desc").value,
+        visible: true
+      };
+
+      try {
+        await window.go.main.App.SaveCommentaryJSON(data);
+      } catch (err) {
+        console.error(err);
+        alert("Error saving commentary JSON!");
+      }
+    }
+
+    function resetCommentary() {
+      document.getElementById("c1name").value = "";
+      document.getElementById("c1desc").value = "";
+      document.getElementById("c2name").value = "";
+      document.getElementById("c2desc").value = "";
+      updateCommentary();
+    }
+
+    async function toggleCommentary(state) {
+      const data = {
+        commentator1: document.getElementById("c1name").value,
+        description1: document.getElementById("c1desc").value,
+        commentator2: document.getElementById("c2name").value,
+        description2: document.getElementById("c2desc").value,
+        visible: (state === "show")
+      };
+
+      try {
+        await window.go.main.App.SaveCommentaryJSON(data);
+      } catch (err) {
+        console.error(err);
+        alert("Error updating commentary visibility!");
+      }
+    }
+  </script>
+</body>
+</html>

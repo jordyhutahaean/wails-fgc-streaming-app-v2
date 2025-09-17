@@ -1,5 +1,25 @@
 export namespace main {
 	
+	export class Commentary {
+	    commentator1: string;
+	    description1: string;
+	    commentator2: string;
+	    description2: string;
+	    visible: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new Commentary(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.commentator1 = source["commentator1"];
+	        this.description1 = source["description1"];
+	        this.commentator2 = source["commentator2"];
+	        this.description2 = source["description2"];
+	        this.visible = source["visible"];
+	    }
+	}
 	export class Scoreboard {
 	    game: string;
 	    style: string;

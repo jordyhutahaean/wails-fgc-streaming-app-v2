@@ -26,6 +26,30 @@
     color: var(--accent);
   }
 
+  /* Tabs */
+  .tab {
+    display: flex;
+    gap: 10px;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .tab button {
+    background: none;
+    border: none;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--text);
+    border-radius: 6px 6px 0 0;
+    transition: background 0.2s, color 0.2s;
+  }
+  .tab button.active {
+    background: var(--accent);
+    color: #fff;
+  }
+  .tabcontent { display: none; }
+  .tabcontent.active { display: block; }
+
   .toolbar {
     display: flex;
     gap: 10px;
@@ -42,9 +66,7 @@
     font-weight: bold;
     transition: background 0.2s;
   }
-  button:hover {
-    background: #005fd4;
-  }
+  button:hover { background: #005fd4; }
 
   .settings {
     display: flex;
@@ -96,117 +118,179 @@
     gap: 6px;
     font-weight: bold;
   }
+
+  /* Commentary specific */
+  .commentary-panel {
+    padding: 16px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .commentator-block {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .commentator-block label {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.9em;
+    font-weight: bold;
+    min-width: 220px;
+  }
+  .commentary-toolbar { margin-top: 8px; display:flex; gap:8px; }
 </style>
 </head>
 <body>
-  <h1>Fighting Game Scoreboard Control</h1>
+  <h1>Fighting Game Control Panel</h1>
 
-  <div class="toolbar">
-    <button onclick="updateScoreboard()">💾 Save</button>
-    <button onclick="resetScoreboard()">🔄 Reset</button>
+  <!-- TAB HEADERS -->
+  <div class="tab">
+    <button class="tablinks active" onclick="openTab(event, 'scoreboard')">🏆 Scoreboard</button>
+    <button class="tablinks" onclick="openTab(event, 'commentary')">🎙 Commentary</button>
   </div>
 
-  <div class="settings">
-    <label>Game:
-      <select id="game" onchange="toggleGameMode()">
-        <option value="sf">Street Fighter</option>
-        <option value="dbfz">Dragon Ball FighterZ</option>
-        <option value="tekken">Tekken</option>
-        <option value="2xko">2XKO</option>
-      </select>
-    </label>
+  <!-- SCOREBOARD TAB -->
+  <div id="scoreboard" class="tabcontent active">
+    <div class="toolbar">
+      <button onclick="updateScoreboard()">💾 Save Scoreboard</button>
+      <button onclick="resetScoreboard()">🔄 Reset Scoreboard</button>
+    </div>
 
-    <label>Style:
-      <select id="style">
-        <option value="minimalist">Minimalist</option>
-        <option value="arcade">Arcade</option>
-        <option value="futuristic">Futuristic</option>
-      </select>
-    </label>
+    <div class="settings">
+      <label>Game:
+        <select id="game" onchange="toggleGameMode()">
+          <option value="sf">Street Fighter</option>
+          <option value="dbfz">Dragon Ball FighterZ</option>
+          <option value="tekken">Tekken</option>
+          <option value="2xko">2XKO</option>
+        </select>
+      </label>
 
-    <label>Titlecard:
-      <input id="titlecard" type="text" placeholder="Top 8 / Grand Finals / etc.">
-    </label>
-  </div>
+      <label>Style:
+        <select id="style">
+          <option value="minimalist">Minimalist</option>
+          <option value="arcade">Arcade</option>
+          <option value="futuristic">Futuristic</option>
+        </select>
+      </label>
 
-<!-- Player 1 -->
-<div class="player-block">
-  <label>Name: <input id="p1" type="text" placeholder="Player 1"></label>
-  <label>Team: <input id="t1" type="text" placeholder="Team 1"></label>
-  <label>Controller:
-    <select id="c1">
-      <option value="">None</option>
-      <option value="arcade">Arcade Stick</option>
-      <option value="leverless">Leverless</option>
-      <option value="gamepad">Gamepad</option>
-      <option value="arcade_white">Arcade Stick White</option>
-      <option value="leverless_white">Leverless White</option>
-      <option value="gamepad_white">Gamepad White</option>
-    </select>
-  </label>
-  <label>Score: <input id="s1" type="number" value="0"></label>
-</div>
+      <label>Titlecard:
+        <input id="titlecard" type="text" placeholder="Top 8 / Grand Finals / etc.">
+      </label>
+    </div>
 
-<!-- Player 2 -->
-<div class="player-block">
-  <label>Name: <input id="p2" type="text" placeholder="Player 2"></label>
-  <label>Team: <input id="t2" type="text" placeholder="Team 2"></label>
-  <label>Controller:
-    <select id="c2">
-      <option value="">None</option>
-      <option value="arcade">Arcade Stick</option>
-      <option value="leverless">Leverless</option>
-      <option value="gamepad">Gamepad</option>
-      <option value="arcade_white">Arcade Stick White</option>
-      <option value="leverless_white">Leverless White</option>
-      <option value="gamepad_white">Gamepad White</option>
-    </select>
-  </label>
-  <label>Score: <input id="s2" type="number" value="0"></label>
-</div>
+    <!-- Player 1 -->
+    <div class="player-block">
+      <label>Name: <input id="p1" type="text" placeholder="Player 1"></label>
+      <label>Team: <input id="t1" type="text" placeholder="Team 1"></label>
+      <label>Controller:
+        <select id="c1">
+          <option value="">None</option>
+          <option value="arcade">Arcade Stick</option>
+          <option value="leverless">Leverless</option>
+          <option value="gamepad">Gamepad</option>
+          <option value="arcade_white">Arcade Stick White</option>
+          <option value="leverless_white">Leverless White</option>
+          <option value="gamepad_white">Gamepad White</option>
+        </select>
+      </label>
+      <label>Score: <input id="s1" type="number" value="0"></label>
+    </div>
 
-<!-- Player 3 (2XKO only) -->
-<div class="player-block" id="p3block" style="display:none;">
-  <span class="checkbox-label">
-    <input type="checkbox" id="v3"> Visible
-  </span>
-  <label>Name: <input id="p3" type="text" placeholder="Player 3"></label>
-  <label>Team: <input id="t3" type="text" placeholder="Team 3"></label>
-  <label>Controller:
-    <select id="c3">
-      <option value="">None</option>
-      <option value="arcade">Arcade Stick</option>
-      <option value="leverless">Leverless</option>
-      <option value="gamepad">Gamepad</option>
-      <option value="arcade_white">Arcade Stick White</option>
-      <option value="leverless_white">Leverless White</option>
-      <option value="gamepad_white">Gamepad White</option>
-    </select>
-  </label>
-  <label>Score: <input id="s3" type="number" value="0"></label>
-</div>
+    <!-- Player 2 -->
+    <div class="player-block">
+      <label>Name: <input id="p2" type="text" placeholder="Player 2"></label>
+      <label>Team: <input id="t2" type="text" placeholder="Team 2"></label>
+      <label>Controller:
+        <select id="c2">
+          <option value="">None</option>
+          <option value="arcade">Arcade Stick</option>
+          <option value="leverless">Leverless</option>
+          <option value="gamepad">Gamepad</option>
+          <option value="arcade_white">Arcade Stick White</option>
+          <option value="leverless_white">Leverless White</option>
+          <option value="gamepad_white">Gamepad White</option>
+        </select>
+      </label>
+      <label>Score: <input id="s2" type="number" value="0"></label>
+    </div>
 
-<!-- Player 4 (2XKO only) -->
-<div class="player-block" id="p4block" style="display:none;">
-  <span class="checkbox-label">
-    <input type="checkbox" id="v4"> Visible
-  </span>
-  <label>Name: <input id="p4" type="text" placeholder="Player 4"></label>
-  <label>Team: <input id="t4" type="text" placeholder="Team 4"></label>
-  <label>Controller:
-    <select id="c4">
-      <option value="">None</option>
-      <option value="arcade">Arcade Stick</option>
-      <option value="leverless">Leverless</option>
-      <option value="gamepad">Gamepad</option>
-      <option value="arcade_white">Arcade Stick White</option>
-      <option value="leverless_white">Leverless White</option>
-      <option value="gamepad_white">Gamepad White</option>
-    </select>
-  </label>
-  <label>Score: <input id="s4" type="number" value="0"></label>
-</div>
+    <!-- Player 3 (2XKO only) -->
+    <div class="player-block" id="p3block" style="display:none;">
+      <span class="checkbox-label">
+        <input type="checkbox" id="v3"> Visible
+      </span>
+      <label>Name: <input id="p3" type="text" placeholder="Player 3"></label>
+      <label>Team: <input id="t3" type="text" placeholder="Team 3"></label>
+      <label>Controller:
+        <select id="c3">
+          <option value="">None</option>
+          <option value="arcade">Arcade Stick</option>
+          <option value="leverless">Leverless</option>
+          <option value="gamepad">Gamepad</option>
+          <option value="arcade_white">Arcade Stick White</option>
+          <option value="leverless_white">Leverless White</option>
+          <option value="gamepad_white">Gamepad White</option>
+        </select>
+      </label>
+      <label>Score: <input id="s3" type="number" value="0"></label>
+    </div>
 
+    <!-- Player 4 (2XKO only) -->
+    <div class="player-block" id="p4block" style="display:none;">
+      <span class="checkbox-label">
+        <input type="checkbox" id="v4"> Visible
+      </span>
+      <label>Name: <input id="p4" type="text" placeholder="Player 4"></label>
+      <label>Team: <input id="t4" type="text" placeholder="Team 4"></label>
+      <label>Controller:
+        <select id="c4">
+          <option value="">None</option>
+          <option value="arcade">Arcade Stick</option>
+          <option value="leverless">Leverless</option>
+          <option value="gamepad">Gamepad</option>
+          <option value="arcade_white">Arcade Stick White</option>
+          <option value="leverless_white">Leverless White</option>
+          <option value="gamepad_white">Gamepad White</option>
+        </select>
+      </label>
+      <label>Score: <input id="s4" type="number" value="0"></label>
+    </div>
+  </div> <!-- end scoreboard tab -->
+
+  <!-- COMMENTARY TAB -->
+  <div id="commentary" class="tabcontent">
+    <div class="commentary-panel">
+      <h2>Commentary Lower Third</h2>
+
+      <div class="commentator-block">
+        <label>Commentator 1 - Name
+          <input id="com1_name" type="text" placeholder="Commentator 1">
+        </label>
+        <label>Commentator 1 - Description
+          <input id="com1_desc" type="text" placeholder="FGC Expert, EVO Winner, etc.">
+        </label>
+      </div>
+
+      <div class="commentator-block">
+        <label>Commentator 2 - Name
+          <input id="com2_name" type="text" placeholder="Commentator 2">
+        </label>
+        <label>Commentator 2 - Description
+          <input id="com2_desc" type="text" placeholder="FGC Expert, Studio Host, etc.">
+        </label>
+      </div>
+
+      <div class="commentary-toolbar">
+        <button onclick="updateCommentary()">💾 Save Commentary</button>
+        <button onclick="resetCommentary()">🔄 Reset Commentary</button>
+        <button onclick="toggleCommentary(true)">▶ Show</button>
+        <button onclick="toggleCommentary(false)">⏹ Hide</button>
+      </div>
+    </div>
+  </div> <!-- end commentary tab -->
 
 <script>
 function toggleGameMode() {
@@ -220,23 +304,19 @@ async function updateScoreboard() {
     game: document.getElementById("game").value,
     style: document.getElementById("style").value,
     titlecard: document.getElementById("titlecard").value,
-
     player1: document.getElementById("p1").value,
     team1: document.getElementById("t1").value,
     controller1: document.getElementById("c1").value,
     score1: parseInt(document.getElementById("s1").value, 10),
-
     player2: document.getElementById("p2").value,
     team2: document.getElementById("t2").value,
     controller2: document.getElementById("c2").value,
     score2: parseInt(document.getElementById("s2").value, 10),
-
     player3: document.getElementById("p3")?.value || "",
     team3: document.getElementById("t3")?.value || "",
     controller3: document.getElementById("c3")?.value || "",
     score3: parseInt(document.getElementById("s3")?.value || 0, 10),
     visible3: document.getElementById("v3")?.checked ?? false,
-
     player4: document.getElementById("p4")?.value || "",
     team4: document.getElementById("t4")?.value || "",
     controller4: document.getElementById("c4")?.value || "",
@@ -247,8 +327,8 @@ async function updateScoreboard() {
   try {
     await window.go.main.App.SaveScoreboardJSON(data);
   } catch (err) {
-    console.error(err);
-    alert("Error saving JSON!");
+    console.error("SaveScoreboardJSON failed:", err);
+    alert("Error saving scoreboard JSON (see console).");
   }
 }
 
@@ -257,6 +337,53 @@ function resetScoreboard() {
   document.getElementById("v3").checked = false;
   document.getElementById("v4").checked = false;
   updateScoreboard();
+}
+
+async function updateCommentary() {
+  const data = {
+    commentator1: document.getElementById("com1_name").value || "",
+    description1: document.getElementById("com1_desc").value || "",
+    commentator2: document.getElementById("com2_name").value || "",
+    description2: document.getElementById("com2_desc").value || "",
+    visible: true
+  };
+  try {
+    await window.go.main.App.SaveCommentaryJSON(data);
+  } catch (err) {
+    console.error("SaveCommentaryJSON failed:", err);
+    alert("Error saving commentary JSON (see console).");
+  }
+}
+
+function resetCommentary() {
+  document.getElementById("com1_name").value = "";
+  document.getElementById("com1_desc").value = "";
+  document.getElementById("com2_name").value = "";
+  document.getElementById("com2_desc").value = "";
+  updateCommentary();
+}
+
+async function toggleCommentary(show) {
+  const data = {
+    commentator1: document.getElementById("com1_name").value || "",
+    description1: document.getElementById("com1_desc").value || "",
+    commentator2: document.getElementById("com2_name").value || "",
+    description2: document.getElementById("com2_desc").value || "",
+    visible: !!show
+  };
+  try {
+    await window.go.main.App.SaveCommentaryJSON(data);
+  } catch (err) {
+    console.error("SaveCommentaryJSON failed:", err);
+    alert("Error saving commentary visibility (see console).");
+  }
+}
+
+function openTab(evt, tabName) {
+  document.querySelectorAll(".tabcontent").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".tablinks").forEach(el => el.classList.remove("active"));
+  document.getElementById(tabName).classList.add("active");
+  evt.currentTarget.classList.add("active");
 }
 </script>
 </body>

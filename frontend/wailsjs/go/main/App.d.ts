@@ -4,6 +4,8 @@ import {main} from '../models';
 
 export function GetScoreboard():Promise<main.Scoreboard>;
 
+export function SaveCommentaryJSON(arg1:main.Commentary):Promise<void>;
+
 export function SaveScoreboardJSON(arg1:main.Scoreboard):Promise<void>;
 
 export function UpdateScoreboard(arg1:main.Scoreboard):Promise<void>;

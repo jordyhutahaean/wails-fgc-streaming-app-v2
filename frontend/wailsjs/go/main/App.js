@@ -6,6 +6,10 @@ export function GetScoreboard() {
   return window['go']['main']['App']['GetScoreboard']();
 }
 
+export function SaveCommentaryJSON(arg1) {
+  return window['go']['main']['App']['SaveCommentaryJSON'](arg1);
+}
+
 export function SaveScoreboardJSON(arg1) {
   return window['go']['main']['App']['SaveScoreboardJSON'](arg1);
 }

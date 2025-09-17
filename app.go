@@ -7,18 +7,24 @@ import (
 
 type App struct {
 	scoreboard Scoreboard
+	commentary Commentary
 }
 
 func NewApp() *App {
 	return &App{
 		scoreboard: Scoreboard{
 			Game:      "sf",
-			Style:     "minimalist", // default style
+			Style:     "minimalist",
 			Titlecard: "",
 			Visible1:  true,
 			Visible2:  true,
 			Visible3:  false,
 			Visible4:  false,
+		},
+		commentary: Commentary{
+			Commentator1: "",
+			Commentator2: "",
+			Visible:      false,
 		},
 	}
 }
@@ -51,6 +57,14 @@ type Scoreboard struct {
 	Visible4    bool   `json:"visible4"`
 }
 
+type Commentary struct {
+	Commentator1 string `json:"commentator1"`
+	Description1 string `json:"description1"`
+	Commentator2 string `json:"commentator2"`
+	Description2 string `json:"description2"`
+	Visible      bool   `json:"visible"`
+}
+
 func (a *App) GetScoreboard() Scoreboard {
 	return a.scoreboard
 }
@@ -61,6 +75,18 @@ func (a *App) UpdateScoreboard(data Scoreboard) {
 
 func (a *App) SaveScoreboardJSON(data Scoreboard) error {
 	file, err := os.Create("scoreboard.json")
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	return encoder.Encode(data)
+}
+
+func (a *App) SaveCommentaryJSON(data Commentary) error {
+	file, err := os.Create("commentary.json")
 	if err != nil {
 		return err
 	}
