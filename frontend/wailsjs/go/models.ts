@@ -2,6 +2,8 @@ export namespace main {
 	
 	export class Scoreboard {
 	    game: string;
+	    style: string;
+	    titlecard: string;
 	    player1: string;
 	    team1: string;
 	    controller1: string;
@@ -28,6 +30,8 @@ export namespace main {
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.game = source["game"];
+	        this.style = source["style"];
+	        this.titlecard = source["titlecard"];
 	        this.player1 = source["player1"];
 	        this.team1 = source["team1"];
 	        this.controller1 = source["controller1"];

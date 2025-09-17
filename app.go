@@ -12,17 +12,22 @@ type App struct {
 func NewApp() *App {
 	return &App{
 		scoreboard: Scoreboard{
-			Game:     "sf",
-			Visible1: true,
-			Visible2: true,
-			Visible3: false,
-			Visible4: false,
+			Game:      "sf",
+			Style:     "minimalist", // default style
+			Titlecard: "",
+			Visible1:  true,
+			Visible2:  true,
+			Visible3:  false,
+			Visible4:  false,
 		},
 	}
 }
 
 type Scoreboard struct {
-	Game        string `json:"game"`
+	Game      string `json:"game"`
+	Style     string `json:"style"`
+	Titlecard string `json:"titlecard"`
+
 	Player1     string `json:"player1"`
 	Team1       string `json:"team1"`
 	Controller1 string `json:"controller1"`
