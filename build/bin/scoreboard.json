@@ -1,0 +1,23 @@
+{
+  "game": "2xko",
+  "style": "arcade",
+  "titlecard": "",
+  "player1": "aa",
+  "team1": "",
+  "controller1": "",
+  "score1": 0,
+  "visible1": false,
+  "player2": "cc",
+  "team2": "",
+  "controller2": "",
+  "score2": 0,
+  "visible2": false,
+  "player3": "bb",
+  "team3": "",
+  "controller3": "",
+  "visible3": true,
+  "player4": "dd",
+  "team4": "",
+  "controller4": "",
+  "visible4": true
+}
