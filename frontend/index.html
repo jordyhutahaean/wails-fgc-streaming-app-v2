@@ -1,187 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8" />
 <title>Scoreboard Control</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <style>
-  :root {
-    --bg: #f5f7fa;
-    --card-bg: #ffffff;
-    --border: #dcdfe3;
-    --accent: #0077ff;
-    --text: #333;
+  :root{
+    --bg:#f5f7fa;
+    --card-bg:#fff;
+    --panel:#ffffff;
+    --border:#dcdfe3;
+    --accent:#0077ff;
+    --muted:#666;
+    --text:#222;
+    --win:#5a5a5a;
+    --lose:#fff5f5;
   }
 
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background: var(--bg);
-    color: var(--text);
+  html,body{height:100%;margin:0;padding:0;background:var(--bg);font-family:Inter, Arial, sans-serif;color:var(--text)}
+  .container{padding:20px;max-width:1200px;margin:0 auto}
+  h1{margin:0 0 18px;font-size:20px;color:var(--accent)}
+
+  /* Top tabs */
+  .tab{display:flex;gap:10px;border-bottom:2px solid var(--border);margin-bottom:18px}
+  .tab button{background:none;border:0;padding:10px 14px;cursor:pointer;font-weight:700;border-radius:6px;color:var(--text)}
+  .tab button.active{background:var(--accent);color:#fff}
+  .tabcontent{display:none}
+  .tabcontent.active{display:block}
+
+  /* toolbar & controls */
+  .toolbar{display:flex;gap:10px;margin-bottom:18px}
+  button.btn{background:var(--accent);color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
+  button.btn:hover{filter:brightness(.9)}
+  .settings{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:18px}
+  .settings label{display:flex;flex-direction:column;font-weight:700;font-size:13px}
+  input[type="text"], input[type="number"], select{margin-top:6px;padding:8px;border:1px solid var(--border);border-radius:6px;min-width:26px}
+
+  .player-block{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .player-block label{font-weight:700;font-size:13px;min-width:150px}
+
+  /* commentary */
+  .commentary-panel{padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:10px}
+  .commentator-block{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+  .commentary-toolbar{display:flex;gap:8px;margin-top:6px}
+
+  /* Bracket Panel layout (horizontal tournament tree) */
+  .bracket-panel{padding:16px;background:var(--panel);border:1px solid var(--border);border-radius:10px}
+  .inner-tabs{display:flex;gap:10px;margin-bottom:14px}
+  .inner-tabs button{background:none;border:1px solid var(--border);padding:8px 10px;border-radius:8px;cursor:pointer}
+  .inner-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+  /* bracket tree grid */
+  .bracket-tree{display:flex;gap:28px;align-items:center;overflow:auto;padding:18px 8px}
+  .round{display:flex;flex-direction:column;gap:18px;min-width:220px}
+  .round .round-title{text-align:center;font-weight:800;color:var(--muted);margin-bottom:6px}
+  
+  .match{width: 240px;display: table; background:#f8fbff;border:1px solid var(--border);border-radius:8px;padding:8px 10px;position:relative;box-shadow:0 4px 10px rgba(0,0,0,0.03)}
+  .match .player-line{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px;border-radius:6px}
+  .match .player-line.name{font-weight:700}
+  .match .player-line .score{min-width:44px;text-align:center;border-radius:6px;padding:6px;border:1px solid #e6eefb;background:#fff}
+  .match .player-line.win{background:var(--win)}
+ 
+  .match .controls{display:flex;gap:8px;margin-top:8px;justify-content:flex-end}
+
+  /* connectors: small horizontal line to next round */
+  .round:not(:last-child) .match::after{
+    content:"";
+    position:absolute;
+    right:-24px;
+    top:50%;
+    transform:translateY(-50%);
+    width:20px;height:2px;background:var(--border);
+    border-radius:2px;
   }
 
-  h1 {
-    margin-top: 0;
-    font-size: 1.6em;
-    color: var(--accent);
+  /* vertical connector in middle between rounds */
+  .connector-vertical{
+    width:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+  }
+  .connector-vertical::before{
+    content:"";
+    width:2px;height:100%;background:linear-gradient(to bottom,var(--border),transparent);
+    opacity:.6;border-radius:2px;
   }
 
-  /* Tabs */
-  .tab {
-    display: flex;
-    gap: 10px;
-    border-bottom: 2px solid var(--border);
-    margin-bottom: 20px;
-  }
-  .tab button {
-    background: none;
-    border: none;
-    padding: 10px 16px;
-    cursor: pointer;
-    font-weight: bold;
-    color: var(--text);
-    border-radius: 6px 6px 0 0;
-    transition: background 0.2s, color 0.2s;
-  }
-  .tab button.active {
-    background: var(--accent);
-    color: #fff;
-  }
-  .tabcontent { display: none; }
-  .tabcontent.active { display: block; }
+      .bracket {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+    }
 
-  .toolbar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
+    .round {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      gap: 40px;
+      position: relative;
+    }
 
-  button {
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 14px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.2s;
-  }
-  button:hover { background: #005fd4; }
+    .match {
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 6px 10px;
+      width: 160px;
+      font-size: 12px;
+    }
 
-  .settings {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
+    .player-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 3px 0;
+    }
 
-  .settings label {
-    display: flex;
-    flex-direction: column;
-    font-size: 0.9em;
-    font-weight: bold;
-  }
+    .player-line input {
+      width: 26px;
+      font-size: 12px;
+      text-align: center;
+      background: #000;
+      color: #fff;
+      border: 1px solid #555;
+      border-radius: 3px;
+      padding: 1px;
+    }
 
-  select, input[type="text"], input[type="number"] {
-    margin-top: 4px;
-    padding: 6px;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    min-width: 160px;
-  }
+    .connector {
+      position: absolute;
+      border-left: 2px solid #666;
+      border-top: 2px solid #666;
+      width: 20px;
+      height: 40px;
+      left: -20px;
+    }
 
-  .player-block {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 15px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    .round.semifinal .connector {
+      height: 80px;
+    }
+
+    .round.final .connector {
+      height: 160px;
+    }
+
+  /* responsive */
+  @media (max-width:900px){
+    .bracket-tree{gap:18px}
+    .round{min-width:180px}
   }
 
-  .player-block label {
-    flex: 1;
-    min-width: 120px;
-    display: flex;
-    flex-direction: column;
-    font-size: 0.85em;
-    font-weight: bold;
-  }
+  /* small helper */
+  .small{font-size:12px;color:var(--muted);margin-top:8px}
+  hr{border:0;border-top:1px dashed #eee;margin:14px 0}
 
-  .checkbox-label {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: bold;
-  }
-
-  /* Commentary specific */
-  .commentary-panel {
-    padding: 16px;
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-  }
-  .commentator-block {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-  }
-  .commentator-block label {
-    display: flex;
-    flex-direction: column;
-    font-size: 0.9em;
-    font-weight: bold;
-    min-width: 220px;
-  }
-  .commentary-toolbar { margin-top: 8px; display:flex; gap:8px; }
+/* === ADDED: make bracket text white === */
+.bracket-tree .match,
+.bracket-tree .player-line span,
+.bracket-tree .player-line input {
+  color: #fff;
+}
 </style>
 </head>
 <body>
-  <h1>Fighting Game Control Panel</h1>
+  <div class="container">
+    <h1>Fighting Game Control Panel</h1>
 
-  <!-- TAB HEADERS -->
-  <div class="tab">
-    <button class="tablinks active" onclick="openTab(event, 'scoreboard')">🏆 Scoreboard</button>
-    <button class="tablinks" onclick="openTab(event, 'commentary')">🎙 Commentary</button>
-  </div>
-
-  <!-- SCOREBOARD TAB -->
-  <div id="scoreboard" class="tabcontent active">
-    <div class="toolbar">
-      <button onclick="updateScoreboard()">💾 Save Scoreboard</button>
-      <button onclick="resetScoreboard()">🔄 Reset Scoreboard</button>
+    <div class="tab">
+      <button class="tablinks active" onclick="openTab(event,'scoreboard')">🏆 Scoreboard</button>
+      <button class="tablinks" onclick="openTab(event,'commentary')">🎙 Commentary</button>
+      <button class="tablinks" onclick="openTab(event,'brackets')">🔀 Brackets</button>
     </div>
 
-    <div class="settings">
-      <label>Game:
-        <select id="game" onchange="toggleGameMode()">
-          <option value="sf">Street Fighter</option>
-          <option value="dbfz">Dragon Ball FighterZ</option>
-          <option value="tekken">Tekken</option>
-          <option value="2xko">2XKO</option>
-        </select>
-      </label>
+    <!-- SCOREBOARD -->
+    <div id="scoreboard" class="tabcontent active">
+      <div class="toolbar">
+        <button class="btn" onclick="updateScoreboard()">💾 Save Scoreboard</button>
+        <button class="btn" onclick="resetScoreboard()">🔄 Reset Scoreboard</button>
+      </div>
 
-      <label>Style:
-        <select id="style">
-          <option value="minimalist">Minimalist</option>
-          <option value="arcade">Arcade</option>
-          <option value="futuristic">Futuristic</option>
-        </select>
-      </label>
+      <div class="settings">
+        <label>Game
+          <select id="game" onchange="toggleGameMode()">
+            <option value="sf">Street Fighter</option>
+            <option value="dbfz">Dragon Ball FighterZ</option>
+            <option value="tekken">Tekken</option>
+            <option value="2xko">2XKO</option>
+          </select>
+        </label>
 
-      <label>Titlecard:
-        <input id="titlecard" type="text" placeholder="Top 8 / Grand Finals / etc.">
-      </label>
-    </div>
+        <label>Style
+          <select id="style">
+            <option value="minimalist">Minimalist</option>
+            <option value="arcade">Arcade</option>
+            <option value="futuristic">Futuristic</option>
+          </select>
+        </label>
 
-    <!-- Player 1 -->
+        <label>Titlecard
+          <input id="titlecard" type="text" placeholder="Top 8 / Grand Finals / etc.">
+        </label>
+      </div>
+
+ <!-- Player 1 -->
     <div class="player-block">
       <label>Name: <input id="p1" type="text" placeholder="Player 1"></label>
       <label>Team: <input id="t1" type="text" placeholder="Team 1"></label>
@@ -260,46 +279,166 @@
     </div>
   </div> <!-- end scoreboard tab -->
 
-  <!-- COMMENTARY TAB -->
-  <div id="commentary" class="tabcontent">
-    <div class="commentary-panel">
-      <h2>Commentary Lower Third</h2>
+    <!-- COMMENTARY -->
+    <div id="commentary" class="tabcontent">
+      <div class="commentary-panel">
+        <h2 style="margin-top:0">Commentary Lower Third</h2>
+        <div class="commentator-block">
+          <label>Commentator 1 - Name<input id="com1_name" type="text" placeholder="Commentator 1"></label>
+          <label>Commentator 1 - Description<input id="com1_desc" type="text" placeholder="FGC Expert"></label>
+        </div>
 
-      <div class="commentator-block">
-        <label>Commentator 1 - Name
-          <input id="com1_name" type="text" placeholder="Commentator 1">
-        </label>
-        <label>Commentator 1 - Description
-          <input id="com1_desc" type="text" placeholder="FGC Expert, EVO Winner, etc.">
-        </label>
-      </div>
+        <div class="commentator-block">
+          <label>Commentator 2 - Name<input id="com2_name" type="text" placeholder="Commentator 2"></label>
+          <label>Commentator 2 - Description<input id="com2_desc" type="text" placeholder="Studio Host"></label>
+        </div>
 
-      <div class="commentator-block">
-        <label>Commentator 2 - Name
-          <input id="com2_name" type="text" placeholder="Commentator 2">
-        </label>
-        <label>Commentator 2 - Description
-          <input id="com2_desc" type="text" placeholder="FGC Expert, Studio Host, etc.">
-        </label>
-      </div>
-
-      <div class="commentary-toolbar">
-        <button onclick="updateCommentary()">💾 Save Commentary</button>
-        <button onclick="resetCommentary()">🔄 Reset Commentary</button>
-        <button onclick="toggleCommentary(true)">▶ Show</button>
-        <button onclick="toggleCommentary(false)">⏹ Hide</button>
+        <div class="commentary-toolbar">
+          <button class="btn" onclick="updateCommentary()">💾 Save Commentary</button>
+          <button class="btn" onclick="resetCommentary()">🔄 Reset Commentary</button>
+          <button class="btn" onclick="toggleCommentary(true)">▶ Show</button>
+          <button class="btn" onclick="toggleCommentary(false)">⏹ Hide</button>
+        </div>
       </div>
     </div>
-  </div> <!-- end commentary tab -->
+
+    <!-- BRACKETS -->
+    <div id="brackets" class="tabcontent">
+      <div class="bracket-panel">
+        <h2 style="margin-top:0">Brackets — Single Elimination (Top 8)</h2>
+
+        <div class="inner-tabs" style="margin-bottom:14px">
+          <button id="singleTabBtn" class="active" onclick="openInnerTab('single')">Single Elimination</button>
+          <button id="doubleTabBtn" onclick="openInnerTab('double')">Double Elimination</button>
+        </div>
+
+        <!-- Single elimination UI (visual tree) -->
+        <div id="single" class="inner-tabcontent" style="display:block">
+          <p class="small">Seed Top 8 below. After seeding, enter scores on each match and press <strong>Set</strong> — winners auto-advance to next round.</p>
+
+          <div style="display:flex;gap:12px;align-items:flex-start;margin-top:10px;margin-bottom:12px;flex-wrap:wrap">
+            <div style="flex:1;min-width:260px">
+              <div class="bracket-top8" style="display:grid;grid-template-columns:1fr 1fr;gap:8px 12px">
+                <label>Seed 1: <input id="sp1" type="text"></label>
+                <label>Seed 2: <input id="sp2" type="text"></label>
+                <label>Seed 3: <input id="sp3" type="text"></label>
+                <label>Seed 4: <input id="sp4" type="text"></label>
+                <label>Seed 5: <input id="sp5" type="text"></label>
+                <label>Seed 6: <input id="sp6" type="text"></label>
+                <label>Seed 7: <input id="sp7" type="text"></label>
+                <label>Seed 8: <input id="sp8" type="text"></label>
+              </div>
+              <div style="margin-top:8px;display:flex;gap:8px">
+                <button class="btn" onclick="saveSinglePlayers()">💾 Save Top 8</button>
+                <button class="btn" onclick="resetSingle()">🔄 Reset Top 8</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- visual bracket tree -->
+          <div class="bracket-tree" id="visualBracket" aria-label="Bracket tree">
+
+    <!-- Quarterfinals -->
+    <div class="round quarterfinal">
+      <div class="match" id="qf1">
+        <div class="player-line"><span id="qf1p1">Player 1</span><input type="number" id="qf1s1"></div>
+        <div class="player-line"><span id="qf1p2">Player 2</span><input type="number" id="qf1s2"></div>
+      </div>
+      <div class="match" id="qf2">
+        <div class="player-line"><span id="qf2p1">Player 3</span><input type="number" id="qf2s1"></div>
+        <div class="player-line"><span id="qf2p2">Player 4</span><input type="number" id="qf2s2"></div>
+      </div>
+      <div class="match" id="qf3">
+        <div class="player-line"><span id="qf3p1">Player 5</span><input type="number" id="qf3s1"></div>
+        <div class="player-line"><span id="qf3p2">Player 6</span><input type="number" id="qf3s2"></div>
+      </div>
+      <div class="match" id="qf4">
+        <div class="player-line"><span id="qf4p1">Player 7</span><input type="number" id="qf4s1"></div>
+        <div class="player-line"><span id="qf4p2">Player 8</span><input type="number" id="qf4s2"></div>
+      </div>
+    </div>
+
+    <!-- Semifinals -->
+    <div class="round semifinal">
+      <div class="connector" style="top: 50px;"></div>
+      <div class="match" id="sf1">
+        <div class="player-line"><span id="sf1p1">Winner QF1</span><input type="number" id="sf1s1"></div>
+        <div class="player-line"><span id="sf1p2">Winner QF2</span><input type="number" id="sf1s2"></div>
+      </div>
+      <div class="connector" style="top: 210px;"></div>
+      <div class="match" id="sf2">
+        <div class="player-line"><span id="sf2p1">Winner QF3</span><input type="number" id="sf2s1"></div>
+        <div class="player-line"><span id="sf2p2">Winner QF4</span><input type="number" id="sf2s2"></div>
+      </div>
+    </div>
+
+    <!-- Final -->
+    <div class="round final">
+      <div class="connector" style="top: 130px;"></div>
+      <div class="match" id="f1">
+        <div class="player-line"><span id="f1p1">Winner SF1</span><input type="number" id="f1s1"></div>
+        <div class="player-line"><span id="f1p2">Winner SF2</span><input type="number" id="f1s2"></div>
+      </div>
+    </div>
+  </div>
+
+          </div>
+        </div>
+
+        <!-- Double elimination placeholder (keeps same storage) -->
+        <div id="double" class="inner-tabcontent" style="display:none">
+          <p class="small">Double-elimination UI — seed players below. Advanced auto-placement for losers can be added later.</p>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:720px">
+            <label>Seed 1: <input id="dp1" type="text"></label>
+            <label>Seed 8: <input id="dp8" type="text"></label>
+            <label>Seed 4: <input id="dp4" type="text"></label>
+            <label>Seed 5: <input id="dp5" type="text"></label>
+            <label>Seed 3: <input id="dp3" type="text"></label>
+            <label>Seed 6: <input id="dp6" type="text"></label>
+            <label>Seed 2: <input id="dp2" type="text"></label>
+            <label>Seed 7: <input id="dp7" type="text"></label>
+          </div>
+
+          <div style="margin-top:10px">
+            <button class="btn" onclick="saveDoublePlayers()">💾 Save Double Players</button>
+            <button class="btn" onclick="resetDouble()">🔄 Reset Double</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
 <script>
-function toggleGameMode() {
-  const game = document.getElementById("game").value;
-  document.getElementById("p3block").style.display = (game === "2xko") ? "flex" : "none";
-  document.getElementById("p4block").style.display = (game === "2xko") ? "flex" : "none";
+/* ---------------------
+   Utility + tabs
+   --------------------- */
+function openTab(evt, tabName){
+  document.querySelectorAll(".tabcontent").forEach(el=>el.classList.remove("active"));
+  document.querySelectorAll(".tablinks").forEach(el=>el.classList.remove("active"));
+  document.getElementById(tabName).classList.add("active");
+  evt.currentTarget.classList.add("active");
 }
 
-async function updateScoreboard() {
+function openInnerTab(name){
+  document.querySelectorAll(".inner-tabcontent").forEach(el=>el.style.display="none");
+  document.querySelectorAll(".inner-tabs button").forEach(b=>b.classList.remove("active"));
+  document.getElementById(name).style.display="block";
+  document.getElementById(name + "TabBtn") && document.getElementById(name + "TabBtn").classList.add("active");
+}
+
+/* ---------------------
+   Scoreboard logic (unchanged)
+   --------------------- */
+function toggleGameMode(){
+  const game = document.getElementById("game").value;
+  const p3 = document.getElementById("p3block");
+  const p4 = document.getElementById("p4block");
+  if(p3) p3.style.display = (game==="2xko")?"flex":"none";
+  if(p4) p4.style.display = (game==="2xko")?"flex":"none";
+}
+
+async function updateScoreboard(){
   const data = {
     game: document.getElementById("game").value,
     style: document.getElementById("style").value,
@@ -307,89 +446,407 @@ async function updateScoreboard() {
     player1: document.getElementById("p1").value,
     team1: document.getElementById("t1").value,
     controller1: document.getElementById("c1").value,
-    score1: parseInt(document.getElementById("s1").value, 10),
+    score1: parseInt(document.getElementById("s1").value||0,10),
     player2: document.getElementById("p2").value,
     team2: document.getElementById("t2").value,
     controller2: document.getElementById("c2").value,
-    score2: parseInt(document.getElementById("s2").value, 10),
-    player3: document.getElementById("p3")?.value || "",
-    team3: document.getElementById("t3")?.value || "",
-    controller3: document.getElementById("c3")?.value || "",
-    score3: parseInt(document.getElementById("s3")?.value || 0, 10),
-    visible3: document.getElementById("v3")?.checked ?? false,
-    player4: document.getElementById("p4")?.value || "",
-    team4: document.getElementById("t4")?.value || "",
-    controller4: document.getElementById("c4")?.value || "",
-    score4: parseInt(document.getElementById("s4")?.value || 0, 10),
-    visible4: document.getElementById("v4")?.checked ?? false
+    score2: parseInt(document.getElementById("s2").value||0,10),
+    player3: document.getElementById("p3")?.value||"",
+    team3: document.getElementById("t3")?.value||"",
+    controller3: document.getElementById("c3")?.value||"",
+    score3: parseInt(document.getElementById("s3")?.value||0,10),
+    visible3: document.getElementById("v3")?.checked??false,
+    player4: document.getElementById("p4")?.value||"",
+    team4: document.getElementById("t4")?.value||"",
+    controller4: document.getElementById("c4")?.value||"",
+    score4: parseInt(document.getElementById("s4")?.value||0,10),
+    visible4: document.getElementById("v4")?.checked??false
   };
-
-  try {
+  try{
     await window.go.main.App.SaveScoreboardJSON(data);
-  } catch (err) {
-    console.error("SaveScoreboardJSON failed:", err);
+  }catch(err){
+    console.error("SaveScoreboardJSON failed:",err);
     alert("Error saving scoreboard JSON (see console).");
   }
 }
 
-function resetScoreboard() {
-  document.querySelectorAll("input[type=text], input[type=number]").forEach(el => el.value = "");
-  document.getElementById("v3").checked = false;
-  document.getElementById("v4").checked = false;
+function resetScoreboard(){
+  // limit reset to scoreboard form inputs only (avoid wiping bracket seeds by accident)
+  const selectors = ['#p1','#t1','#s1','#c1','#p2','#t2','#s2','#c2','#p3','#t3','#s3','#c3','#p4','#t4','#s4','#c4','#titlecard'];
+  selectors.forEach(sel=>{ const el = document.querySelector(sel); if(el) el.value = (el.type==='number')?0:''; });
+  const v3 = document.getElementById("v3"), v4 = document.getElementById("v4");
+  if(v3) v3.checked=false; if(v4) v4.checked=false;
   updateScoreboard();
 }
 
-let commentaryVisible = false; // keep in-memory state
+/* ---------------------
+   Commentary logic (unchanged behavior)
+   --------------------- */
+let commentaryVisible = false;
 
-async function updateCommentary() {
+async function updateCommentary(){
   const data = {
-    commentator1: document.getElementById("com1_name").value || "",
-    description1: document.getElementById("com1_desc").value || "",
-    commentator2: document.getElementById("com2_name").value || "",
-    description2: document.getElementById("com2_desc").value || "",
-    visible: commentaryVisible   // always reuse in-memory state
+    commentator1: document.getElementById("com1_name").value||"",
+    description1: document.getElementById("com1_desc").value||"",
+    commentator2: document.getElementById("com2_name").value||"",
+    description2: document.getElementById("com2_desc").value||"",
+    visible: commentaryVisible
   };
-  try {
+  try{
     await window.go.main.App.SaveCommentaryJSON(data);
-  } catch (err) {
-    console.error("SaveCommentaryJSON failed:", err);
+  }catch(err){
+    console.error("SaveCommentaryJSON failed:",err);
     alert("Error saving commentary JSON (see console).");
   }
 }
 
-function resetCommentary() {
-  document.getElementById("com1_name").value = "";
-  document.getElementById("com1_desc").value = "";
-  document.getElementById("com2_name").value = "";
-  document.getElementById("com2_desc").value = "";
+function resetCommentary(){
+  document.getElementById("com1_name").value="";
+  document.getElementById("com1_desc").value="";
+  document.getElementById("com2_name").value="";
+  document.getElementById("com2_desc").value="";
   updateCommentary();
 }
 
-async function toggleCommentary(show) {
-  commentaryVisible = show; // update memory state
-
+async function toggleCommentary(show){
+  commentaryVisible = show;
   const data = {
-    commentator1: document.getElementById("com1_name").value || "",
-    description1: document.getElementById("com1_desc").value || "",
-    commentator2: document.getElementById("com2_name").value || "",
-    description2: document.getElementById("com2_desc").value || "",
+    commentator1: document.getElementById("com1_name").value||"",
+    description1: document.getElementById("com1_desc").value||"",
+    commentator2: document.getElementById("com2_name").value||"",
+    description2: document.getElementById("com2_desc").value||"",
     visible: show
   };
-
-  try {
+  try{
     await window.go.main.App.SaveCommentaryJSON(data);
-  } catch (err) {
-    console.error("SaveCommentaryJSON failed:", err);
+  }catch(err){
+    console.error("SaveCommentaryJSON failed:",err);
     alert("Error saving commentary JSON (see console).");
   }
 }
 
-function openTab(evt, tabName) {
-  document.querySelectorAll(".tabcontent").forEach(el => el.classList.remove("active"));
-  document.querySelectorAll(".tablinks").forEach(el => el.classList.remove("active"));
-  document.getElementById(tabName).classList.add("active");
-  evt.currentTarget.classList.add("active");
+/* ---------------------
+   Bracket data & functions (keeps previous IDs/logic)
+   --------------------- */
+
+let bracketData = null;
+
+function ensureBracket(){
+  if(!bracketData){
+    bracketData = { single: { players: Array(8).fill(""), scores: {}, winners: {} }, double: { players: Array(8).fill(""), scores: {}, winners:{}, meta:{} } };
+  }
 }
+
+async function loadBracket(){
+  ensureBracket();
+  try{
+    const resp = await fetch("bracket.json?_=" + Date.now());
+    if(!resp.ok) throw new Error("no bracket.json");
+    const data = await resp.json();
+    bracketData = data;
+  }catch(err){
+    console.warn("No bracket.json found – using blank bracket");
+  }
+  renderSingleFromData();
+  renderDoubleFromData();
+}
+
+function renderSingleFromData(){
+  ensureBracket();
+  const s = bracketData.single || { players: Array(8).fill(""), scores:{}, winners:{} };
+
+  // seed inputs sp1..sp8 (we assume order [1..8])
+  (s.players || Array(8).fill("")).forEach((p,i)=>{
+    const el = document.getElementById("sp"+(i+1));
+    if(el) el.value = p||"";
+  });
+
+  // map seeds into QF pairs (consistent with saveSinglePlayers):
+  const players = s.players || Array(8).fill("");
+  const qfPairs = {
+    qf1: [players[0]||"", players[7]||""], // 1 vs 8
+    qf2: [players[3]||"", players[4]||""], // 4 vs 5
+    qf3: [players[2]||"", players[5]||""], // 3 vs 6
+    qf4: [players[1]||"", players[6]||""]  // 2 vs 7
+  };
+
+  // fill QF names and scores using the actual IDs in the DOM (qf1p1, qf1s1 etc.)
+  Object.keys(qfPairs).forEach(k=>{
+    const aName = qfPairs[k][0]||"—";
+    const bName = qfPairs[k][1]||"—";
+    const aSpan = document.getElementById(k + "p1");
+    const bSpan = document.getElementById(k + "p2");
+    if(aSpan) aSpan.textContent = aName;
+    if(bSpan) bSpan.textContent = bName;
+
+    const sc = (s.scores && s.scores[k]) ? s.scores[k] : [null,null];
+    const aScoreEl = document.getElementById(k + "s1");
+    const bScoreEl = document.getElementById(k + "s2");
+    if(aScoreEl) aScoreEl.value = sc[0] != null ? sc[0] : "";
+    if(bScoreEl) bScoreEl.value = sc[1] != null ? sc[1] : "";
+  });
+
+  // semis winners mapping (if winners saved) or blank placeholders
+  const sf1a = (s.winners && s.winners['qf1']) ? s.winners['qf1'] : "Winner QF1";
+  const sf1b = (s.winners && s.winners['qf2']) ? s.winners['qf2'] : "Winner QF2";
+  const sf2a = (s.winners && s.winners['qf3']) ? s.winners['qf3'] : "Winner QF3";
+  const sf2b = (s.winners && s.winners['qf4']) ? s.winners['qf4'] : "Winner QF4";
+
+  const sf1p1 = document.getElementById("sf1p1"); if(sf1p1) sf1p1.textContent = sf1a;
+  const sf1p2 = document.getElementById("sf1p2"); if(sf1p2) sf1p2.textContent = sf1b;
+  const sf2p1 = document.getElementById("sf2p1"); if(sf2p1) sf2p1.textContent = sf2a;
+  const sf2p2 = document.getElementById("sf2p2"); if(sf2p2) sf2p2.textContent = sf2b;
+
+  if(s.scores && s.scores['sf1']){ const el1 = document.getElementById('sf1s1'); const el2 = document.getElementById('sf1s2'); if(el1) el1.value = s.scores['sf1'][0]; if(el2) el2.value = s.scores['sf1'][1]; }
+  if(s.scores && s.scores['sf2']){ const el1 = document.getElementById('sf2s1'); const el2 = document.getElementById('sf2s2'); if(el1) el1.value = s.scores['sf2'][0]; if(el2) el2.value = s.scores['sf2'][1]; }
+
+  // final
+  const fA = (s.winners && s.winners['sf1']) ? s.winners['sf1'] : "Winner SF1";
+  const fB = (s.winners && s.winners['sf2']) ? s.winners['sf2'] : "Winner SF2";
+  const f1p1 = document.getElementById("f1p1"); if(f1p1) f1p1.textContent = fA;
+  const f1p2 = document.getElementById("f1p2"); if(f1p2) f1p2.textContent = fB;
+  if(s.scores && s.scores['f1']){ const el1 = document.getElementById('f1s1'); const el2 = document.getElementById('f1s2'); if(el1) el1.value = s.scores['f1'][0]; if(el2) el2.value = s.scores['f1'][1]; }
+
+  // visually highlight winners if desired
+  highlightWinners(s);
+}
+
+function highlightWinners(s){
+  // soft visual: apply .win to the player-line that matches saved winners
+  ['qf1','qf2','qf3','qf4','sf1','sf2','f1'].forEach(mid=>{
+    const winner = s.winners && s.winners[mid] ? s.winners[mid] : null;
+    // containers may be the first or second .player-line inside the match
+    const matchEl = document.getElementById(mid);
+    if(!matchEl) return;
+    const lines = matchEl.querySelectorAll('.player-line');
+    lines.forEach(l=>{ l.classList.remove('win','lose'); });
+    if(winner){
+      lines.forEach(l=>{
+        const nameSpan = l.querySelector('span');
+        if(nameSpan && nameSpan.textContent.trim() === winner){ l.classList.add('win'); }
+      });
+      // mark others as lose
+      lines.forEach(l=>{ if(!l.classList.contains('win')) l.classList.add('lose'); });
+    }
+  });
+}
+
+// store top 8
+async function saveSinglePlayers(){
+  ensureBracket();
+  const arr = [
+    document.getElementById("sp1").value || "",
+    document.getElementById("sp2").value || "",
+    document.getElementById("sp3").value || "",
+    document.getElementById("sp4").value || "",
+    document.getElementById("sp5").value || "",
+    document.getElementById("sp6").value || "",
+    document.getElementById("sp7").value || "",
+    document.getElementById("sp8").value || ""
+  ];
+  bracketData.single.players = arr;
+  bracketData.single.scores = {};
+  bracketData.single.winners = {};
+  await saveBracket();
+  renderSingleFromData();
+
+  // ALSO populate the visual bracket (qf / sf / final) so updateBracket() can operate
+  // seeding: seed1 -> top-left, seed8 -> top-right, seed4 vs seed5, seed3 vs seed6, seed2 vs seed7
+  try{
+    // Quarterfinals
+    document.getElementById("qf1p1").textContent = arr[0] || "—"; // seed1
+    document.getElementById("qf1p2").textContent = arr[7] || "—"; // seed8
+
+    document.getElementById("qf2p1").textContent = arr[3] || "—"; // seed4
+    document.getElementById("qf2p2").textContent = arr[4] || "—"; // seed5
+
+    document.getElementById("qf3p1").textContent = arr[2] || "—"; // seed3
+    document.getElementById("qf3p2").textContent = arr[5] || "—"; // seed6
+
+    document.getElementById("qf4p1").textContent = arr[1] || "—"; // seed2
+    document.getElementById("qf4p2").textContent = arr[6] || "—"; // seed7
+
+    // clear scores and downstream slots
+    ["qf1s1","qf1s2","qf2s1","qf2s2","qf3s1","qf3s2","qf4s1","qf4s2","sf1s1","sf1s2","sf2s1","sf2s2","f1s1","f1s2"].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.value = "";
+    });
+    document.getElementById("sf1p1").textContent = "Winner QF1";
+    document.getElementById("sf1p2").textContent = "Winner QF2";
+    document.getElementById("sf2p1").textContent = "Winner QF3";
+    document.getElementById("sf2p2").textContent = "Winner QF4";
+    document.getElementById("f1p1").textContent = "Winner SF1";
+    document.getElementById("f1p2").textContent = "Winner SF2";
+  }catch(e){
+    // if visual elements missing, ignore
+    console.warn("Could not populate visual bracket:", e);
+  }
+
+  // ensure bracket progression recalculates
+  updateBracket();
+}
+
+async function saveBracket(){
+  ensureBracket();
+  try{
+    await window.go.main.App.SaveBracketJSON(bracketData);
+    console.log("bracket saved");
+  }catch(err){
+    console.error("SaveBracketJSON failed:",err);
+    alert("Error saving bracket (see console).");
+  }
+}
+
+function resetBracket(){
+  bracketData = { single: { players: Array(8).fill(""), scores:{}, winners:{} }, double: { players: Array(8).fill(""), scores:{}, winners:{}, meta:{} } };
+  saveBracket();
+  renderSingleFromData();
+}
+
+function updateBracket() {
+      ensureBracket();
+      const getVal = id => {
+        const raw = document.getElementById(id)?.value;
+        return (raw === undefined || raw === null || raw === '') ? null : Number(raw);
+      };
+
+      const qf1a = getVal('qf1s1');
+      const qf1b = getVal('qf1s2');
+      const qf2a = getVal('qf2s1');
+      const qf2b = getVal('qf2s2');
+      const qf3a = getVal('qf3s1');
+      const qf3b = getVal('qf3s2');
+      const qf4a = getVal('qf4s1');
+      const qf4b = getVal('qf4s2');
+
+      // update scores in memory
+      bracketData.single.scores = bracketData.single.scores || {};
+      bracketData.single.scores['qf1'] = [qf1a, qf1b];
+      bracketData.single.scores['qf2'] = [qf2a, qf2b];
+      bracketData.single.scores['qf3'] = [qf3a, qf3b];
+      bracketData.single.scores['qf4'] = [qf4a, qf4b];
+
+      // advance from QF -> SF
+      if(qf1a !== null && qf1b !== null && qf1a !== qf1b){
+        const winner = (qf1a > qf1b) ? document.getElementById("qf1p1").textContent : document.getElementById("qf1p2").textContent;
+        document.getElementById("sf1p1").textContent = winner;
+        bracketData.single.winners['qf1'] = winner;
+      } else {
+        document.getElementById("sf1p1").textContent = "Winner QF1";
+        delete bracketData.single.winners['qf1'];
+      }
+
+      if(qf2a !== null && qf2b !== null && qf2a !== qf2b){
+        const winner = (qf2a > qf2b) ? document.getElementById("qf2p1").textContent : document.getElementById("qf2p2").textContent;
+        document.getElementById("sf1p2").textContent = winner;
+        bracketData.single.winners['qf2'] = winner;
+      } else {
+        document.getElementById("sf1p2").textContent = "Winner QF2";
+        delete bracketData.single.winners['qf2'];
+      }
+
+      if(qf3a !== null && qf3b !== null && qf3a !== qf3b){
+        const winner = (qf3a > qf3b) ? document.getElementById("qf3p1").textContent : document.getElementById("qf3p2").textContent;
+        document.getElementById("sf2p1").textContent = winner;
+        bracketData.single.winners['qf3'] = winner;
+      } else {
+        document.getElementById("sf2p1").textContent = "Winner QF3";
+        delete bracketData.single.winners['qf3'];
+      }
+
+      if(qf4a !== null && qf4b !== null && qf4a !== qf4b){
+        const winner = (qf4a > qf4b) ? document.getElementById("qf4p1").textContent : document.getElementById("qf4p2").textContent;
+        document.getElementById("sf2p2").textContent = winner;
+        bracketData.single.winners['qf4'] = winner;
+      } else {
+        document.getElementById("sf2p2").textContent = "Winner QF4";
+        delete bracketData.single.winners['qf4'];
+      }
+
+      // SF -> Final
+      const sf1a = getVal('sf1s1');
+      const sf1b = getVal('sf1s2');
+      const sf2a = getVal('sf2s1');
+      const sf2b = getVal('sf2s2');
+
+      bracketData.single.scores['sf1'] = [sf1a, sf1b];
+      bracketData.single.scores['sf2'] = [sf2a, sf2b];
+
+      if(sf1a !== null && sf1b !== null && sf1a !== sf1b){
+        const winner = (sf1a > sf1b) ? document.getElementById("sf1p1").textContent : document.getElementById("sf1p2").textContent;
+        document.getElementById("f1p1").textContent = winner;
+        bracketData.single.winners['sf1'] = winner;
+      } else {
+        document.getElementById("f1p1").textContent = "Winner SF1";
+        delete bracketData.single.winners['sf1'];
+      }
+
+      if(sf2a !== null && sf2b !== null && sf2a !== sf2b){
+        const winner = (sf2a > sf2b) ? document.getElementById("sf2p1").textContent : document.getElementById("sf2p2").textContent;
+        document.getElementById("f1p2").textContent = winner;
+        bracketData.single.winners['sf2'] = winner;
+      } else {
+        document.getElementById("f1p2").textContent = "Winner SF2";
+        delete bracketData.single.winners['sf2'];
+      }
+
+      // final scores
+      const f1a = getVal('f1s1');
+      const f1b = getVal('f1s2');
+      bracketData.single.scores['f1'] = [f1a, f1b];
+
+      // update highlight
+      highlightWinners(bracketData.single);
+}
+
+// only attach update listeners to bracket inputs (not every input on the page)
+function attachBracketListeners(){
+  const inputs = document.querySelectorAll('#visualBracket input[type=number]');
+  inputs.forEach(input => {
+    input.removeEventListener('input', updateBracket);
+    input.addEventListener('input', updateBracket);
+  });
+}
+
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      attachBracketListeners();
+    });
+
+/* ---------------------
+   Double bracket (simple store)
+   --------------------- */
+function renderDoubleFromData(){
+  ensureBracket();
+  const d = bracketData.double || { players: Array(8).fill("") };
+  for(let i=1;i<=8;i++){
+    const el = document.getElementById("dp"+i);
+    if(el) el.value = (d.players && d.players[i-1]) ? d.players[i-1] : "";
+  }
+}
+
+async function saveDoublePlayers(){
+  ensureBracket();
+  const arr = [];
+  for(let i=1;i<=8;i++) arr.push(document.getElementById("dp"+i).value || "");
+  bracketData.double.players = arr;
+  await saveBracket();
+  renderDoubleFromData();
+}
+
+function resetDouble(){
+  for(let i=1;i<=8;i++){ const el = document.getElementById("dp"+i); if(el) el.value=""; }
+  bracketData.double.players = Array(8).fill("");
+  bracketData.double.scores = {};
+  bracketData.double.winners = {};
+  saveBracket();
+}
+
+/* ---------------------
+   Initialization
+   --------------------- */
+ensureBracket();
+loadBracket();
 </script>
 </body>
 </html>

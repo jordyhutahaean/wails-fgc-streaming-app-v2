@@ -1,5 +1,71 @@
 export namespace main {
 	
+	export class DoubleBracket {
+	    players: string[];
+	    scores: Record<string, Array<number>>;
+	    winners: Record<string, string>;
+	    meta: Record<string, string>;
+	
+	    static createFrom(source: any = {}) {
+	        return new DoubleBracket(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.players = source["players"];
+	        this.scores = source["scores"];
+	        this.winners = source["winners"];
+	        this.meta = source["meta"];
+	    }
+	}
+	export class SingleBracket {
+	    players: string[];
+	    scores: Record<string, Array<number>>;
+	    winners: Record<string, string>;
+	
+	    static createFrom(source: any = {}) {
+	        return new SingleBracket(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.players = source["players"];
+	        this.scores = source["scores"];
+	        this.winners = source["winners"];
+	    }
+	}
+	export class Bracket {
+	    single: SingleBracket;
+	    double: DoubleBracket;
+	
+	    static createFrom(source: any = {}) {
+	        return new Bracket(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.single = this.convertValues(source["single"], SingleBracket);
+	        this.double = this.convertValues(source["double"], DoubleBracket);
+	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice && a.map) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
+	}
 	export class Commentary {
 	    commentator1: string;
 	    description1: string;
@@ -20,6 +86,7 @@ export namespace main {
 	        this.visible = source["visible"];
 	    }
 	}
+	
 	export class Scoreboard {
 	    game: string;
 	    style: string;

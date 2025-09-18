@@ -1,0 +1,31 @@
+{
+  "single": {
+    "players": [
+      "aaa",
+      "",
+      "ccc",
+      "bbb",
+      "bbb",
+      "",
+      "",
+      "ddd"
+    ],
+    "scores": {},
+    "winners": {}
+  },
+  "double": {
+    "players": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "scores": {},
+    "winners": {},
+    "meta": {}
+  }
+}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Single Elimination Bracket</title>
+<style>
+  body { background: transparent; color: white; font-family: sans-serif; }
+  .match { margin: 10px; padding: 6px; border: 1px solid #aaa; border-radius: 4px; }
+  .round { font-weight: bold; }
+</style>
+</head>
+<body>
+  <div id="bracket"></div>
+<script>
+async function loadBracket() {
+  const res = await fetch("bracket.json?_=" + Date.now());
+  const data = await res.json();
+  if (data.type !== "single") return; // ignore if wrong type
+
+  const container = document.getElementById("bracket");
+  container.innerHTML = `<h2>${data.title} (Single Elimination)</h2>`;
+  data.matches.forEach(m => {
+    container.innerHTML += `
+      <div class="match">
+        <div class="round">${m.round}</div>
+        <div>${m.playerA} (${m.scoreA}) vs ${m.playerB} (${m.scoreB})</div>
+      </div>
+    `;
+  });
+}
+setInterval(loadBracket, 2000);
+loadBracket();
+</script>
+</body>
+</html>

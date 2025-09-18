@@ -5,9 +5,11 @@ import (
 	"os"
 )
 
+// App holds scoreboard, commentary and brackets
 type App struct {
 	scoreboard Scoreboard
 	commentary Commentary
+	bracket    Bracket
 }
 
 func NewApp() *App {
@@ -28,6 +30,7 @@ func NewApp() *App {
 			Description2: "",
 			Visible:      false,
 		},
+		bracket: NewEmptyBracket(),
 	}
 }
 
@@ -87,15 +90,60 @@ func (a *App) GetCommentary() Commentary {
 }
 
 func (a *App) SaveCommentaryJSON(data Commentary) error {
-	file, err := os.Create("commentary.json")
-	if err != nil {
-		return err
-	}
-	defer file.Close()
+	a.commentary = data
+	return saveJSON("commentary.json", data)
+}
 
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-	return encoder.Encode(data)
+// -------------------- BRACKETS --------------------
+
+// For persistence we store bracket JSON. Frontend performs progression logic for single-elim.
+type Bracket struct {
+	Single SingleBracket `json:"single"`
+	Double DoubleBracket `json:"double"`
+}
+
+type SingleBracket struct {
+	// Top 8 players (seeded order). Always length 8.
+	Players []string `json:"players"`
+	// Scores for matches (keyed)
+	// allowed keys: qf1,qf2,qf3,qf4, sf1,sf2, f1
+	Scores map[string][2]int `json:"scores"`
+	// Resolved winners (optional cache)
+	// Keys same as scores: qf1,qf2,..., f1
+	Winners map[string]string `json:"winners"`
+}
+
+type DoubleBracket struct {
+	// We'll store players and score buckets — frontend can implement complex flow later.
+	Players []string          `json:"players"` // length 8
+	Scores  map[string][2]int `json:"scores"`
+	Winners map[string]string `json:"winners"`
+	Meta    map[string]string `json:"meta"` // any helper data
+}
+
+func NewEmptyBracket() Bracket {
+	return Bracket{
+		Single: SingleBracket{
+			Players: make([]string, 8),
+			Scores:  make(map[string][2]int),
+			Winners: make(map[string]string),
+		},
+		Double: DoubleBracket{
+			Players: make([]string, 8),
+			Scores:  make(map[string][2]int),
+			Winners: make(map[string]string),
+			Meta:    make(map[string]string),
+		},
+	}
+}
+
+func (a *App) GetBracket() Bracket {
+	return a.bracket
+}
+
+func (a *App) SaveBracketJSON(data Bracket) error {
+	a.bracket = data
+	return saveJSON("bracket.json", data)
 }
 
 // -------------------- UTILITY --------------------
