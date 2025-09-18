@@ -23,11 +23,15 @@ func NewApp() *App {
 		},
 		commentary: Commentary{
 			Commentator1: "",
+			Description1: "",
 			Commentator2: "",
+			Description2: "",
 			Visible:      false,
 		},
 	}
 }
+
+// -------------------- SCOREBOARD --------------------
 
 type Scoreboard struct {
 	Game      string `json:"game"`
@@ -49,13 +53,26 @@ type Scoreboard struct {
 	Player3     string `json:"player3"`
 	Team3       string `json:"team3"`
 	Controller3 string `json:"controller3"`
+	Score3      int    `json:"score3"`
 	Visible3    bool   `json:"visible3"`
 
 	Player4     string `json:"player4"`
 	Team4       string `json:"team4"`
 	Controller4 string `json:"controller4"`
+	Score4      int    `json:"score4"`
 	Visible4    bool   `json:"visible4"`
 }
+
+func (a *App) GetScoreboard() Scoreboard {
+	return a.scoreboard
+}
+
+func (a *App) SaveScoreboardJSON(data Scoreboard) error {
+	a.scoreboard = data // keep in memory
+	return saveJSON("scoreboard.json", data)
+}
+
+// -------------------- COMMENTARY --------------------
 
 type Commentary struct {
 	Commentator1 string `json:"commentator1"`
@@ -65,24 +82,8 @@ type Commentary struct {
 	Visible      bool   `json:"visible"`
 }
 
-func (a *App) GetScoreboard() Scoreboard {
-	return a.scoreboard
-}
-
-func (a *App) UpdateScoreboard(data Scoreboard) {
-	a.scoreboard = data
-}
-
-func (a *App) SaveScoreboardJSON(data Scoreboard) error {
-	file, err := os.Create("scoreboard.json")
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
-	return encoder.Encode(data)
+func (a *App) GetCommentary() Commentary {
+	return a.commentary
 }
 
 func (a *App) SaveCommentaryJSON(data Commentary) error {
@@ -95,4 +96,18 @@ func (a *App) SaveCommentaryJSON(data Commentary) error {
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
 	return encoder.Encode(data)
+}
+
+// -------------------- UTILITY --------------------
+
+func saveJSON(filename string, v interface{}) error {
+	file, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	enc := json.NewEncoder(file)
+	enc.SetIndent("", "  ")
+	return enc.Encode(v)
 }

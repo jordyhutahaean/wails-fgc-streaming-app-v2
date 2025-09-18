@@ -339,13 +339,15 @@ function resetScoreboard() {
   updateScoreboard();
 }
 
+let commentaryVisible = false; // keep in-memory state
+
 async function updateCommentary() {
   const data = {
     commentator1: document.getElementById("com1_name").value || "",
     description1: document.getElementById("com1_desc").value || "",
     commentator2: document.getElementById("com2_name").value || "",
     description2: document.getElementById("com2_desc").value || "",
-    visible: true
+    visible: commentaryVisible   // always reuse in-memory state
   };
   try {
     await window.go.main.App.SaveCommentaryJSON(data);
@@ -364,18 +366,21 @@ function resetCommentary() {
 }
 
 async function toggleCommentary(show) {
+  commentaryVisible = show; // update memory state
+
   const data = {
     commentator1: document.getElementById("com1_name").value || "",
     description1: document.getElementById("com1_desc").value || "",
     commentator2: document.getElementById("com2_name").value || "",
     description2: document.getElementById("com2_desc").value || "",
-    visible: !!show
+    visible: show
   };
+
   try {
     await window.go.main.App.SaveCommentaryJSON(data);
   } catch (err) {
     console.error("SaveCommentaryJSON failed:", err);
-    alert("Error saving commentary visibility (see console).");
+    alert("Error saving commentary JSON (see console).");
   }
 }
 

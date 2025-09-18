@@ -37,10 +37,12 @@ export namespace main {
 	    player3: string;
 	    team3: string;
 	    controller3: string;
+	    score3: number;
 	    visible3: boolean;
 	    player4: string;
 	    team4: string;
 	    controller4: string;
+	    score4: number;
 	    visible4: boolean;
 	
 	    static createFrom(source: any = {}) {
@@ -65,10 +67,12 @@ export namespace main {
 	        this.player3 = source["player3"];
 	        this.team3 = source["team3"];
 	        this.controller3 = source["controller3"];
+	        this.score3 = source["score3"];
 	        this.visible3 = source["visible3"];
 	        this.player4 = source["player4"];
 	        this.team4 = source["team4"];
 	        this.controller4 = source["controller4"];
+	        this.score4 = source["score4"];
 	        this.visible4 = source["visible4"];
 	    }
 	}
