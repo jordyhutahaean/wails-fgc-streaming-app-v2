@@ -51,8 +51,6 @@
   .inner-tabs button{background:none;border:1px solid var(--border);padding:8px 10px;border-radius:8px;cursor:pointer}
   .inner-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 
-  /* bracket tree grid */
-  .bracket-tree{display:flex;gap:28px;align-items:center;overflow:auto;padding:18px 8px}
   .round{display:flex;flex-direction:column;gap:18px;min-width:220px}
   .round .round-title{text-align:center;font-weight:800;color:var(--muted);margin-bottom:6px}
   
@@ -63,27 +61,6 @@
   .match .player-line.win{background:var(--win)}
  
   .match .controls{display:flex;gap:8px;margin-top:8px;justify-content:flex-end}
-
-  /* connectors: small horizontal line to next round */
-  .round:not(:last-child) .match::after{
-    content:"";
-    position:absolute;
-    right:-24px;
-    top:50%;
-    transform:translateY(-50%);
-    width:20px;height:2px;background:var(--border);
-    border-radius:2px;
-  }
-
-  /* vertical connector in middle between rounds */
-  .connector-vertical{
-    width:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
-  }
-  .connector-vertical::before{
-    content:"";
-    width:2px;height:100%;background:linear-gradient(to bottom,var(--border),transparent);
-    opacity:.6;border-radius:2px;
-  }
 
       .bracket {
       display: flex;
@@ -104,7 +81,7 @@
       border: 1px solid #444;
       border-radius: 6px;
       padding: 6px 10px;
-      width: 160px;
+      width: 200px;
       font-size: 12px;
     }
 
@@ -125,27 +102,10 @@
       border-radius: 3px;
       padding: 1px;
     }
-
-    .connector {
-      position: absolute;
-      border-left: 2px solid #666;
-      border-top: 2px solid #666;
-      width: 20px;
-      height: 40px;
-      left: -20px;
-    }
-
-    .round.semifinal .connector {
-      height: 80px;
-    }
-
-    .round.final .connector {
-      height: 160px;
-    }
-
+ 
   /* responsive */
   @media (max-width:900px){
-    .bracket-tree{gap:18px}
+    .bracket-tree{gap:45}
     .round{min-width:180px}
   }
 
@@ -313,101 +273,11 @@
           <button id="doubleTabBtn" onclick="openInnerTab('double')">Double Elimination</button>
         </div>
 
-        <!-- Single elimination UI (visual tree) -->
-        <div id="single" class="inner-tabcontent" style="display:block">
-          <p class="small">Seed Top 8 below. After seeding, enter scores on each match and press <strong>Set</strong> — winners auto-advance to next round.</p>
+        <!-- Single elimination UI (will be loaded from bracket_single.html) -->
+        <div id="single" class="inner-tabcontent" style="display:block"></div>
 
-          <div style="display:flex;gap:12px;align-items:flex-start;margin-top:10px;margin-bottom:12px;flex-wrap:wrap">
-            <div style="flex:1;min-width:260px">
-              <div class="bracket-top8" style="display:grid;grid-template-columns:1fr 1fr;gap:8px 12px">
-                <label>Seed 1: <input id="sp1" type="text"></label>
-                <label>Seed 2: <input id="sp2" type="text"></label>
-                <label>Seed 3: <input id="sp3" type="text"></label>
-                <label>Seed 4: <input id="sp4" type="text"></label>
-                <label>Seed 5: <input id="sp5" type="text"></label>
-                <label>Seed 6: <input id="sp6" type="text"></label>
-                <label>Seed 7: <input id="sp7" type="text"></label>
-                <label>Seed 8: <input id="sp8" type="text"></label>
-              </div>
-              <div style="margin-top:8px;display:flex;gap:8px">
-                <button class="btn" onclick="saveSinglePlayers()">💾 Save Top 8</button>
-                <button class="btn" onclick="resetSingle()">🔄 Reset Top 8</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- visual bracket tree -->
-          <div class="bracket-tree" id="visualBracket" aria-label="Bracket tree">
-
-    <!-- Quarterfinals -->
-    <div class="round quarterfinal">
-      <div class="match" id="qf1">
-        <div class="player-line"><span id="qf1p1">Player 1</span><input type="number" id="qf1s1"></div>
-        <div class="player-line"><span id="qf1p2">Player 2</span><input type="number" id="qf1s2"></div>
-      </div>
-      <div class="match" id="qf2">
-        <div class="player-line"><span id="qf2p1">Player 3</span><input type="number" id="qf2s1"></div>
-        <div class="player-line"><span id="qf2p2">Player 4</span><input type="number" id="qf2s2"></div>
-      </div>
-      <div class="match" id="qf3">
-        <div class="player-line"><span id="qf3p1">Player 5</span><input type="number" id="qf3s1"></div>
-        <div class="player-line"><span id="qf3p2">Player 6</span><input type="number" id="qf3s2"></div>
-      </div>
-      <div class="match" id="qf4">
-        <div class="player-line"><span id="qf4p1">Player 7</span><input type="number" id="qf4s1"></div>
-        <div class="player-line"><span id="qf4p2">Player 8</span><input type="number" id="qf4s2"></div>
-      </div>
-    </div>
-
-    <!-- Semifinals -->
-    <div class="round semifinal">
-      <div class="connector" style="top: 50px;"></div>
-      <div class="match" id="sf1">
-        <div class="player-line"><span id="sf1p1">Winner QF1</span><input type="number" id="sf1s1"></div>
-        <div class="player-line"><span id="sf1p2">Winner QF2</span><input type="number" id="sf1s2"></div>
-      </div>
-      <div class="connector" style="top: 210px;"></div>
-      <div class="match" id="sf2">
-        <div class="player-line"><span id="sf2p1">Winner QF3</span><input type="number" id="sf2s1"></div>
-        <div class="player-line"><span id="sf2p2">Winner QF4</span><input type="number" id="sf2s2"></div>
-      </div>
-    </div>
-
-    <!-- Final -->
-    <div class="round final">
-      <div class="connector" style="top: 130px;"></div>
-      <div class="match" id="f1">
-        <div class="player-line"><span id="f1p1">Winner SF1</span><input type="number" id="f1s1"></div>
-        <div class="player-line"><span id="f1p2">Winner SF2</span><input type="number" id="f1s2"></div>
-      </div>
-    </div>
-  </div>
-
-          </div>
-        </div>
-
-        <!-- Double elimination placeholder (keeps same storage) -->
-        <div id="double" class="inner-tabcontent" style="display:none">
-          <p class="small">Double-elimination UI — seed players below. Advanced auto-placement for losers can be added later.</p>
-          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:720px">
-            <label>Seed 1: <input id="dp1" type="text"></label>
-            <label>Seed 8: <input id="dp8" type="text"></label>
-            <label>Seed 4: <input id="dp4" type="text"></label>
-            <label>Seed 5: <input id="dp5" type="text"></label>
-            <label>Seed 3: <input id="dp3" type="text"></label>
-            <label>Seed 6: <input id="dp6" type="text"></label>
-            <label>Seed 2: <input id="dp2" type="text"></label>
-            <label>Seed 7: <input id="dp7" type="text"></label>
-          </div>
-
-          <div style="margin-top:10px">
-            <button class="btn" onclick="saveDoublePlayers()">💾 Save Double Players</button>
-            <button class="btn" onclick="resetDouble()">🔄 Reset Double</button>
-          </div>
-        </div>
-
-      </div>
-    </div>
+        <!-- Double elimination UI (will be loaded from bracket_double.html) -->
+        <div id="double" class="inner-tabcontent" style="display:none"></div>
   </div>
 
 <script>
@@ -814,6 +684,47 @@ function attachBracketListeners(){
       attachBracketListeners();
     });
 
+    function resetSingle(){
+  ensureBracket();
+  // Clear all seed inputs
+  for(let i=1;i<=8;i++){
+    const el = document.getElementById("sp"+i);
+    if(el) el.value = "";
+  }
+
+  // Reset bracketData.single
+  bracketData.single = { players: Array(8).fill(""), scores:{}, winners:{} };
+
+  // Reset all bracket spans + scores
+  const placeholders = {
+    qf1p1:"Player 1", qf1p2:"Player 2",
+    qf2p1:"Player 3", qf2p2:"Player 4",
+    qf3p1:"Player 5", qf3p2:"Player 6",
+    qf4p1:"Player 7", qf4p2:"Player 8",
+    sf1p1:"Winner QF1", sf1p2:"Winner QF2",
+    sf2p1:"Winner QF3", sf2p2:"Winner QF4",
+    f1p1:"Winner SF1", f1p2:"Winner SF2"
+  };
+  Object.keys(placeholders).forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.textContent = placeholders[id];
+  });
+
+  // Clear all score inputs
+  const scoreInputs = document.querySelectorAll("#single input[type='number']");
+  scoreInputs.forEach(inp=>inp.value="");
+
+  highlightWinners(bracketData.single);
+
+  // (optional) persist blank bracket to backend
+  try{
+    window.go.main.App.SaveBracketJSON(bracketData);
+  }catch(e){
+    console.warn("resetSingle: SaveBracketJSON not available",e);
+  }
+}
+
+
 /* ---------------------
    Double bracket (simple store)
    --------------------- */
@@ -828,26 +739,208 @@ function renderDoubleFromData(){
 
 async function saveDoublePlayers(){
   ensureBracket();
-  const arr = [];
-  for(let i=1;i<=8;i++) arr.push(document.getElementById("dp"+i).value || "");
+
+  // read seed inputs dp1..dp8
+  const arr = [
+    document.getElementById("dp1")?.value || "",
+    document.getElementById("dp2")?.value || "",
+    document.getElementById("dp3")?.value || "",
+    document.getElementById("dp4")?.value || "",
+    document.getElementById("dp5")?.value || "",
+    document.getElementById("dp6")?.value || "",
+    document.getElementById("dp7")?.value || "",
+    document.getElementById("dp8")?.value || ""
+  ];
+
+  // persist player seeds in bracketData.double
+  bracketData.double = bracketData.double || {};
   bracketData.double.players = arr;
-  await saveBracket();
-  renderDoubleFromData();
+  bracketData.double.scores = bracketData.double.scores || {};
+  bracketData.double.winners = bracketData.double.winners || {};
+
+  try{
+    await saveBracket(); // uses existing saveBracket() which saves bracketData
+  }catch(err){
+    console.warn("saveBracket failed:", err);
+  }
+
+  // mapping as requested:
+  // dp1 -> wb_sf1_p1, dp2 -> wb_sf1_p2, dp3 -> wb_sf2_p1, dp4 -> wb_sf2_p2
+  // dp5 -> lb_r1_m1_p1, dp6 -> lb_r1_m1_p2, dp7 -> lb_r1_m2_p1, dp8 -> lb_r1_m2_p2
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if(el){
+      // prefer textContent for spans, if input exist set value
+      if(el.tagName === 'INPUT') el.value = value;
+      else el.textContent = value || '';
+    }
+  };
+
+  set('wb_sf1_p1', arr[0] || 'Seed 1');
+  set('wb_sf1_p2', arr[1] || 'Seed 2');
+  set('wb_sf2_p1', arr[2] || 'Seed 3');
+  set('wb_sf2_p2', arr[3] || 'Seed 4');
+
+  set('lb_r1_m1_p1', arr[4] || 'Loser 1');
+  set('lb_r1_m1_p2', arr[5] || 'Loser 2');
+  set('lb_r1_m2_p1', arr[6] || 'Loser 3');
+  set('lb_r1_m2_p2', arr[7] || 'Loser 4');
+
+  // clear numeric inputs inside the double visual so new progression is clean
+  document.querySelectorAll('#doubleVisual input[type="number"]').forEach(i=>i.value='');
+
+  // reset downstream placeholders
+  const placeholders = {
+    'wb_final_p1': 'Winner SF1', 'wb_final_p2':'Winner SF2',
+    'lb_r2_m1_p1':'Winner R1M1','lb_r2_m1_p2':'Loser SF1',
+    'lb_r2_m2_p1':'Winner R1M2','lb_r2_m2_p2':'Loser SF2',
+    'lb_final_p1':'Winner R2M1','lb_final_p2':'Winner R2M2',
+    'gf_wb':'WB Winner','gf_lb':'LB Winner'
+  };
+  Object.entries(placeholders).forEach(([id,val])=> set(id, val));
+
+  // hide gf reset area
+  const gfReset = document.getElementById('gf_reset');
+  if(gfReset) gfReset.style.display = 'none';
+
+  // run progression
+  if(typeof updateDoubleBracket === 'function') updateDoubleBracket();
 }
+
 
 function resetDouble(){
-  for(let i=1;i<=8;i++){ const el = document.getElementById("dp"+i); if(el) el.value=""; }
-  bracketData.double.players = Array(8).fill("");
-  bracketData.double.scores = {};
-  bracketData.double.winners = {};
-  saveBracket();
-}
+  // clear seed inputs dp1..dp8
+  for(let i=1;i<=8;i++){
+    const el = document.getElementById('dp'+i);
+    if(el) el.value = '';
+  }
 
+  // clear bracketData.double and persist
+  bracketData.double = { players: Array(8).fill(""), scores: {}, winners: {} };
+  try{ saveBracket(); }catch(e){ console.warn('saveBracket failed', e); }
+
+  // reset visual placeholders and clear numeric inputs
+  const resetPlace = (id, val) => {
+    const el = document.getElementById(id);
+    if(el){
+      if(el.tagName === 'INPUT') el.value = '';
+      else el.textContent = val || '';
+    }
+  };
+
+  resetPlace('wb_sf1_p1','Winner QF1'); resetPlace('wb_sf1_p2','Winner QF2');
+  resetPlace('wb_sf2_p1','Winner QF3'); resetPlace('wb_sf2_p2','Winner QF4');
+
+  resetPlace('lb_r1_m1_p1','Loser QF1'); resetPlace('lb_r1_m1_p2','Loser QF2');
+  resetPlace('lb_r1_m2_p1','Loser QF3'); resetPlace('lb_r1_m2_p2','Loser QF4');
+
+  resetPlace('wb_final_p1','Winner SF1'); resetPlace('wb_final_p2','Winner SF2');
+  resetPlace('lb_r2_m1_p1','Winner R1M1'); resetPlace('lb_r2_m1_p2','Loser SF1');
+  resetPlace('lb_r2_m2_p1','Winner R1M2'); resetPlace('lb_r2_m2_p2','Loser SF2');
+  resetPlace('lb_final_p1','Winner R2M1'); resetPlace('lb_final_p2','Winner R2M2');
+  resetPlace('gf_wb','WB Winner'); resetPlace('gf_lb','LB Winner');
+
+  document.querySelectorAll('#doubleVisual input[type="number"]').forEach(i=>i.value='');
+
+  // hide reset UI
+  const gfReset = document.getElementById('gf_reset'); if(gfReset) gfReset.style.display='none';
+
+  // re-run progression to clear state
+  if(typeof updateDoubleBracket === 'function') updateDoubleBracket();
+}
 /* ---------------------
    Initialization
    --------------------- */
 ensureBracket();
 loadBracket();
 </script>
+
+<script>
+function seedPlayers(){
+  document.getElementById("wb_sf1p1").textContent=document.getElementById("sp1").value;
+  document.getElementById("wb_sf1p2").textContent=document.getElementById("sp8").value;
+  document.getElementById("wb_sf2p1").textContent=document.getElementById("sp4").value;
+  document.getElementById("wb_sf2p2").textContent=document.getElementById("sp5").value;
+  document.getElementById("wb_sf3p1").textContent=document.getElementById("sp3").value;
+  document.getElementById("wb_sf3p2").textContent=document.getElementById("sp6").value;
+  document.getElementById("wb_sf4p1").textContent=document.getElementById("sp2").value;
+  document.getElementById("wb_sf4p2").textContent=document.getElementById("sp7").value;
+}
+
+function setMatch(matchId, nextWinId, nextLoseId){
+  let p1=document.getElementById(matchId+"p1").textContent;
+  let p2=document.getElementById(matchId+"p2").textContent;
+  let s1=parseInt(document.getElementById(matchId+"s1").value)||0;
+  let s2=parseInt(document.getElementById(matchId+"s2").value)||0;
+  let winner=s1>s2?p1:p2;
+  let loser=s1>s2?p2:p1;
+
+  if(nextWinId){
+    let slot=document.querySelector("#"+nextWinId+" span:empty, #"+nextWinId+" span:contains('Winner')");
+    if(slot) slot.textContent=winner;
+  }
+  if(nextLoseId){
+    let slot=document.querySelector("#"+nextLoseId+" span:empty, #"+nextLoseId+" span:contains('L ')");
+    if(slot) slot.textContent=loser;
+  }
+}
+
+function setGrandFinal(){
+  let p1=document.getElementById("gfp1").textContent;
+  let p2=document.getElementById("gfp2").textContent;
+  let s1=parseInt(document.getElementById("gfs1").value)||0;
+  let s2=parseInt(document.getElementById("gfs2").value)||0;
+  if(s1>s2){
+    alert("🏆 Champion: "+p1);
+  } else if(s2>s1){
+    // LB Champ won, trigger reset
+    document.getElementById("gf_reset").style.display="block";
+    document.getElementById("gf_resetp1").textContent=p1;
+    document.getElementById("gf_resetp2").textContent=p2;
+  }
+}
+
+function finalizeChampion(){
+  let p1=document.getElementById("gf_resetp1").textContent;
+  let p2=document.getElementById("gf_resetp2").textContent;
+  let s1=parseInt(document.getElementById("gf_resets1").value)||0;
+  let s2=parseInt(document.getElementById("gf_resets2").value)||0;
+  let champ=s1>s2?p1:p2;
+  alert("🏆 Champion: "+champ);
+}
+</script>
+
+
+<script>
+  // loadPartial: fetch HTML partial and inject into container
+  async function loadPartial(containerId, filePath){
+    try{
+      const res = await fetch(filePath + '?_=' + Date.now());
+      if(!res.ok) throw new Error('Failed to load ' + filePath);
+      const html = await res.text();
+      const container = document.getElementById(containerId);
+      if(container) container.innerHTML = html;
+
+      // re-attach bracket listeners if visual was injected
+      attachBracketListeners();
+
+      // call init hooks if present in the injected partial
+      if(containerId === 'single' && typeof initSingle === 'function') initSingle();
+      if(containerId === 'double' && typeof initDouble === 'function') initDouble();
+    }catch(err){
+      console.warn('loadPartial error:', filePath, err);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    // load partials using new filenames to avoid conflicts with your existing single.html / double.html
+    loadPartial('single','bracket_single.html');
+    loadPartial('double','bracket_double.html');
+
+    // existing init
+    attachBracketListeners();
+  });
+</script>
+
 </body>
 </html>
