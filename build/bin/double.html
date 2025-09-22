@@ -209,10 +209,36 @@ function renderDoubleFromData(){
   }
 }
 
+// Winners Semis
+let sc = d.scores?.wb_sf1 || [null,null];
+document.getElementById("wb_sf1_s1").value = sc[0] ?? "";
+document.getElementById("wb_sf1_s2").value = sc[1] ?? "";
+
+sc = d.scores?.wb_sf2 || [null,null];
+document.getElementById("wb_sf2_s1").value = sc[0] ?? "";
+document.getElementById("wb_sf2_s2").value = sc[1] ?? "";
+
+// Winners Final
+sc = d.scores?.wb_final || [null,null];
+document.getElementById("wb_final_s1").value = sc[0] ?? "";
+document.getElementById("wb_final_s2").value = sc[1] ?? "";
+
+// Losers R1
+sc = d.scores?.lb_r1_m1 || [null,null];
+document.getElementById("lb_r1_m1_s1").value = sc[0] ?? "";
+document.getElementById("lb_r1_m1_s2").value = sc[1] ?? "";
+
+sc = d.scores?.lb_r1_m2 || [null,null];
+document.getElementById("lb_r1_m2_s1").value = sc[0] ?? "";
+document.getElementById("lb_r1_m2_s2").value = sc[1] ?? "";
+
+// …repeat for lb_r2_m1, lb_r2_m2, lb_final, gf_wb/gf_lb, gf_reset
+
+
 // Auto load on page open
 window.addEventListener("DOMContentLoaded", () => {
   loadBracket();
-  setInterval(loadBracket, 2000);
+  setInterval(loadBracket, 1000);
 });
 </script>
 </body>

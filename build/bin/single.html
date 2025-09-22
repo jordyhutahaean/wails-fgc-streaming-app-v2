@@ -154,16 +154,28 @@ function renderSingleFromData(){
   document.getElementById("sf2p1").textContent = (s.winners && s.winners.qf3) || "Winner QF3";
   document.getElementById("sf2p2").textContent = (s.winners && s.winners.qf4) || "Winner QF4";
 
+  const sf1sc = s.scores?.sf1 || [null,null];
+  document.getElementById("sf1s1").value = sf1sc[0] ?? "";
+  document.getElementById("sf1s2").value = sf1sc[1] ?? "";
+
+  const sf2sc = s.scores?.sf2 || [null,null];
+  document.getElementById("sf2s1").value = sf2sc[0] ?? "";
+  document.getElementById("sf2s2").value = sf2sc[1] ?? "";
+
   // Final
   document.getElementById("f1p1").textContent = (s.winners && s.winners.sf1) || "Winner SF1";
   document.getElementById("f1p2").textContent = (s.winners && s.winners.sf2) || "Winner SF2";
+
+  const fsc = s.scores?.f1 || [null,null];
+  document.getElementById("f1s1").value = fsc[0] ?? "";
+  document.getElementById("f1s2").value = fsc[1] ?? "";
 }
 
 // Auto load on page open
 window.addEventListener("DOMContentLoaded", () => {
   loadBracket();
-  // Auto-refresh every 5 seconds
-  setInterval(loadBracket, 100);
+  // Auto-refresh every second
+  setInterval(loadBracket, 1000);
 });
 </script>
 </body>
