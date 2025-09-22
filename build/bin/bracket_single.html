@@ -1,5 +1,67 @@
 <style>
   /* manual positions for each match (example) */
+  
+    /* bracket tree grid */
+  .bracket-tree {
+    position: relative;
+    width: 1000px; /* adjust as needed */
+    height: 400px; /* adjust as needed */
+    background: transparent;
+    overflow: visible; /* so matches can overflow if needed */
+  }
+
+  /* Scrollable wrapper */
+.bracket-scroll-container {
+  width: 80%;       /* fill available width */
+  max-width: 1000px; /* optional max width */
+  max-height: 500px; /* adjust as needed */
+  overflow: auto;    /* scroll when content exceeds */
+  border: 1px solid var(--border);
+  padding: 8px;
+  background: var(--panel);
+  border-radius: 10px;
+}
+
+  
+/* rounds are absolute so you can position manually */
+.bracket-tree .round {
+  position: absolute;
+  display: block; /* remove flex */
+  width: 200px;   /* width of each round column */
+}
+
+/* quarterfinals, semifinals, final positions */
+.bracket-tree .round.quarterfinal {
+  left: 0;
+  top: 0;
+}
+
+.bracket-tree .round.semifinal {
+  left: 250px; /* adjust horizontal spacing */
+  top: 50px;   /* adjust vertical offset */
+}
+
+.bracket-tree .round.final {
+  left: 500px; /* adjust horizontal spacing */
+  top: 130px;  /* adjust vertical offset */
+}
+
+/* matches inside rounds */
+.bracket-tree .round .match {
+  position: absolute;
+  width: 200px;
+  background: #222;
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+  .bracket-line{
+      fill: none;
+      stroke: #882f2f;
+      stroke-width: 2px;
+  }
+  
 #qf1 { top: 0; left: 0; }
 #qf2 { top: 100px; left: 0; }
 #qf3 { top: 200px; left: 0; }
@@ -78,12 +140,14 @@
 </div>
 
 <script>
-/* initSingle is called after the partial is injected */
 function initSingle(){
-  // ensure listeners exist
   const inputs = document.querySelectorAll('#single #visualBracket input[type=number]');
-  inputs.forEach(i => i.addEventListener('input', updateBracket));
-  // re-run a bracket update so saved data appears
-  setTimeout(()=>{ if(typeof updateBracket === 'function') updateBracket(); }, 30);
+  inputs.forEach(i => {
+    i.removeEventListener('input', updateBracket);
+    i.addEventListener('input', updateBracket);
+  });
+
+  // run once so saved data appears
+  setTimeout(()=>{ updateBracket(); }, 30);
 }
 </script>

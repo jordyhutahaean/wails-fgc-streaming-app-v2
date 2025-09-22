@@ -422,18 +422,43 @@ async function loadBracket(){
   renderDoubleFromData();
 }
 
+{
+/* ---------- replaced: renderSingleFromData, updateBracket, attachBracketListeners ---------- */
+
+/* small helpers used by bracket logic */
+function getNum(id){
+  const el = document.getElementById(id);
+  if(!el) return null;
+  const v = el.value;
+  return (v === '' || v === undefined) ? null : Number(v);
+}
+function setText(id, txt){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.textContent = txt;
+}
+function setInputVal(id, v){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.value = (v === null || v === undefined) ? '' : v;
+}
+
+/* compute winner from stored scores if available, else null */
+function computeWinnerFromScores(scoresObj, matchId, p1Id, p2Id){
+  const sc = (scoresObj && scoresObj[matchId]) ? scoresObj[matchId] : [null, null];
+  if(!Array.isArray(sc) || sc.length < 2) return null;
+  const [a,b] = sc;
+  if(a === null || b === null || a === b) return null;
+  return a > b ? (document.getElementById(p1Id)?.textContent || '') : (document.getElementById(p2Id)?.textContent || '');
+}
+
+/* render single-elim data into the UI (seeds, scores, derived winners) */
 function renderSingleFromData(){
   ensureBracket();
-  const s = bracketData.single || { players: Array(8).fill(""), scores:{}, winners:{} };
-
-  // seed inputs sp1..sp8 (we assume order [1..8])
-  (s.players || Array(8).fill("")).forEach((p,i)=>{
-    const el = document.getElementById("sp"+(i+1));
-    if(el) el.value = p||"";
-  });
-
-  // map seeds into QF pairs (consistent with saveSinglePlayers):
+  const s = bracketData && bracketData.single ? bracketData.single : { players: Array(8).fill(""), scores:{}, winners:{} };
   const players = s.players || Array(8).fill("");
+
+  // seeding -> QF mapping (keep your original mapping)
   const qfPairs = {
     qf1: [players[0]||"", players[7]||""], // 1 vs 8
     qf2: [players[3]||"", players[4]||""], // 4 vs 5
@@ -441,293 +466,114 @@ function renderSingleFromData(){
     qf4: [players[1]||"", players[6]||""]  // 2 vs 7
   };
 
-  // fill QF names and scores using the actual IDs in the DOM (qf1p1, qf1s1 etc.)
+  // fill QF names and scores
   Object.keys(qfPairs).forEach(k=>{
-    const aName = qfPairs[k][0]||"—";
-    const bName = qfPairs[k][1]||"—";
-    const aSpan = document.getElementById(k + "p1");
-    const bSpan = document.getElementById(k + "p2");
-    if(aSpan) aSpan.textContent = aName;
-    if(bSpan) bSpan.textContent = bName;
-
+    const [aName,bName] = qfPairs[k];
+    setText(k + 'p1', aName || '—');
+    setText(k + 'p2', bName || '—');
     const sc = (s.scores && s.scores[k]) ? s.scores[k] : [null,null];
-    const aScoreEl = document.getElementById(k + "s1");
-    const bScoreEl = document.getElementById(k + "s2");
-    if(aScoreEl) aScoreEl.value = sc[0] != null ? sc[0] : "";
-    if(bScoreEl) bScoreEl.value = sc[1] != null ? sc[1] : "";
+    setInputVal(k + 's1', sc[0] ?? '');
+    setInputVal(k + 's2', sc[1] ?? '');
   });
 
-  // semis winners mapping (if winners saved) or blank placeholders
-  const sf1a = (s.winners && s.winners['qf1']) ? s.winners['qf1'] : "Winner QF1";
-  const sf1b = (s.winners && s.winners['qf2']) ? s.winners['qf2'] : "Winner QF2";
-  const sf2a = (s.winners && s.winners['qf3']) ? s.winners['qf3'] : "Winner QF3";
-  const sf2b = (s.winners && s.winners['qf4']) ? s.winners['qf4'] : "Winner QF4";
+  // derive QF winners (try saved winners first, otherwise compute from scores)
+  ['qf1','qf2','qf3','qf4'].forEach((qf, idx) => {
+    const saved = s.winners && s.winners[qf];
+    const derived = saved || computeWinnerFromScores(s.scores, qf, qf + 'p1', qf + 'p2');
+    // place into SF slots (mapping preserved from original logic)
+    const sfTarget = (qf === 'qf1') ? 'sf1p1' : (qf === 'qf2') ? 'sf1p2' : (qf === 'qf3') ? 'sf2p1' : 'sf2p2';
+    setText(sfTarget, derived || ('Winner ' + qf.toUpperCase()));
+    if(derived) bracketData.single.winners = bracketData.single.winners || {}, bracketData.single.winners[qf] = derived;
+    else if(bracketData.single && bracketData.single.winners) delete bracketData.single.winners[qf];
+  });
 
-  const sf1p1 = document.getElementById("sf1p1"); if(sf1p1) sf1p1.textContent = sf1a;
-  const sf1p2 = document.getElementById("sf1p2"); if(sf1p2) sf1p2.textContent = sf1b;
-  const sf2p1 = document.getElementById("sf2p1"); if(sf2p1) sf2p1.textContent = sf2a;
-  const sf2p2 = document.getElementById("sf2p2"); if(sf2p2) sf2p2.textContent = sf2b;
+  // populate SF scores
+  setInputVal('sf1s1', s.scores?.sf1 ? s.scores.sf1[0] ?? '' : '');
+  setInputVal('sf1s2', s.scores?.sf1 ? s.scores.sf1[1] ?? '' : '');
+  setInputVal('sf2s1', s.scores?.sf2 ? s.scores.sf2[0] ?? '' : '');
+  setInputVal('sf2s2', s.scores?.sf2 ? s.scores.sf2[1] ?? '' : '');
 
-  if(s.scores && s.scores['sf1']){ const el1 = document.getElementById('sf1s1'); const el2 = document.getElementById('sf1s2'); if(el1) el1.value = s.scores['sf1'][0]; if(el2) el2.value = s.scores['sf1'][1]; }
-  if(s.scores && s.scores['sf2']){ const el1 = document.getElementById('sf2s1'); const el2 = document.getElementById('sf2s2'); if(el1) el1.value = s.scores['sf2'][0]; if(el2) el2.value = s.scores['sf2'][1]; }
+  // derive SF winners -> final participants
+  ['sf1','sf2'].forEach(sf=>{
+    const saved = s.winners && s.winners[sf];
+    const derived = saved || computeWinnerFromScores(s.scores, sf, sf + 'p1', sf + 'p2');
+    const fTarget = (sf === 'sf1') ? 'f1p1' : 'f1p2';
+    setText(fTarget, derived || ('Winner ' + sf.toUpperCase()));
+    if(derived) bracketData.single.winners = bracketData.single.winners || {}, bracketData.single.winners[sf] = derived;
+    else if(bracketData.single && bracketData.single.winners) delete bracketData.single.winners[sf];
+  });
 
-  // final
-  const fA = (s.winners && s.winners['sf1']) ? s.winners['sf1'] : "Winner SF1";
-  const fB = (s.winners && s.winners['sf2']) ? s.winners['sf2'] : "Winner SF2";
-  const f1p1 = document.getElementById("f1p1"); if(f1p1) f1p1.textContent = fA;
-  const f1p2 = document.getElementById("f1p2"); if(f1p2) f1p2.textContent = fB;
-  if(s.scores && s.scores['f1']){ const el1 = document.getElementById('f1s1'); const el2 = document.getElementById('f1s2'); if(el1) el1.value = s.scores['f1'][0]; if(el2) el2.value = s.scores['f1'][1]; }
+  // final scores
+  setInputVal('f1s1', s.scores?.f1 ? s.scores.f1[0] ?? '' : '');
+  setInputVal('f1s2', s.scores?.f1 ? s.scores.f1[1] ?? '' : '');
 
-  // visually highlight winners if desired
-  highlightWinners(s);
+  // visual highlight
+  highlightWinners(bracketData.single);
 }
 
-function highlightWinners(s){
-  // soft visual: apply .win to the player-line that matches saved winners
-  ['qf1','qf2','qf3','qf4','sf1','sf2','f1'].forEach(mid=>{
-    const winner = s.winners && s.winners[mid] ? s.winners[mid] : null;
-    // containers may be the first or second .player-line inside the match
-    const matchEl = document.getElementById(mid);
-    if(!matchEl) return;
-    const lines = matchEl.querySelectorAll('.player-line');
-    lines.forEach(l=>{ l.classList.remove('win','lose'); });
-    if(winner){
-      lines.forEach(l=>{
-        const nameSpan = l.querySelector('span');
-        if(nameSpan && nameSpan.textContent.trim() === winner){ l.classList.add('win'); }
-      });
-      // mark others as lose
-      lines.forEach(l=>{ if(!l.classList.contains('win')) l.classList.add('lose'); });
+/* unified match processor for live UI changes -> updates bracketData and downstream slots */
+function processAndAdvance(){
+  ensureBracket();
+  bracketData.single.scores = bracketData.single.scores || {};
+
+  // helper to update a match's scores into bracketData
+  function storeScores(mid){
+    const a = getNum(mid + 's1'), b = getNum(mid + 's2');
+    bracketData.single.scores[mid] = [a,b];
+    return [a,b];
+  }
+
+  // process QFs -> SF slots
+  [['qf1','sf1p1'], ['qf2','sf1p2'], ['qf3','sf2p1'], ['qf4','sf2p2']].forEach(([mid, sfTarget])=>{
+    const [a,b] = storeScores(mid);
+    if(a !== null && b !== null && a !== b){
+      const winner = a > b ? document.getElementById(mid + 'p1').textContent : document.getElementById(mid + 'p2').textContent;
+      setText(sfTarget, winner);
+      bracketData.single.winners = bracketData.single.winners || {};
+      bracketData.single.winners[mid] = winner;
+    } else {
+      setText(sfTarget, 'Winner ' + mid.toUpperCase());
+      if(bracketData.single && bracketData.single.winners) delete bracketData.single.winners[mid];
     }
   });
-}
 
-// store top 8
-async function saveSinglePlayers(){
-  ensureBracket();
-  const arr = [
-    document.getElementById("sp1").value || "",
-    document.getElementById("sp2").value || "",
-    document.getElementById("sp3").value || "",
-    document.getElementById("sp4").value || "",
-    document.getElementById("sp5").value || "",
-    document.getElementById("sp6").value || "",
-    document.getElementById("sp7").value || "",
-    document.getElementById("sp8").value || ""
-  ];
-  bracketData.single.players = arr;
-  bracketData.single.scores = {};
-  bracketData.single.winners = {};
-  await saveBracket();
-  renderSingleFromData();
-
-  // ALSO populate the visual bracket (qf / sf / final) so updateBracket() can operate
-  // seeding: seed1 -> top-left, seed8 -> top-right, seed4 vs seed5, seed3 vs seed6, seed2 vs seed7
-  try{
-    // Quarterfinals
-    document.getElementById("qf1p1").textContent = arr[0] || "—"; // seed1
-    document.getElementById("qf1p2").textContent = arr[7] || "—"; // seed8
-
-    document.getElementById("qf2p1").textContent = arr[3] || "—"; // seed4
-    document.getElementById("qf2p2").textContent = arr[4] || "—"; // seed5
-
-    document.getElementById("qf3p1").textContent = arr[2] || "—"; // seed3
-    document.getElementById("qf3p2").textContent = arr[5] || "—"; // seed6
-
-    document.getElementById("qf4p1").textContent = arr[1] || "—"; // seed2
-    document.getElementById("qf4p2").textContent = arr[6] || "—"; // seed7
-
-    // clear scores and downstream slots
-    ["qf1s1","qf1s2","qf2s1","qf2s2","qf3s1","qf3s2","qf4s1","qf4s2","sf1s1","sf1s2","sf2s1","sf2s2","f1s1","f1s2"].forEach(id=>{
-      const el = document.getElementById(id);
-      if(el) el.value = "";
-    });
-    document.getElementById("sf1p1").textContent = "Winner QF1";
-    document.getElementById("sf1p2").textContent = "Winner QF2";
-    document.getElementById("sf2p1").textContent = "Winner QF3";
-    document.getElementById("sf2p2").textContent = "Winner QF4";
-    document.getElementById("f1p1").textContent = "Winner SF1";
-    document.getElementById("f1p2").textContent = "Winner SF2";
-  }catch(e){
-    // if visual elements missing, ignore
-    console.warn("Could not populate visual bracket:", e);
-  }
-
-  // ensure bracket progression recalculates
-  updateBracket();
-}
-
-async function saveBracket(){
-  ensureBracket();
-  try{
-    await window.go.main.App.SaveBracketJSON(bracketData);
-    console.log("bracket saved");
-  }catch(err){
-    console.error("SaveBracketJSON failed:",err);
-    alert("Error saving bracket (see console).");
-  }
-}
-
-function resetBracket(){
-  bracketData = { single: { players: Array(8).fill(""), scores:{}, winners:{} }, double: { players: Array(8).fill(""), scores:{}, winners:{}, meta:{} } };
-  saveBracket();
-  renderSingleFromData();
-}
-
-function updateBracket() {
-      ensureBracket();
-      const getVal = id => {
-        const raw = document.getElementById(id)?.value;
-        return (raw === undefined || raw === null || raw === '') ? null : Number(raw);
-      };
-
-      const qf1a = getVal('qf1s1');
-      const qf1b = getVal('qf1s2');
-      const qf2a = getVal('qf2s1');
-      const qf2b = getVal('qf2s2');
-      const qf3a = getVal('qf3s1');
-      const qf3b = getVal('qf3s2');
-      const qf4a = getVal('qf4s1');
-      const qf4b = getVal('qf4s2');
-
-      // update scores in memory
-      bracketData.single.scores = bracketData.single.scores || {};
-      bracketData.single.scores['qf1'] = [qf1a, qf1b];
-      bracketData.single.scores['qf2'] = [qf2a, qf2b];
-      bracketData.single.scores['qf3'] = [qf3a, qf3b];
-      bracketData.single.scores['qf4'] = [qf4a, qf4b];
-
-      // advance from QF -> SF
-      if(qf1a !== null && qf1b !== null && qf1a !== qf1b){
-        const winner = (qf1a > qf1b) ? document.getElementById("qf1p1").textContent : document.getElementById("qf1p2").textContent;
-        document.getElementById("sf1p1").textContent = winner;
-        bracketData.single.winners['qf1'] = winner;
-      } else {
-        document.getElementById("sf1p1").textContent = "Winner QF1";
-        delete bracketData.single.winners['qf1'];
-      }
-
-      if(qf2a !== null && qf2b !== null && qf2a !== qf2b){
-        const winner = (qf2a > qf2b) ? document.getElementById("qf2p1").textContent : document.getElementById("qf2p2").textContent;
-        document.getElementById("sf1p2").textContent = winner;
-        bracketData.single.winners['qf2'] = winner;
-      } else {
-        document.getElementById("sf1p2").textContent = "Winner QF2";
-        delete bracketData.single.winners['qf2'];
-      }
-
-      if(qf3a !== null && qf3b !== null && qf3a !== qf3b){
-        const winner = (qf3a > qf3b) ? document.getElementById("qf3p1").textContent : document.getElementById("qf3p2").textContent;
-        document.getElementById("sf2p1").textContent = winner;
-        bracketData.single.winners['qf3'] = winner;
-      } else {
-        document.getElementById("sf2p1").textContent = "Winner QF3";
-        delete bracketData.single.winners['qf3'];
-      }
-
-      if(qf4a !== null && qf4b !== null && qf4a !== qf4b){
-        const winner = (qf4a > qf4b) ? document.getElementById("qf4p1").textContent : document.getElementById("qf4p2").textContent;
-        document.getElementById("sf2p2").textContent = winner;
-        bracketData.single.winners['qf4'] = winner;
-      } else {
-        document.getElementById("sf2p2").textContent = "Winner QF4";
-        delete bracketData.single.winners['qf4'];
-      }
-
-      // SF -> Final
-      const sf1a = getVal('sf1s1');
-      const sf1b = getVal('sf1s2');
-      const sf2a = getVal('sf2s1');
-      const sf2b = getVal('sf2s2');
-
-      bracketData.single.scores['sf1'] = [sf1a, sf1b];
-      bracketData.single.scores['sf2'] = [sf2a, sf2b];
-
-      if(sf1a !== null && sf1b !== null && sf1a !== sf1b){
-        const winner = (sf1a > sf1b) ? document.getElementById("sf1p1").textContent : document.getElementById("sf1p2").textContent;
-        document.getElementById("f1p1").textContent = winner;
-        bracketData.single.winners['sf1'] = winner;
-      } else {
-        document.getElementById("f1p1").textContent = "Winner SF1";
-        delete bracketData.single.winners['sf1'];
-      }
-
-      if(sf2a !== null && sf2b !== null && sf2a !== sf2b){
-        const winner = (sf2a > sf2b) ? document.getElementById("sf2p1").textContent : document.getElementById("sf2p2").textContent;
-        document.getElementById("f1p2").textContent = winner;
-        bracketData.single.winners['sf2'] = winner;
-      } else {
-        document.getElementById("f1p2").textContent = "Winner SF2";
-        delete bracketData.single.winners['sf2'];
-      }
-
-      // final scores
-      const f1a = getVal('f1s1');
-      const f1b = getVal('f1s2');
-      bracketData.single.scores['f1'] = [f1a, f1b];
-
-      // update highlight
-      highlightWinners(bracketData.single);
-}
-
-// only attach update listeners to bracket inputs (not every input on the page)
-function attachBracketListeners(){
-  const inputs = document.querySelectorAll('#visualBracket input[type=number]');
-  inputs.forEach(input => {
-    input.removeEventListener('input', updateBracket);
-    input.addEventListener('input', updateBracket);
-  });
-}
-
-
-    document.addEventListener('DOMContentLoaded', ()=>{
-      attachBracketListeners();
-    });
-
-    function resetSingle(){
-  ensureBracket();
-  // Clear all seed inputs
-  for(let i=1;i<=8;i++){
-    const el = document.getElementById("sp"+i);
-    if(el) el.value = "";
-  }
-
-  // Reset bracketData.single
-  bracketData.single = { players: Array(8).fill(""), scores:{}, winners:{} };
-
-  // Reset all bracket spans + scores
-  const placeholders = {
-    qf1p1:"Player 1", qf1p2:"Player 2",
-    qf2p1:"Player 3", qf2p2:"Player 4",
-    qf3p1:"Player 5", qf3p2:"Player 6",
-    qf4p1:"Player 7", qf4p2:"Player 8",
-    sf1p1:"Winner QF1", sf1p2:"Winner QF2",
-    sf2p1:"Winner QF3", sf2p2:"Winner QF4",
-    f1p1:"Winner SF1", f1p2:"Winner SF2"
-  };
-  Object.keys(placeholders).forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.textContent = placeholders[id];
+  // process SFs -> Final slots
+  [['sf1','f1p1'], ['sf2','f1p2']].forEach(([mid, fTarget])=>{
+    const [a,b] = storeScores(mid);
+    if(a !== null && b !== null && a !== b){
+      const winner = a > b ? document.getElementById(mid + 'p1').textContent : document.getElementById(mid + 'p2').textContent;
+      setText(fTarget, winner);
+      bracketData.single.winners = bracketData.single.winners || {};
+      bracketData.single.winners[mid] = winner;
+    } else {
+      setText(fTarget, 'Winner ' + mid.toUpperCase());
+      if(bracketData.single && bracketData.single.winners) delete bracketData.single.winners[mid];
+    }
   });
 
-  // Clear all score inputs
-  const scoreInputs = document.querySelectorAll("#single input[type='number']");
-  scoreInputs.forEach(inp=>inp.value="");
+  // final scores stored
+  storeScores('f1');
 
+  // update visual highlights
   highlightWinners(bracketData.single);
 
-  // (optional) persist blank bracket to backend
-  try{
-    window.go.main.App.SaveBracketJSON(bracketData);
-  }catch(e){
-    console.warn("resetSingle: SaveBracketJSON not available",e);
-  }
+  // optionally persist (non-blocking)
+  try{ if(window.go?.main?.App) window.go.main.App.SaveBracketJSON(bracketData); }catch(e){}
 }
 
+/* attach listeners to inputs inside the visual bracket only */
+function attachBracketListeners(){
+  const container = document.getElementById('visualBracket') || document;
+  const inputs = container.querySelectorAll('input[type=number]');
+  inputs.forEach(inp=>{
+    inp.removeEventListener('input', processAndAdvance);
+    inp.addEventListener('input', processAndAdvance);
+  });
+}
 
-/* ---------------------
-   Double bracket (simple store)
-   --------------------- */
+/* ---------- end replacements ---------- */
+}
+
 function renderDoubleFromData(){
   ensureBracket();
   const d = bracketData.double || { players: Array(8).fill("") };
@@ -941,6 +787,503 @@ function finalizeChampion(){
     attachBracketListeners();
   });
 </script>
+
+<!-- index.html (only showing bottom part where scripts are) -->
+
+<script>
+/* ----------------- SINGLE BRACKET LOGIC (unchanged) ----------------- */
+ function getSingleSeedInputs() {
+  return [
+    document.getElementById("sp1")?.value || "",
+    document.getElementById("sp8")?.value || "",
+    document.getElementById("sp4")?.value || "",
+    document.getElementById("sp5")?.value || "",
+    document.getElementById("sp3")?.value || "",
+    document.getElementById("sp6")?.value || "",
+    document.getElementById("sp2")?.value || "",
+    document.getElementById("sp7")?.value || ""
+  ];
+}
+
+function setSingleSeedInputs(arr) {
+  if (!arr) return;
+  document.getElementById("sp1").value = arr[0] || "";
+  document.getElementById("sp8").value = arr[1] || "";
+  document.getElementById("sp4").value = arr[2] || "";
+  document.getElementById("sp5").value = arr[3] || "";
+  document.getElementById("sp3").value = arr[4] || "";
+  document.getElementById("sp6").value = arr[5] || "";
+  document.getElementById("sp2").value = arr[6] || "";
+  document.getElementById("sp7").value = arr[7] || "";
+}
+
+// --- Save/Reset Single Players ---
+async function saveSinglePlayers() {
+  ensureBracket();
+  const arr = getSingleSeedInputs();
+  bracketData.single.players = arr;
+  bracketData.single.scores = bracketData.single.scores || {};
+  bracketData.single.winners = bracketData.single.winners || {};
+  try {
+    if (typeof saveBracket === "function") await saveBracket();
+    else if (window.go?.main?.App) await window.go.main.App.SaveBracketJSON(bracketData);
+  } catch (e) {
+    console.warn("saveBracket failed", e);
+  }
+  seedSingleVisualBracket();
+}
+
+function resetSingle() {
+  setSingleSeedInputs(Array(8).fill(""));
+  bracketData.single = { players: Array(8).fill(""), scores: {}, winners: {} };
+  seedSingleVisualBracket();
+  try {
+    if (typeof saveBracket === "function") saveBracket();
+    else if (window.go?.main?.App) window.go.main.App.SaveBracketJSON(bracketData);
+  } catch (e) {
+    console.warn("saveBracket failed", e);
+  }
+}
+
+// --- Seeding and Progression ---
+function seedSingleVisualBracket() {
+  const seeds = getSingleSeedInputs();
+  // QF mapping: qf1: 1 vs 8, qf2: 4 vs 5, qf3: 3 vs 6, qf4: 2 vs 7
+  setText("qf1p1", seeds[0] || "Seed 1");
+  setText("qf1p2", seeds[1] || "Seed 8");
+  setText("qf2p1", seeds[2] || "Seed 4");
+  setText("qf2p2", seeds[3] || "Seed 5");
+  setText("qf3p1", seeds[4] || "Seed 3");
+  setText("qf3p2", seeds[5] || "Seed 6");
+  setText("qf4p1", seeds[6] || "Seed 2");
+  setText("qf4p2", seeds[7] || "Seed 7");
+
+  // Reset downstream
+  setText("sf1p1", "Winner QF1");
+  setText("sf1p2", "Winner QF2");
+  setText("sf2p1", "Winner QF3");
+  setText("sf2p2", "Winner QF4");
+  setText("f1p1", "Winner SF1");
+  setText("f1p2", "Winner SF2");
+
+  // Clear all score inputs
+  document.querySelectorAll('#visualBracket input[type=number]').forEach(i => i.value = '');
+
+  // Run progression
+  renderSingleFromData();
+}
+
+// --- Render/Progression Logic ---
+function renderSingleFromData() {
+  ensureBracket();
+  const s = bracketData.single || { players: Array(8).fill(""), scores: {}, winners: {} };
+  const players = s.players || Array(8).fill("");
+
+  // QF mapping
+  const qfPairs = {
+    qf1: [players[0] || "", players[1] || ""],
+    qf2: [players[2] || "", players[3] || ""],
+    qf3: [players[4] || "", players[5] || ""],
+    qf4: [players[6] || "", players[7] || ""]
+  };
+
+  Object.keys(qfPairs).forEach(k => {
+    const [aName, bName] = qfPairs[k];
+    setText(k + "p1", aName || "—");
+    setText(k + "p2", bName || "—");
+    const sc = (s.scores && s.scores[k]) ? s.scores[k] : [null, null];
+    setInputVal(k + "s1", sc[0] != null ? sc[0] : "");
+    setInputVal(k + "s2", sc[1] != null ? sc[1] : "");
+  });
+
+  // QF winners
+  const qfWinners = {};
+  ["qf1", "qf2", "qf3", "qf4"].forEach(qf => {
+    const sc = s.scores?.[qf];
+    if (Array.isArray(sc) && sc.length >= 2 && sc[0] !== null && sc[1] !== null && sc[0] !== sc[1]) {
+      const winner = sc[0] > sc[1] ? document.getElementById(qf + "p1").textContent : document.getElementById(qf + "p2").textContent;
+      qfWinners[qf] = winner;
+    }
+  });
+
+  setText("sf1p1", qfWinners.qf1 || "Winner QF1");
+  setText("sf1p2", qfWinners.qf2 || "Winner QF2");
+  setText("sf2p1", qfWinners.qf3 || "Winner QF3");
+  setText("sf2p2", qfWinners.qf4 || "Winner QF4");
+
+  // SF scores
+  setInputVal("sf1s1", s.scores?.sf1 ? s.scores.sf1[0] ?? "" : "");
+  setInputVal("sf1s2", s.scores?.sf1 ? s.scores.sf1[1] ?? "" : "");
+  setInputVal("sf2s1", s.scores?.sf2 ? s.scores.sf2[0] ?? "" : "");
+  setInputVal("sf2s2", s.scores?.sf2 ? s.scores.sf2[1] ?? "" : "");
+
+  // SF winners
+  const sfWinners = {};
+  ["sf1", "sf2"].forEach(sf => {
+    const sc = s.scores?.[sf];
+    if (Array.isArray(sc) && sc.length >= 2 && sc[0] !== null && sc[1] !== null && sc[0] !== sc[1]) {
+      const winner = sc[0] > sc[1] ? document.getElementById(sf + "p1").textContent : document.getElementById(sf + "p2").textContent;
+      sfWinners[sf] = winner;
+    }
+  });
+
+  setText("f1p1", sfWinners.sf1 || "Winner SF1");
+  setText("f1p2", sfWinners.sf2 || "Winner SF2");
+
+  // Final scores
+  setInputVal("f1s1", s.scores?.f1 ? s.scores.f1[0] ?? "" : "");
+  setInputVal("f1s2", s.scores?.f1 ? s.scores.f1[1] ?? "" : "");
+}
+
+// --- Helpers ---
+function setText(id, txt) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = txt;
+}
+function setInputVal(id, v) {
+  const el = document.getElementById(id);
+  if (el) el.value = (v === null || v === undefined) ? "" : v;
+}
+
+// --- Attach listeners (call after loading partial) ---
+function attachSingleBracketListeners() {
+  const container = document.getElementById('visualBracket') || document;
+  const inputs = container.querySelectorAll('input[type=number]');
+  inputs.forEach(inp => {
+    inp.removeEventListener('input', processSingleBracket);
+    inp.addEventListener('input', processSingleBracket);
+  });
+}
+
+// --- Live progression ---
+function processSingleBracket() {
+  ensureBracket();
+  bracketData.single.scores = bracketData.single.scores || {};
+
+  // Store scores
+  function storeScores(mid) {
+    const a = parseInt(document.getElementById(mid + "s1").value) || 0;
+    const b = parseInt(document.getElementById(mid + "s2").value) || 0;
+    bracketData.single.scores[mid] = [a, b];
+    return [a, b];
+  }
+
+  // QFs -> SFs
+  [["qf1", "sf1p1"], ["qf2", "sf1p2"], ["qf3", "sf2p1"], ["qf4", "sf2p2"]].forEach(([mid, sfTarget]) => {
+    const [a, b] = storeScores(mid);
+    if (a !== null && b !== null && a !== b) {
+      const winner = a > b ? document.getElementById(mid + "p1").textContent : document.getElementById(mid + "p2").textContent;
+      setText(sfTarget, winner);
+      bracketData.single.winners = bracketData.single.winners || {};
+      bracketData.single.winners[mid] = winner;
+    } else {
+      setText(sfTarget, "Winner " + mid.toUpperCase());
+      if (bracketData.single && bracketData.single.winners) delete bracketData.single.winners[mid];
+    }
+  });
+
+  // SFs -> Final
+  [["sf1", "f1p1"], ["sf2", "f1p2"]].forEach(([mid, fTarget]) => {
+    const [a, b] = storeScores(mid);
+    if (a !== null && b !== null && a !== b) {
+      const winner = a > b ? document.getElementById(mid + "p1").textContent : document.getElementById(mid + "p2").textContent;
+      setText(fTarget, winner);
+      bracketData.single.winners = bracketData.single.winners || {};
+      bracketData.single.winners[mid] = winner;
+    } else {
+      setText(fTarget, "Winner " + mid.toUpperCase());
+      if (bracketData.single && bracketData.single.winners) delete bracketData.single.winners[mid];
+    }
+  });
+
+  // Final scores
+  storeScores("f1");
+
+  // Optionally persist
+  try {
+    if (window.go?.main?.App) window.go.main.App.SaveBracketJSON(bracketData);
+  } catch (e) {}
+}
+
+// --- Initialization (call after loading partial) ---
+function initSingle() {
+  attachSingleBracketListeners();
+  setTimeout(() => { renderSingleFromData(); }, 30);
+}
+
+
+/* ----------------- DOUBLE BRACKET LOGIC ----------------- */
+
+if (typeof bracketData === 'undefined') window.bracketData = {};
+function ensureBracket(){
+  if(!bracketData.double){
+    bracketData.double = { players: Array(8).fill(""), scores:{}, winners:{}, eliminated:[] };
+  }
+}
+
+/* Called when bracket_double.html is loaded */
+function initDouble(){
+  const container = document.getElementById('doubleVisual') || document;
+
+  // Attach score input listeners
+  const numberInputs = container.querySelectorAll('input[type=number]');
+  numberInputs.forEach(i=>{
+    i.removeEventListener('input', updateDoubleBracket);
+    i.addEventListener('input', updateDoubleBracket);
+  });
+
+  // Attach seed listeners
+  for(let i=1;i<=8;i++){
+    const dp = document.getElementById('dp'+i);
+    if(!dp) continue;
+    dp.removeEventListener('input', seedDoubleVisualBracket);
+    dp.addEventListener('input', seedDoubleVisualBracket);
+  }
+
+  setTimeout(populateDoubleFromData, 20);
+  setTimeout(()=>{
+    seedDoubleVisualBracket();
+    updateDoubleBracket();
+  }, 40);
+}
+
+function val(id){
+  const el = document.getElementById(id);
+  if(!el) return null;
+  const v = el.value;
+  return (v===''||v===undefined)?null:Number(v);
+}
+function text(id){
+  const el = document.getElementById(id);
+  return el ? (el.textContent||'').trim() : '';
+}
+function setText(id, value){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.textContent=value;
+  el.classList.remove('eliminated');
+}
+function setEliminated(id,on){
+  const el=document.getElementById(id);
+  if(!el) return;
+  if(on) el.classList.add('eliminated'); else el.classList.remove('eliminated');
+}
+
+/* Highlight winners/losers */
+function highlightDoubleWinners(){
+  const matchIds=['wb_sf1','wb_sf2','wb_final','lb_r1_m1','lb_r1_m2','lb_r2_m1','lb_r2_m2','lb_final','grand_final'];
+  matchIds.forEach(mid=>{
+    const matchEl=document.getElementById(mid);
+    if(!matchEl) return;
+    const lines=matchEl.querySelectorAll('.player-line');
+    lines.forEach(l=>{ l.classList.remove('win','lose'); });
+    const scores=bracketData.double.scores[mid];
+    if(!scores||scores.length<2) return;
+    const [a,b]=scores;
+    if(a===null||b===null||a===b) return;
+    const winner=a>b?text(mid+'_p1'):text(mid+'_p2');
+    lines.forEach(l=>{
+      const span=l.querySelector('span');
+      if(!span) return;
+      if(span.textContent.trim()===winner) l.classList.add('win'); else l.classList.add('lose');
+    });
+  });
+}
+
+/* Progression */
+function updateDoubleBracket(){
+  ensureBracket();
+  bracketData.double.eliminated=[];
+
+  // WB Semis → WB Final, losers → LB R2 slots
+  [['wb_sf1','wb_final_p1'],['wb_sf2','wb_final_p2']].forEach(([mid,winTarget])=>{
+    const a=val(mid+'_s1'), b=val(mid+'_s2');
+    bracketData.double.scores[mid]=[a,b];
+    if(a!==null&&b!==null&&a!==b){
+      const winner=a>b?text(mid+'_p1'):text(mid+'_p2');
+      const loser =a>b?text(mid+'_p2'):text(mid+'_p1');
+      setText(winTarget,winner);
+      bracketData.double.winners[mid]=winner;
+      bracketData.double.losers=bracketData.double.losers||{};
+      bracketData.double.losers[mid]=loser;
+    } else {
+      setText(winTarget,'Winner '+mid.toUpperCase());
+      delete bracketData.double.winners[mid];
+      if(bracketData.double.losers) delete bracketData.double.losers[mid];
+    }
+  });
+
+  // LB R1 → LB R2
+  [['lb_r1_m1','lb_r2_m1_p1'],['lb_r1_m2','lb_r2_m2_p1']].forEach(([mid,winTarget])=>{
+    const a=val(mid+'_s1'), b=val(mid+'_s2');
+    bracketData.double.scores[mid]=[a,b];
+    if(a!==null&&b!==null&&a!==b){
+      const winner=a>b?text(mid+'_p1'):text(mid+'_p2');
+      const loser =a>b?text(mid+'_p2'):text(mid+'_p1');
+      setText(winTarget,winner);
+      bracketData.double.winners[mid]=winner;
+      bracketData.double.eliminated.push(loser);
+      if(a>b) setEliminated(mid+'_p2',true); else setEliminated(mid+'_p1',true);
+    } else {
+      setText(winTarget,'Winner '+mid.toUpperCase());
+      setEliminated(mid+'_p1',false); setEliminated(mid+'_p2',false);
+      delete bracketData.double.winners[mid];
+    }
+  });
+
+  // Drop WB SF losers into LB R2
+  if(bracketData.double.losers){
+    if(bracketData.double.losers['wb_sf1']) setText('lb_r2_m1_p2',bracketData.double.losers['wb_sf1']);
+    if(bracketData.double.losers['wb_sf2']) setText('lb_r2_m2_p2',bracketData.double.losers['wb_sf2']);
+  }
+
+  // LB R2 → LB Final
+  [['lb_r2_m1','lb_final_p1'],['lb_r2_m2','lb_final_p2']].forEach(([mid,winTarget])=>{
+    const a=val(mid+'_s1'), b=val(mid+'_s2');
+    bracketData.double.scores[mid]=[a,b];
+    if(a!==null&&b!==null&&a!==b){
+      const winner=a>b?text(mid+'_p1'):text(mid+'_p2');
+      const loser =a>b?text(mid+'_p2'):text(mid+'_p1');
+      setText(winTarget,winner);
+      if(a>b) setEliminated(mid+'_p2',true); else setEliminated(mid+'_p1',true);
+      bracketData.double.winners[mid]=winner;
+      bracketData.double.eliminated.push(loser);
+    } else {
+      setText(winTarget,'Winner '+mid.toUpperCase());
+      setEliminated(mid+'_p1',false); setEliminated(mid+'_p2',false);
+      delete bracketData.double.winners[mid];
+    }
+  });
+
+  // LB Final → GF LB slot
+  const lfa=val('lb_final_s1'), lfb=val('lb_final_s2');
+  bracketData.double.scores['lb_final']=[lfa,lfb];
+  if(lfa!==null&&lfb!==null&&lfa!==lfb){
+    const winner=lfa>lfb?text('lb_final_p1'):text('lb_final_p2');
+    const loser =lfa>lfb?text('lb_final_p2'):text('lb_final_p1');
+    setText('gf_lb',winner);
+    if(lfa>lfb) setEliminated('lb_final_p2',true); else setEliminated('lb_final_p1',true);
+    bracketData.double.winners['lb_final']=winner;
+    bracketData.double.eliminated.push(loser);
+  } else {
+    setText('gf_lb','LB Winner');
+    setEliminated('lb_final_p1',false); setEliminated('lb_final_p2',false);
+    delete bracketData.double.winners['lb_final'];
+  }
+
+  // WB Final → GF WB slot
+  const wfa=val('wb_final_s1'), wfb=val('wb_final_s2');
+  bracketData.double.scores['wb_final']=[wfa,wfb];
+  if(wfa!==null&&wfb!==null&&wfa!==wfb){
+    const winner=wfa>wfb?text('wb_final_p1'):text('wb_final_p2');
+    setText('gf_wb',winner);
+    bracketData.double.winners['wb_final']=winner;
+  } else {
+    setText('gf_wb','WB Winner');
+    delete bracketData.double.winners['wb_final'];
+  }
+
+  // GF → champion or reset
+  const gfa=val('gf_wb_s'), gfb=val('gf_lb_s');
+  bracketData.double.scores['grand_final']=[gfa,gfb];
+  if(gfa!==null&&gfb!==null&&gfa!==gfb){
+    if(gfa>gfb){
+      alert('🏆 Champion: '+text('gf_wb'));
+      setEliminated('gf_lb',true);
+      document.getElementById('gf_reset').style.display='none';
+    } else {
+      document.getElementById('gf_reset').style.display='block';
+      setText('gf_reset_p1',text('gf_wb'));
+      setText('gf_reset_p2',text('gf_lb'));
+    }
+  } else {
+    document.getElementById('gf_reset').style.display='none';
+  }
+
+  highlightDoubleWinners();
+
+  try{ if(window.go?.main?.App) window.go.main.App.SaveBracketJSON(bracketData); }catch(e){}
+}
+
+/* Seeding */
+function seedDoubleVisualBracket(){
+  const seeds=[];
+  for(let i=1;i<=8;i++) seeds.push(document.getElementById('dp'+i)?.value||'');
+
+  setText('wb_sf1_p1',seeds[0]||'Seed 1');
+  setText('wb_sf1_p2',seeds[1]||'Seed 2');
+  setText('wb_sf2_p1',seeds[2]||'Seed 3');
+  setText('wb_sf2_p2',seeds[3]||'Seed 4');
+
+  setText('lb_r1_m1_p1',seeds[4]||'Seed 5');
+  setText('lb_r1_m1_p2',seeds[5]||'Seed 6');
+  setText('lb_r1_m2_p1',seeds[6]||'Seed 7');
+  setText('lb_r1_m2_p2',seeds[7]||'Seed 8');
+
+  document.querySelectorAll('#doubleVisual input[type=number]').forEach(i=>i.value='');
+  updateDoubleBracket();
+}
+
+/* Restore */
+function populateDoubleFromData(){
+  ensureBracket();
+  const d=bracketData.double||{players:Array(8).fill("")};
+  if(d.players?.length>=8){
+    for(let i=0;i<8;i++){
+      const el=document.getElementById('dp'+(i+1));
+      if(el) el.value=d.players[i]||'';
+    }
+    seedDoubleVisualBracket();
+  }
+  const scores=d.scores||{};
+  Object.keys(scores).forEach(mid=>{
+    const arr=scores[mid];
+    if(!arr||arr.length!==2) return;
+    if(mid==='grand_final'){
+      document.getElementById('gf_wb_s').value=arr[0]??'';
+      document.getElementById('gf_lb_s').value=arr[1]??'';
+    } else if(mid==='gf_reset'){
+      document.getElementById('gf_reset_s1').value=arr[0]??'';
+      document.getElementById('gf_reset_s2').value=arr[1]??'';
+    } else {
+      const s1=document.getElementById(mid+'_s1'), s2=document.getElementById(mid+'_s2');
+      if(s1) s1.value=arr[0]??''; if(s2) s2.value=arr[1]??'';
+    }
+  });
+  updateDoubleBracket();
+}
+
+/* Save / Reset */
+async function saveDoublePlayers(){
+  ensureBracket();
+  const arr=[];
+  for(let i=1;i<=8;i++) arr.push(document.getElementById('dp'+i)?.value||'');
+  bracketData.double.players=arr;
+  try{ if(typeof saveBracket==='function') await saveBracket(); }catch(e){}
+  seedDoubleVisualBracket();
+}
+function resetDouble(){
+  for(let i=1;i<=8;i++){ const el=document.getElementById('dp'+i); if(el) el.value=''; }
+  bracketData.double={players:Array(8).fill(""),scores:{},winners:{},eliminated:[]};
+  seedDoubleVisualBracket();
+  try{ if(typeof saveBracket==='function') saveBracket(); }catch(e){}
+}
+
+/* GF Reset */
+function finalizeChampion(){
+  const p1=text('gf_reset_p1'), p2=text('gf_reset_p2');
+  const s1=val('gf_reset_s1'), s2=val('gf_reset_s2');
+  if(s1!==null&&s2!==null&&s1!==s2){
+    const champ=s1>s2?p1:p2;
+    alert('🏆 Champion: '+champ);
+    bracketData.double.scores.gf_reset=[s1,s2];
+    bracketData.double.winners.gf_reset=champ;
+    try{ if(window.go?.main?.App) window.go.main.App.SaveBracketJSON(bracketData); }catch(e){}
+    document.getElementById('gf_reset').style.display='none';
+  }
+}
+</script>
+
 
 </body>
 </html>

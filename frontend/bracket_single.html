@@ -140,12 +140,14 @@
 </div>
 
 <script>
-/* initSingle is called after the partial is injected */
 function initSingle(){
-  // ensure listeners exist
   const inputs = document.querySelectorAll('#single #visualBracket input[type=number]');
-  inputs.forEach(i => i.addEventListener('input', updateBracket));
-  // re-run a bracket update so saved data appears
-  setTimeout(()=>{ if(typeof updateBracket === 'function') updateBracket(); }, 30);
+  inputs.forEach(i => {
+    i.removeEventListener('input', updateBracket);
+    i.addEventListener('input', updateBracket);
+  });
+
+  // run once so saved data appears
+  setTimeout(()=>{ updateBracket(); }, 30);
 }
 </script>

@@ -1,66 +1,32 @@
+<!-- double elimination partial -->
 <style>
- 
   /* bracket tree grid */
-  .bracket-tree {
-    position: relative;
-    width: 1000px;
-    height: 400px;
-    background: transparent;
-    overflow: visible;
-  }
-
-  /* Scrollable wrapper */
-  .bracket-scroll-container {
-    width: 80%;
-    max-width: 1400px;
-    max-height: 500px;
-    overflow: auto;
-    border: 1px solid var(--border);
-    padding: 8px;
-    background: var(--panel);
-    border-radius: 10px;
-  }
-
-  .bracket-tree .round {
-    position: absolute;
-    display: block;
-    width: 200px;
-  }
-
+  .bracket-tree { position: relative; width: 1000px; height: 400px; background: transparent; overflow: visible; }
+  .bracket-scroll-container { width: 100%; max-width: 1400px; max-height: 500px; overflow: auto; border: 1px solid var(--border); padding: 8px; background: var(--panel); border-radius: 10px; }
+  .bracket-tree .round { position: absolute; display: block; width: 200px; }
   .bracket-tree .round.quarterfinal { left: 0; top: 0; }
   .bracket-tree .round.semifinal { left: 250px; top: 0; }
   .bracket-tree .round.final { left: 500px; top: 130px; }
+  .bracket-tree .round .match { position: absolute; width: 200px; background: #222; border: 1px solid #444; border-radius: 6px; padding: 6px 10px; font-size: 12px; color: #fff; }
+  .bracket-line { fill: none; stroke: #882f2f; stroke-width: 2px; }
 
-  .bracket-tree .round .match {
-    position: absolute;
-    width: 200px;
-    background: #222;
-    border: 1px solid #444;
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-  .bracket-line {
-    fill: none;
-    stroke: #882f2f;
-    stroke-width: 2px;
-  }
-
-  /* manual positions */
+  /* manual positions (kept as you asked) */
   #wb_sf1 { top: 50px; left: 10px; }
   #wb_sf2 { top: 160px; left: 10px; }
   #wb_final { top: 10px; left: 300px; }
-
   #lb_r1_m1 { top: 120px; left: 160px; }
   #lb_r1_m2 { top: 250px; left: 160px; }
-
   #lb_r2_m1 { top: -10px; left: 300px; }
   #lb_r2_m2 { top: 100px; left: 300px; }
-
+    #lb_sf { top: -100px; left: 600px; }
   #lb_final { top: -100px; left: 450px; }
   #grand_final { top: -100px; left: 300px; }
   #gf_reset  { top: 80px; left: 600px; }
- 
+
+  /* eliminated visual */
+  .eliminated { opacity: 0.45; text-decoration: line-through; color:#bbb !important; }
+  .player-line.win { background: rgba(0,150,0,0.06); }
+  .player-line.lose { background: rgba(150,0,0,0.04); }
 </style>
 
 <div style="display:flex;gap:12px;align-items:flex-start;margin-top:10px;margin-bottom:12px;flex-wrap:wrap">
@@ -85,7 +51,7 @@
 <div class="bracket-scroll-container">
   <div class="bracket-tree" id="doubleVisual" aria-label="Double-elim bracket">
 
-     <!-- Winners Semis / Winners Final -->
+    <!-- Winners Semis / Winners Final -->
     <div class="round semifinal" style="left:0px;">
       <h4>Winners Semis</h4>
       <div class="match" id="wb_sf1">
@@ -128,11 +94,12 @@
       </div>
     </div>
 
+
     <h4 style="left: 600px; top: 240px; position: absolute;">Losers Finals</h4>
     <div class="round" style="left:150px; top:400px;">
       <div class="match" id="lb_final">
-        <div class="player-line"><span id="lb_final_p1">Winner R2M1</span><input type="number" id="lb_final_s1"></div>
-        <div class="player-line"><span id="lb_final_p2">Winner R2M2</span><input type="number" id="lb_final_s2"></div>
+        <div class="player-line"><span id="lb_final_p1">Winner LB Semi</span><input type="number" id="lb_final_s1"></div>
+        <div class="player-line"><span id="lb_final_p2">Loser WB Final</span><input type="number" id="lb_final_s2"></div>
       </div>
     </div>
 
@@ -151,310 +118,15 @@
         <button class="btn" onclick="finalizeChampion()" style="margin-top:8px;">Declare Champion</button>
       </div>
     </div>
+
   </div>
 </div>
 
-<!-- DOUBLE-ELIM LOGIC: paste into index.html main script -->
 <script>
-/* Double-elim helper + progression logic (must live in index.html so loadPartial() can call initDouble) */
-function initDouble(){
-  // called after partial is injected; attach listeners for numeric inputs inside the double visual
-  const inputs = document.querySelectorAll('#double #doubleVisual input[type=number]');
-  inputs.forEach(i => {
-    i.removeEventListener('input', updateDoubleBracket);
-    i.addEventListener('input', updateDoubleBracket);
-  });
-
-  // Also attach a small listener so seeding text inputs update the visual if user edits them after saving
-  const seedInputs = document.querySelectorAll('#double input[type=text]');
-  seedInputs.forEach(si => {
-    si.removeEventListener('input', seedDoubleVisualBracket);
-    si.addEventListener('input', seedDoubleVisualBracket);
-  });
-
-  // populate from saved bracketData (if any)
-  setTimeout(populateDoubleFromData, 20);
-}
-
-/* simple helpers (local/global names to match your existing code) */
-function val(id){
-  const v = document.getElementById(id)?.value;
-  return (v === '' || v === undefined) ? null : Number(v);
-}
-function text(id){
-  return document.getElementById(id)?.textContent || '';
-}
-function setText(id, v){
-  const el = document.getElementById(id);
-  if(el) el.textContent = v;
-}
-
-/* main progression function */
-function updateDoubleBracket(){
-  ensureBracket();
-  if(!bracketData.double) bracketData.double = { players: Array(8).fill(""), scores:{}, winners:{} };
-  bracketData.double.scores = bracketData.double.scores || {};
-  bracketData.double.winners = bracketData.double.winners || {};
-
-  // 1) Winners QFs -> WB SF & route losers to LB R1
-  const wbQfMappings = [
-    ['wb_qf1','wb_sf1_p1','lb_r1_m1_p1'],
-    ['wb_qf2','wb_sf1_p2','lb_r1_m1_p2'],
-    ['wb_qf3','wb_sf2_p1','lb_r1_m2_p1'],
-    ['wb_qf4','wb_sf2_p2','lb_r1_m2_p2']
-  ];
-  wbQfMappings.forEach(([mid, winTarget, loseTarget])=>{
-    const a = val(mid + '_s1');
-    const b = val(mid + '_s2');
-    bracketData.double.scores[mid] = [a, b];
-
-    if(a !== null && b !== null && a !== b){
-      const winner = (a > b) ? text(mid + '_p1') : text(mid + '_p2');
-      const loser = (a > b) ? text(mid + '_p2') : text(mid + '_p1');
-      setText(winTarget, winner);
-      setText(loseTarget, loser);
-      bracketData.double.winners[mid] = winner;
-    } else {
-      // keep placeholder text intact if scores are incomplete/tied
-      // we preserve original placeholders like "Winner QF1" etc.
-      delete bracketData.double.winners[mid];
-      // don't force placeholder text here — populateDoubleFromData or seeding functions are
-      // responsible for setting appropriate placeholders at seed/reset time.
-    }
-  });
-
-  // 2) LB R1 winners -> R2 slots
-  [['lb_r1_m1','lb_r2_m1_p1'], ['lb_r1_m2','lb_r2_m2_p1']].forEach(([mid, winTarget])=>{
-    const a = val(mid + '_s1');
-    const b = val(mid + '_s2');
-    bracketData.double.scores[mid] = [a, b];
-
-    if(a !== null && b !== null && a !== b){
-      const winner = (a > b) ? text(mid + '_p1') : text(mid + '_p2');
-      setText(winTarget, winner);
-      bracketData.double.winners[mid] = winner;
-    } else {
-      delete bracketData.double.winners[mid];
-    }
-  });
-
-  // 3) WB SF -> WB final, losers to LB R2 second slot
-  [['wb_sf1','wb_final_p1','lb_r2_m1_p2'], ['wb_sf2','wb_final_p2','lb_r2_m2_p2']].forEach(([mid, winTarget, loseTarget])=>{
-    const a = val(mid + '_s1');
-    const b = val(mid + '_s2');
-    bracketData.double.scores[mid] = [a, b];
-
-    if(a !== null && b !== null && a !== b){
-      const winner = (a > b) ? text(mid + '_p1') : text(mid + '_p2');
-      const loser = (a > b) ? text(mid + '_p2') : text(mid + '_p1');
-      setText(winTarget, winner);
-      setText(loseTarget, loser);
-      bracketData.double.winners[mid] = winner;
-    } else {
-      delete bracketData.double.winners[mid];
-    }
-  });
-
-  // 4) LB R2 winners -> LB final
-  [['lb_r2_m1','lb_final_p1'], ['lb_r2_m2','lb_final_p2']].forEach(([mid, winTarget])=>{
-    const a = val(mid + '_s1');
-    const b = val(mid + '_s2');
-    bracketData.double.scores[mid] = [a, b];
-    if(a !== null && b !== null && a !== b){
-      const winner = (a > b) ? text(mid + '_p1') : text(mid + '_p2');
-      setText(winTarget, winner);
-      bracketData.double.winners[mid] = winner;
-    } else {
-      delete bracketData.double.winners[mid];
-    }
-  });
-
-  // 5) LB final -> grand final (LB)
-  const lbFinalA = val('lb_final_s1');
-  const lbFinalB = val('lb_final_s2');
-  bracketData.double.scores['lb_final'] = [lbFinalA, lbFinalB];
-  if(lbFinalA !== null && lbFinalB !== null && lbFinalA !== lbFinalB){
-    const winner = (lbFinalA > lbFinalB) ? text('lb_final_p1') : text('lb_final_p2');
-    setText('gf_lb', winner);
-    bracketData.double.winners['lb_final'] = winner;
-  } else {
-    // keep placeholder
-    delete bracketData.double.winners['lb_final'];
+ /* ---------- Core: robust listeners & helpers ---------- */
+  function initDouble(){
+    // only run seeding + update logic
+    setTimeout(seedDoubleVisualBracket, 20);
+    setTimeout(updateDoubleBracket, 40);
   }
-
-  // 6) WB final -> grand final (WB)
-  const wbFinalA = val('wb_final_s1');
-  const wbFinalB = val('wb_final_s2');
-  bracketData.double.scores['wb_final'] = [wbFinalA, wbFinalB];
-  if(wbFinalA !== null && wbFinalB !== null && wbFinalA !== wbFinalB){
-    const winner = (wbFinalA > wbFinalB) ? text('wb_final_p1') : text('wb_final_p2');
-    setText('gf_wb', winner);
-    bracketData.double.winners['wb_final'] = winner;
-  } else {
-    delete bracketData.double.winners['wb_final'];
-  }
-
-  // 7) Grand final logic + potential reset
-  const gfWbScore = val('gf_wb_s');
-  const gfLbScore = val('gf_lb_s');
-  bracketData.double.scores['grand_final'] = [gfWbScore, gfLbScore];
-
-  if(gfWbScore !== null && gfLbScore !== null && gfWbScore !== gfLbScore){
-    if(gfWbScore > gfLbScore){
-      // WB winner wins tournament
-      alert('🏆 Champion: ' + text('gf_wb'));
-      document.getElementById('gf_reset').style.display = 'none';
-    } else {
-      // LB winner wins the first set → show reset set
-      document.getElementById('gf_reset').style.display = 'block';
-      setText('gf_reset_p1', text('gf_wb'));
-      setText('gf_reset_p2', text('gf_lb'));
-    }
-  } else {
-    document.getElementById('gf_reset').style.display = 'none';
-  }
-
-  // persist bracketData if possible
-  try{
-    if(window.go && window.go.main && window.go.main.App){
-      window.go.main.App.SaveBracketJSON(bracketData);
-    }
-  }catch(e){
-    // noop
-  }
-
-  // visual highlights
-  highlightDoubleWinners();
-}
-
-/* highlight winners/losers in each match box */
-function highlightDoubleWinners(){
-  const matchIds = ['wb_qf1','wb_qf2','wb_qf3','wb_qf4','wb_sf1','wb_sf2','wb_final','lb_r1_m1','lb_r1_m2','lb_r2_m1','lb_r2_m2','lb_final','grand_final'];
-  matchIds.forEach(mid=>{
-    const matchEl = document.getElementById(mid);
-    if(!matchEl) return;
-    matchEl.querySelectorAll('.player-line').forEach(pl => {
-      pl.classList.remove('win','lose');
-    });
-    const scores = bracketData.double.scores && bracketData.double.scores[mid];
-    if(scores && scores[0] !== null && scores[1] !== null && scores[0] !== scores[1]){
-      const winnerName = bracketData.double.winners && bracketData.double.winners[mid];
-      if(winnerName){
-        matchEl.querySelectorAll('.player-line').forEach(pl=>{
-          const nameSpan = pl.querySelector('span');
-          if(!nameSpan) return;
-          if(nameSpan.textContent === winnerName) pl.classList.add('win');
-          else pl.classList.add('lose');
-        });
-      }
-    }
-  });
-}
-
-/* populate UI from bracketData.double (called at init or when loading saved bracket.json) */
-function populateDoubleFromData(){
-  ensureBracket();
-  const d = bracketData.double || { players: Array(8).fill("") };
-
-  // fill seed input boxes (dp1..dp8)
-  if(d.players && d.players.length >= 8){
-    for(let i=0;i<8;i++){
-      const el = document.getElementById('dp'+(i+1));
-      if(el) el.value = d.players[i] || '';
-    }
-
-    // map seeds into winners QFs
-    setText('wb_qf1_p1', d.players[0] || 'Seed 1');
-    setText('wb_qf1_p2', d.players[7] || 'Seed 8');
-    setText('wb_qf2_p1', d.players[3] || 'Seed 4');
-    setText('wb_qf2_p2', d.players[4] || 'Seed 5');
-    setText('wb_qf3_p1', d.players[2] || 'Seed 3');
-    setText('wb_qf3_p2', d.players[5] || 'Seed 6');
-    setText('wb_qf4_p1', d.players[1] || 'Seed 2');
-    setText('wb_qf4_p2', d.players[6] || 'Seed 7');
-  }
-
-  // populate saved scores if present
-  const scores = d.scores || {};
-  Object.keys(scores).forEach(mid=>{
-    const arr = scores[mid];
-    if(!arr || arr.length !== 2) return;
-    const s1 = document.getElementById(mid + '_s1');
-    const s2 = document.getElementById(mid + '_s2');
-    if(s1) s1.value = arr[0] != null ? arr[0] : '';
-    if(s2) s2.value = arr[1] != null ? arr[1] : '';
-  });
-
-  // ensure progression runs to fill derived slots
-  updateDoubleBracket();
-}
-
-/* seed visual bracket from dp1..dp8 (used when editing seeds manually) */
-function seedDoubleVisualBracket(){
-  const seeds = [];
-  for(let i=1;i<=8;i++){
-    const el = document.getElementById('dp'+i);
-    seeds.push(el ? el.value || '' : '');
-  }
-  setText('wb_qf1_p1', seeds[0] || 'Seed 1');
-  setText('wb_qf1_p2', seeds[7] || 'Seed 8');
-  setText('wb_qf2_p1', seeds[3] || 'Seed 4');
-  setText('wb_qf2_p2', seeds[4] || 'Seed 5');
-  setText('wb_qf3_p1', seeds[2] || 'Seed 3');
-  setText('wb_qf3_p2', seeds[5] || 'Seed 6');
-  setText('wb_qf4_p1', seeds[1] || 'Seed 2');
-  setText('wb_qf4_p2', seeds[6] || 'Seed 7');
-
-  // clear scores in visual
-  document.querySelectorAll('#doubleVisual input[type=number]').forEach(inp => inp.value = '');
-
-  // reset placeholders downstream
-  setText('wb_sf1_p1','Winner QF1'); setText('wb_sf1_p2','Winner QF2');
-  setText('wb_sf2_p1','Winner QF3'); setText('wb_sf2_p2','Winner QF4');
-  setText('wb_final_p1','Winner SF1'); setText('wb_final_p2','Winner SF2');
-  setText('lb_r1_m1_p1','Loser QF1'); setText('lb_r1_m1_p2','Loser QF2');
-  setText('lb_r1_m2_p1','Loser QF3'); setText('lb_r1_m2_p2','Loser QF4');
-  setText('lb_r2_m1_p1','Winner R1M1'); setText('lb_r2_m1_p2','Loser SF1');
-  setText('lb_r2_m2_p1','Winner R1M2'); setText('lb_r2_m2_p2','Loser SF2');
-  setText('lb_final_p1','Winner R2M1'); setText('lb_final_p2','Winner R2M2');
-  setText('gf_wb','WB Winner'); setText('gf_lb','LB Winner');
-
-  document.getElementById('gf_reset') && (document.getElementById('gf_reset').style.display = 'none');
-
-  // run progression after seeding
-  updateDoubleBracket();
-}
-
-function syncInputsToBracket(){
-  const ids = [
-    'wb_sf1_p1','wb_sf1_p2','wb_sf2_p1','wb_sf2_p2',
-    'lb_r1_m1_p1','lb_r1_m1_p2','lb_r1_m2_p1','lb_r1_m2_p2'
-  ];
-  ids.forEach(id=>{
-    const inp = document.getElementById(id);
-    if(inp && inp.tagName === 'INPUT'){
-      inp.addEventListener('input', ()=>{
-        setText(id, inp.value || inp.placeholder || '');
-      });
-    }
-  });
-}
-
-
-/* finalize champion from reset match */
-function finalizeChampion(){
-  const p1 = text('gf_reset_p1');
-  const p2 = text('gf_reset_p2');
-  const s1 = val('gf_reset_s1');
-  const s2 = val('gf_reset_s2');
-  if(s1 !== null && s2 !== null && s1 !== s2){
-    const champion = s1 > s2 ? p1 : p2;
-    alert('🏆 Champion: ' + champion);
-    bracketData.double.scores = bracketData.double.scores || {};
-    bracketData.double.scores['gf_reset'] = [s1, s2];
-    bracketData.double.winners = bracketData.double.winners || {};
-    bracketData.double.winners['gf_reset'] = champion;
-    try{ if(window.go && window.go.main && window.go.main.App) window.go.main.App.SaveBracketJSON(bracketData); }catch(e){}
-  }
-}
 </script>

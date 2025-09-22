@@ -132,10 +132,10 @@ function renderSingleFromData(){
   const players = s.players || Array(8).fill("");
 
   const qfPairs = {
-    qf1: [players[0]||"", players[7]||""],
-    qf2: [players[3]||"", players[4]||""],
-    qf3: [players[2]||"", players[5]||""],
-    qf4: [players[1]||"", players[6]||""]
+    qf1: [players[0]||"", players[1]||""],
+    qf2: [players[2]||"", players[3]||""],
+    qf3: [players[4]||"", players[5]||""],
+    qf4: [players[6]||"", players[7]||""]
   };
 
   Object.keys(qfPairs).forEach(k=>{
