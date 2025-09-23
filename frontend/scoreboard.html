@@ -1,61 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Scoreboard</title>
-<link rel="stylesheet" href="scoreboard.css">
-
+  <meta charset="UTF-8">
+  <title>Scoreboard</title>
+  <link rel="stylesheet" href="scoreboard.css">
 </head>
 <body>
-<div id="p1-card" class="player">
-  <div class="score" id="s1">0</div>
-  <div class="player-info">
-    <div class="name">Player 1</div>
-    <div class="team">Team 1</div>
-    <div class="controller">Controller 1</div>
-  </div>
-</div>
 
-<div id="p2-card" class="player">
-  <div class="score" id="s2">0</div>
-  <div class="player-info">
-    <div class="name">Player 2</div>
-    <div class="team">Team 2</div>
-    <div class="controller">Controller 2</div>
+  <div id="titlecard" class="titlecard">
   </div>
-</div>
 
-<div id="p3-card" class="player" style="display:none;">
-  <div class="score" id="s3">0</div>
-  <div class="player-info">
-    <div class="name">Player 3</div>
-    <div class="team">Team 3</div>
-    <div class="controller">Controller 3</div>
+  <div id="p1-card" class="player">
+    <div class="score" id="s1">0</div>
+    <div class="player-info">
+      <div class="score-text">
+        <div class="name">Player 1</div>
+        <div class="team"> </div>
+      </div>
+      <div class="controller-container" id="controller1">
+        <img class="controller" id="c1" src="" alt="Controller 1">
+      </div>
+    </div>
   </div>
-</div>
 
-<div id="p4-card" class="player" style="display:none;">
-  <div class="score" id="s4">0</div>
-  <div class="player-info">
-    <div class="name">Player 4</div>
-    <div class="team">Team 4</div>
-    <div class="controller">Controller 4</div>
+  <div id="p2-card" class="player">
+    <div class="score" id="s2">0</div>
+    <div class="player-info">
+      <div class="score-text">
+        <div class="name">Player 2</div>
+        <div class="team"> </div>
+      </div>
+      <div class="controller-container" id="controller2">
+        <img class="controller" id="c2" src="" alt="Controller 2">
+      </div>
+    </div>
   </div>
-</div>
+
+  <div id="p3-card" class="player" style="display:none;">
+    <div class="score" id="s3" style="display: none;">0</div>
+    <div class="player-info">
+      <div class="score-text">
+        <div class="name">Player 3</div>
+        <div class="team"> </div>
+      </div>
+      <div class="controller-container" id="controller3">
+        <img class="controller" id="c3" src="" alt="Controller 3">
+      </div>
+    </div>
+  </div>
+
+  <div id="p4-card" class="player" style="display:none;">
+    <div class="score" id="s4" style="display: none;">0</div>
+    <div class="player-info">
+      <div class="score-text">
+        <div class="name">Player 4</div>
+        <div class="team"> </div>
+      </div>
+      <div class="controller-container" id="controller4">
+        <img class="controller" id="c4" src="" alt="Controller 4">
+      </div>
+    </div>
+  </div>
+
+  <!-- Sponsor Section -->
+  <div id="sponsor-container">
+    <img id="sponsor-logo" src="" />
+  </div>
+
+  <script>
+    const sponsorImages = [
+      "img/jabo.png",
+    ];
+    const sponsorInterval = 5000; // 5 seconds
+    let sponsorIndex = 0;
+
+    function cycleSponsors() {
+      if (!sponsorImages.length) return;
+      const sponsorLogo = document.getElementById("sponsor-logo");
+      sponsorLogo.classList.remove("visible");
+
+      setTimeout(() => {
+        sponsorLogo.src = sponsorImages[sponsorIndex];
+        sponsorLogo.classList.add("visible");
+        sponsorIndex = (sponsorIndex + 1) % sponsorImages.length;
+      }, 1000);
+    }
+
+    setInterval(cycleSponsors, sponsorInterval);
+    cycleSponsors();
+  </script>
 
 <script>
 async function loadScoreboard() {
   try {
-    const resp = await fetch("scoreboard.json");
+    const resp = await fetch("scoreboard.json?_=" + Date.now());
     if (!resp.ok) throw new Error("Failed to fetch scoreboard.json");
     const data = await resp.json();
 
-    // map your JSON game values to CSS body classes used in scoreboard.css
     const gameClassMap = { sf: "sf", dbfz: "dbfz", tekken: "tekken", "2xko": "_2XKO" };
-    // clear old classes then add the one for current game
-    document.body.classList.remove("sf","dbfz","tekken","_2XKO");
-    if (gameClassMap[data.game]) document.body.classList.add(gameClassMap[data.game]);
 
+    // reset all classes
+    document.body.classList.remove("sf","dbfz","tekken","_2XKO","minimalist","arcade","futuristic");
+
+    // apply game + style
+    if (gameClassMap[data.game]) document.body.classList.add(gameClassMap[data.game]);
+    if (data.style) document.body.classList.add(data.style);
+
+    // update titlecard
+    const titleEl = document.getElementById("titlecard");
+    if (titleEl) titleEl.textContent = data.titlecard || "";
+
+    // players
     ["p1","p2","p3","p4"].forEach((p,i) => {
       const card = document.getElementById(`p${i+1}-card`);
       const visible = (i<2) ? true : !!data[`visible${i+1}`];
@@ -63,18 +118,50 @@ async function loadScoreboard() {
 
       card.querySelector(".name").textContent = data[`player${i+1}`] || `Player ${i+1}`;
       card.querySelector(".team").textContent = data[`team${i+1}`] || `Team ${i+1}`;
-      card.querySelector(".controller").textContent = data[`controller${i+1}`] || `Controller ${i+1}`;
       card.querySelector(".score").textContent = data[`score${i+1}`] || 0;
+
+      // controller image logic
+      const controllerType = data[`controller${i+1}`]; // e.g. "leverless"
+      const containerEl = card.querySelector(".controller-container");
+      const controllerEl = containerEl.querySelector(".controller");
+
+      if (controllerType && controllerType !== "none") {
+        containerEl.style.display = "block";
+        controllerEl.src = `img/controller/1x/${controllerType}.png`;
+      } else {
+        containerEl.style.display = "none";
+      }
     });
+
+    // ✅ Now check duo AFTER loop
+    const p1Visible = document.getElementById("p1-card").style.display !== "none";
+    const p2Visible = document.getElementById("p2-card").style.display !== "none";
+    const p3Visible = document.getElementById("p3-card").style.display !== "none";
+    const p4Visible = document.getElementById("p4-card").style.display !== "none";
+
+    // Clear helper classes first
+    document.body.classList.remove("has-left-duo","has-right-duo");
+
+    // Add helper if P1+P3 are both visible
+    if (p1Visible && p3Visible) {
+      document.body.classList.add("has-left-duo");
+    }
+
+    // Add helper if P2+P4 are both visible
+    if (p2Visible && p4Visible) {
+      document.body.classList.add("has-right-duo");
+    }
 
   } catch (err) {
     console.error("Error loading scoreboard.json:", err);
   }
 }
 
-// Refresh every second
-setInterval(loadScoreboard, 1000);
-loadScoreboard();
+
+
+  setInterval(loadScoreboard, 1000);
+  loadScoreboard();
 </script>
+
 </body>
 </html>

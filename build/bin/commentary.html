@@ -14,48 +14,60 @@
 
   #commentary-bar {
     position: absolute;
-    bottom: 40px;
+    bottom: 80px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 40px; /* space between commentators */
+    gap: 640px; /* space between commentators */
   }
 
-  .commentator {
-    background: rgba(0,0,0,0.7);
-    color: white;
-    padding: 16px 32px;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 400px; /* keeps size consistent */
-  }
+.commentator {
+  position: relative;
+  background: #6a0dad; /* purple */
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  min-width: 280px;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  clip-path: polygon(
+    0% 0%,   /* top left */
+    100% 0%, /* top right */
+    100% 75%,/* bottom right */
+    90% 100%,/* angled bottom */
+    0% 100%  /* bottom left */
+  );
+
+    transform: scale(1.6);
+    gap: 6px;
+}
+
+.commentator .comm-name {
+  font-weight: bold;
+  font-size: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.commentator .comm-desc {
+  font-size: 14px;
+  color: #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 
   /* Hide whole bar */
   .hidden {
     display: none !important;
   }
 
-  .comm-name {
-    font-weight: bold;
-    font-size: 48px;
-    text-align: center;
-  }
-
-  .comm-desc {
-    font-size: 28px;
-    color: #ccc;
-    text-align: center;
-  }
-
-  /* Example: separate styling for each commentator box */
-  #comm1 {
-    background: rgba(20,20,20,0.8);
-  }
-  #comm2 {
-    background: rgba(50,0,0,0.8);
-  }
+ 
+ 
 </style>
 </head>
 <body>
@@ -69,6 +81,7 @@
       <span id="comm2-desc" class="comm-desc">Description 2</span>
     </div>
   </div>
+ 
 
 <script>
 async function loadCommentary() {
