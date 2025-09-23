@@ -10,6 +10,6 @@ export function GetScoreboard():Promise<main.Scoreboard>;
 
 export function SaveBracketJSON(arg1:main.Bracket):Promise<void>;
 
-export function SaveCommentaryJSON(arg1:main.Commentary):Promise<void>;
+export function SaveCommentaryJSON(arg1:Record<string, any>):Promise<void>;
 
 export function SaveScoreboardJSON(arg1:main.Scoreboard):Promise<void>;

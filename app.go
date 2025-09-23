@@ -89,9 +89,16 @@ func (a *App) GetCommentary() Commentary {
 	return a.commentary
 }
 
-func (a *App) SaveCommentaryJSON(data Commentary) error {
-	a.commentary = data
-	return saveJSON("commentary.json", data)
+// SaveCommentaryJSON saves the commentary data to disk
+func (a *App) SaveCommentaryJSON(data map[string]interface{}) error {
+	f, err := os.Create("commentary.json")
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	enc := json.NewEncoder(f)
+	enc.SetIndent("", "  ")
+	return enc.Encode(data)
 }
 
 // -------------------- BRACKETS --------------------

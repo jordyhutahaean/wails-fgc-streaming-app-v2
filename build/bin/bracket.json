@@ -1,53 +1,17 @@
 {
   "single": {
     "players": [
-      "dar",
-      "trejo",
-      "tupi",
-      "pipi",
-      "yoma",
-      "whyman",
-      "riku",
-      "ikko"
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
     ],
-    "scores": {
-      "f1": [
-        3,
-        2
-      ],
-      "qf1": [
-        3,
-        2
-      ],
-      "qf2": [
-        3,
-        1
-      ],
-      "qf3": [
-        3,
-        1
-      ],
-      "qf4": [
-        2,
-        3
-      ],
-      "sf1": [
-        2,
-        3
-      ],
-      "sf2": [
-        3,
-        1
-      ]
-    },
-    "winners": {
-      "qf1": "dar",
-      "qf2": "tupi",
-      "qf3": "yoma",
-      "qf4": "ikko",
-      "sf1": "tupi",
-      "sf2": "yoma"
-    }
+    "scores": {},
+    "winners": {}
   },
   "double": {
     "players": [

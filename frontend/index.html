@@ -357,17 +357,18 @@ let commentaryVisible = false;
 
 async function updateCommentary(){
   const data = {
-    commentator1: document.getElementById("com1_name").value||"",
-    description1: document.getElementById("com1_desc").value||"",
-    commentator2: document.getElementById("com2_name").value||"",
-    description2: document.getElementById("com2_desc").value||"",
+    commentator1: document.getElementById("com1_name").value || "",
+    description1: document.getElementById("com1_desc").value || "",
+    commentator2: document.getElementById("com2_name").value || "",
+    description2: document.getElementById("com2_desc").value || "",
     visible: commentaryVisible
   };
-  try{
-    await window.go.main.App.SaveCommentaryJSON(data);
-  }catch(err){
-    console.error("SaveCommentaryJSON failed:",err);
-    alert("Error saving commentary JSON (see console).");
+  try {
+    if (window.go?.main?.App?.SaveCommentaryJSON) {
+      await window.go.main.App.SaveCommentaryJSON(data);
+    }
+  } catch (e) {
+    alert("Failed to save commentary: " + e);
   }
 }
 
