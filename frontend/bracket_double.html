@@ -16,9 +16,9 @@
   #wb_final { top: 10px; left: 300px; }
   #lb_r1_m1 { top: 120px; left: 160px; }
   #lb_r1_m2 { top: 250px; left: 160px; }
-  #lb_r2_m1 { top: -10px; left: 300px; }
-  #lb_r2_m2 { top: 100px; left: 300px; }
-    #lb_sf { top: -100px; left: 600px; }
+  #lb_qf_m1 { top: -10px; left: 300px; }
+  #lb_qf_m2 { top: 100px; left: 300px; }
+  #lb_sf { top: -100px; left: 600px; }
   #lb_final { top: -100px; left: 450px; }
   #grand_final { top: -100px; left: 300px; }
   #gf_reset  { top: 80px; left: 600px; }
@@ -70,38 +70,50 @@
     </div>
 
     <!-- Losers bracket -->
-    <h4 style="top: 280px; position: absolute;">Losers</h4>
+    <h4 style="top: 280px; position: absolute;">Losers Round 1</h4>
     <div class="round" style="left:-150px; top:220px;">
       <div class="match" id="lb_r1_m1">
         <div class="player-line"><span id="lb_r1_m1_p1">Loser QF1</span><input type="number" id="lb_r1_m1_s1"></div>
         <div class="player-line"><span id="lb_r1_m1_p2">Loser QF2</span><input type="number" id="lb_r1_m1_s2"></div>
       </div>
-      <h4 style="left: 450px; top: 56px; position: absolute;">LosersQuarterFinals</h4>
+
       <div class="match" id="lb_r1_m2">
         <div class="player-line"><span id="lb_r1_m2_p1">Loser QF3</span><input type="number" id="lb_r1_m2_s1"></div>
         <div class="player-line"><span id="lb_r1_m2_p2">Loser QF4</span><input type="number" id="lb_r1_m2_s2"></div>
       </div>
     </div>
 
-    <div class="round" style="left:0px; top:350px;">
-      <div class="match" id="lb_r2_m1">
-        <div class="player-line"><span id="lb_r2_m1_p1">Winner R1M1</span><input type="number" id="lb_r2_m1_s1"></div>
-        <div class="player-line"><span id="lb_r2_m1_p2">Loser SF1</span><input type="number" id="lb_r2_m1_s2"></div>
+    <!-- Losers Quarterfinals -->
+    <h4 style="left: 300px; top: 280px; position: absolute;">Losers Quarterfinals</h4>
+    <div class="round" style="top:350px;">
+      <div class="match" id="lb_qf_m1">
+        <div class="player-line"><span id="lb_qf_m1_p1">Winner R1M1</span><input type="number" id="lb_qf_m1_s1"></div>
+        <div class="player-line"><span id="lb_qf_m1_p2">Loser SF1</span><input type="number" id="lb_qf_m1_s2"></div>
       </div>
-      <div class="match" id="lb_r2_m2">
-        <div class="player-line"><span id="lb_r2_m2_p1">Winner R1M2</span><input type="number" id="lb_r2_m2_s1"></div>
-        <div class="player-line"><span id="lb_r2_m2_p2">Loser SF2</span><input type="number" id="lb_r2_m2_s2"></div>
+      <div class="match" id="lb_qf_m2" >
+        <div class="player-line"><span id="lb_qf_m2_p1">Winner R1M2</span><input type="number" id="lb_qf_m2_s1"></div>
+        <div class="player-line"><span id="lb_qf_m2_p2">Loser SF2</span><input type="number" id="lb_qf_m2_s2"></div>
       </div>
     </div>
 
+    <!-- Losers Semifinals -->
+    <h4 style="left: 600px; top: 280px; position: absolute;">Losers Semifinals</h4>
+    <div class="round" style="left:600px; top:340px;">
+      <div class="match" id="lb_semi">
+        <div class="player-line"><span id="lb_semi_p1">Winner R2M1</span><input type="number" id="lb_semi_s1"></div>
+        <div class="player-line"><span id="lb_semi_p2">Winner R2M2</span><input type="number" id="lb_semi_s2"></div>
+      </div>
+    </div>
 
-    <h4 style="left: 600px; top: 240px; position: absolute;">Losers Finals</h4>
-    <div class="round" style="left:150px; top:400px;">
+    <!-- Losers Final -->
+    <h4 style="left: 870px; top: 280px; position: absolute;">Losers Finals</h4>
+    <div class="round" style="left:420px; top:440px;">
       <div class="match" id="lb_final">
         <div class="player-line"><span id="lb_final_p1">Winner LB Semi</span><input type="number" id="lb_final_s1"></div>
         <div class="player-line"><span id="lb_final_p2">Loser WB Final</span><input type="number" id="lb_final_s2"></div>
       </div>
     </div>
+
 
     <!-- Grand Final -->
     <h4 style="left: 600px; top: 0px; position: absolute;">GrandFinals</h4>

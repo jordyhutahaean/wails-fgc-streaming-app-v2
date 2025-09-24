@@ -12,15 +12,7 @@
     font-family: Arial, sans-serif;
   }
 
-  #commentary-bar {
-    position: absolute;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 640px; /* space between commentators */
-  }
-
+ 
 .commentator {
   position: relative;
   background: #6a0dad; /* purple */
@@ -61,18 +53,12 @@
 }
 
 
-  /* Hide whole bar */
-  .hidden {
-    display: none !important;
-  }
-
- 
  
 </style>
 </head>
 <body>
-  <div id="commentary-bar" class="hidden">
-    <div class="commentator" id="comm1">
+  <div id="commentary-bar" class="hide">
+    <div class="commentator commentary-inner" id="comm1">
       <span id="comm1-name" class="comm-name">Commentator 1</span>
       <span id="comm1-desc" class="comm-desc">Description 1</span>
     </div>
@@ -84,6 +70,7 @@
  
 
 <script>
+  
 async function loadCommentary() {
   try {
     const resp = await fetch("commentary.json?_=" + Date.now());
@@ -91,18 +78,23 @@ async function loadCommentary() {
     const data = await resp.json();
 
     const bar = document.getElementById("commentary-bar");
+    document.getElementById("comm1-name").textContent = data.commentator1 || "Commentator 1";
+    document.getElementById("comm1-desc").textContent = data.description1 || "";
+    document.getElementById("comm2-name").textContent = data.commentator2 || "Commentator 2";
+    document.getElementById("comm2-desc").textContent = data.description2 || "";
+
     if (data.visible) {
-      bar.classList.remove("hidden");
-      document.getElementById("comm1-name").textContent = data.commentator1 || "Commentator 1";
-      document.getElementById("comm1-desc").textContent = data.description1 || "";
-      document.getElementById("comm2-name").textContent = data.commentator2 || "Commentator 2";
-      document.getElementById("comm2-desc").textContent = data.description2 || "";
+      bar.classList.remove("hide");
+      bar.classList.add("show");
     } else {
-      bar.classList.add("hidden");
+      bar.classList.remove("show");
+      bar.classList.add("hide");
     }
   } catch (err) {
     console.warn("No commentary.json yet, hiding bar");
-    document.getElementById("commentary-bar").classList.add("hidden");
+    const bar = document.getElementById("commentary-bar");
+    bar.classList.remove("show");
+    bar.classList.add("hide");
   }
 }
 

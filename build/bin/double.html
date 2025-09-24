@@ -4,200 +4,298 @@
 <meta charset="UTF-8">
 <title>Double Bracket Overlay</title>
 <style>
-  body {
-    margin: 0;
-    background: #111;
-    color: #fff;
-    font-family: sans-serif;
-  }
+ body {
+  margin: 0;
+ 
+  color: #fff;
+  font-family: 'Bahnschrift', sans-serif;
+}
 
-  .bracket-container {
-    width: 100%;
-    height: 100vh;
-    overflow: auto;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 20px;
-  }
+.bracket-container {
+  width: 100%;
+  height: 100vh;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
 
-  .bracket-tree {
-    display: grid;
-    grid-template-columns: repeat(4, 220px);
-    gap: 50px;
-  }
+  background: rgba(0, 0, 0, 0.925)
+}
 
-  .round {
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-  }
+.bracket-tree {
+  position: absolute;
+  bottom: 30%;
+}
 
-  .match {
-    background: #222;
-    border: 1px solid #444;
-    border-radius: 8px;
-    padding: 6px 10px;
-    min-width: 200px;
-  }
+.bracket-tree .win {
+  display: grid;
+  gap: 385px;
+  align-items: center;
+  grid-template-columns: repeat(3, 320px);
+}
 
-  .player {
-    display: flex;
-    justify-content: space-between;
-    padding: 4px;
-  }
+.bracket-tree .los {
+  display: grid;
+  gap: 150px;
+  align-items: center;
+  grid-template-columns: repeat(4, 320px);
+}
 
-  .player span {
-    flex: 1;
-  }
+.round {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.round h3 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #1ea7ff;
+  margin: 8px 0;
+  text-align: center;
+}
 
-  .score {
-    width: 28px;
-    text-align: center;
-    background: transparent;
-    border: none;
-    color: #fff;
-  }
+.match {
+  background: rgba(20, 20, 30, 0.7);
+  border: 1px solid rgba(30,167,255,0.6);
+  border-radius: 10px;
+  padding: 8px 12px;
+  min-width: 180px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.6);
+  backdrop-filter: blur(6px);
+  transition: all 0.2s ease;
+}
+.match:hover {
+  transform: scale(1.02);
+  border-color: #1ea7ff;
+  box-shadow: 0 0 18px rgba(30,167,255,0.8);
+}
+
+.player {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px;
+  border-radius: 6px;
+  margin: 2px 0;
+  transition: background 0.3s ease;
+}
+.player span {
+  flex: 1;
+  font-weight: 600;
+}
+.player.empty span {
+  color: #666;
+  font-weight: normal;
+}
+
+.player.win {
+  background: rgba(0,200,100,0.25);
+}
+.player.lose {
+  background: rgba(200,0,50,0.25);
+}
+
+.score {
+  width: 32px;
+  text-align: center;
+  border: none;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-weight: bold;
+}
+
+.player.win { background: rgba(255,255,255,0.15); }
+.player.lose { background: transparent; opacity: 0.6; }
+
+.vid-cont{
+    background: rgba(7, 7, 6, 0.233);
+}
+.background-vid{
+    width: 100vw;
+    height: auto;
+    object-fit: cover;
+    position:absolute;
+    filter:blur(18px) brightness(0.4);
+}
+
+
+.title {
+  position: absolute;
+  left: 4%;
+  top: 2%;
+
+  display: block;
+ 
+  gap: 06px;
+}
+
+.title h1 {
+  margin-top: 30px;
+  font-size: 32px;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(30,167,255,0.7);
+}
+
+.title h2 {
+ 
+  font-size: 40px;
+  color: #1ea7ff;
+  text-shadow: 0 0 6px rgba(0,0,0,0.5);
+}
 </style>
 </head>
 <body>
+   <div class="title">
+    <h1 id="top8">TOP 8</h1>
+    <h2 id="game-title">Tekken 8</h1>
+  </div>
   <div class="bracket-container">
     <div class="bracket-tree" id="visualBracket">
-      <!-- Winners Side -->
-      <div class="round">
-        <h3>Winners Semis</h3>
-        <div class="match">
-          <div class="player"><span id="wb_sf1_p1">—</span><input id="wb_sf1_s1" class="score" readonly></div>
-          <div class="player"><span id="wb_sf1_p2">—</span><input id="wb_sf1_s2" class="score" readonly></div>
+      <div class="win">
+        <!-- Winners Side -->
+        <div class="round" style="gap: 20px;">
+          <h3>Winners Semis</h3>
+          <div class="match">
+            <div class="player"><span id="wb_sf1_p1">—</span><input id="wb_sf1_s1" class="score" readonly></div>
+            <div class="player"><span id="wb_sf1_p2">—</span><input id="wb_sf1_s2" class="score" readonly></div>
+          </div>
+          <div class="match">
+            <div class="player"><span id="wb_sf2_p1">—</span><input id="wb_sf2_s1" class="score" readonly></div>
+            <div class="player"><span id="wb_sf2_p2">—</span><input id="wb_sf2_s2" class="score" readonly></div>
+          </div>
         </div>
-        <div class="match">
-          <div class="player"><span id="wb_sf2_p1">—</span><input id="wb_sf2_s1" class="score" readonly></div>
-          <div class="player"><span id="wb_sf2_p2">—</span><input id="wb_sf2_s2" class="score" readonly></div>
+        <div class="round">
+          <h3>Winners Final</h3>
+          <div class="match">
+            <div class="player"><span id="wb_final_p1">—</span><input id="wb_final_s1" class="score" readonly></div>
+            <div class="player"><span id="wb_final_p2">—</span><input id="wb_final_s2" class="score" readonly></div>
+          </div>
         </div>
-        <h3>Winners Final</h3>
-        <div class="match">
-          <div class="player"><span id="wb_final_p1">—</span><input id="wb_final_s1" class="score" readonly></div>
-          <div class="player"><span id="wb_final_p2">—</span><input id="wb_final_s2" class="score" readonly></div>
+        <div class="finals-bracket">
+          <div class="round">
+            <h3>Grand Final</h3>
+            <div class="match">
+              <div class="player"><span id="gf_wb">—</span><input id="gf_wb_s" class="score" readonly></div>
+              <div class="player"><span id="gf_lb">—</span><input id="gf_lb_s" class="score" readonly></div>
+            </div>
+
+            <h3>Grand Final Reset</h3>
+            <div class="match">
+              <div class="player"><span id="gf_reset_p1">—</span><input id="gf_reset_s1" class="score" readonly></div>
+              <div class="player"><span id="gf_reset_p2">—</span><input id="gf_reset_s2" class="score" readonly></div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Losers R1 -->
-      <div class="round">
-        <h3>Losers R1</h3>
-        <div class="match">
-          <div class="player"><span id="lb_r1_m1_p1">—</span><input id="lb_r1_m1_s1" class="score" readonly></div>
-          <div class="player"><span id="lb_r1_m1_p2">—</span><input id="lb_r1_m1_s2" class="score" readonly></div>
+      <div class="los">
+        <!-- Losers R1 -->
+        <div class="round" style="gap: 30px;">
+          <h3>Losers Round 1</h3>
+          <div class="match">
+            <div class="player"><span id="lb_r1_m1_p1">—</span><input id="lb_r1_m1_s1" class="score" readonly></div>
+            <div class="player"><span id="lb_r1_m1_p2">—</span><input id="lb_r1_m1_s2" class="score" readonly></div>
+          </div>
+          <div class="match">
+            <div class="player"><span id="lb_r1_m2_p1">—</span><input id="lb_r1_m2_s1" class="score" readonly></div>
+            <div class="player"><span id="lb_r1_m2_p2">—</span><input id="lb_r1_m2_s2" class="score" readonly></div>
+          </div>
         </div>
-        <div class="match">
-          <div class="player"><span id="lb_r1_m2_p1">—</span><input id="lb_r1_m2_s1" class="score" readonly></div>
-          <div class="player"><span id="lb_r1_m2_p2">—</span><input id="lb_r1_m2_s2" class="score" readonly></div>
+        <!-- Losers Quarterfinals -->
+        <div class="round" style="gap: 30px;">
+          <h3>Losers Quarterfinals</h3>
+          <div class="match">
+            <div class="player"><span id="lb_qf_m1_p1">—</span><input id="lb_qf_m1_s1" class="score" readonly></div>
+            <div class="player"><span id="lb_qf_m1_p2">—</span><input id="lb_qf_m1_s2" class="score" readonly></div>
+          </div>
+          <div class="match">
+            <div class="player"><span id="lb_qf_m2_p1">—</span><input id="lb_qf_m2_s1" class="score" readonly></div>
+            <div class="player"><span id="lb_qf_m2_p2">—</span><input id="lb_qf_m2_s2" class="score" readonly></div>
+          </div>
         </div>
-
-        <h3>Losers R2</h3>
-        <div class="match">
-          <div class="player"><span id="lb_r2_m1_p1">—</span><input id="lb_r2_m1_s1" class="score" readonly></div>
-          <div class="player"><span id="lb_r2_m1_p2">—</span><input id="lb_r2_m1_s2" class="score" readonly></div>
+        <!-- Losers Semis -->
+        <div class="round" style="gap: 30px;">
+          <h3>Losers Semifinal</h3>
+          <div class="match">
+            <div class="player"><span id="lb_semi_p1">—</span><input id="lb_semi_s1" class="score" readonly></div>
+            <div class="player"><span id="lb_semi_p2">—</span><input id="lb_semi_s2" class="score" readonly></div>
+          </div>
         </div>
-        <div class="match">
-          <div class="player"><span id="lb_r2_m2_p1">—</span><input id="lb_r2_m2_s1" class="score" readonly></div>
-          <div class="player"><span id="lb_r2_m2_p2">—</span><input id="lb_r2_m2_s2" class="score" readonly></div>
-        </div>
-      </div>
-
-      <!-- Losers Final -->
-      <div class="round">
-        <h3>Losers Final</h3>
-        <div class="match">
-          <div class="player"><span id="lb_final_p1">—</span><input id="lb_final_s1" class="score" readonly></div>
-          <div class="player"><span id="lb_final_p2">—</span><input id="lb_final_s2" class="score" readonly></div>
-        </div>
-      </div>
-
-      <!-- Grand Final -->
-      <div class="round">
-        <h3>Grand Final</h3>
-        <div class="match">
-          <div class="player"><span id="gf_wb">—</span><input id="gf_wb_s" class="score" readonly></div>
-          <div class="player"><span id="gf_lb">—</span><input id="gf_lb_s" class="score" readonly></div>
-        </div>
-
-        <h3>Grand Final Reset</h3>
-        <div class="match">
-          <div class="player"><span id="gf_reset_p1">—</span><input id="gf_reset_s1" class="score" readonly></div>
-          <div class="player"><span id="gf_reset_p2">—</span><input id="gf_reset_s2" class="score" readonly></div>
+        <!-- Losers Final -->
+        <div class="round" style="gap: 30px;">
+          <h3>Losers Final</h3>
+          <div class="match">
+            <div class="player"><span id="lb_final_p1">—</span><input id="lb_final_s1" class="score" readonly></div>
+            <div class="player"><span id="lb_final_p2">—</span><input id="lb_final_s2" class="score" readonly></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
 <script>
+// ===== Bracket Core =====
 let bracketData = null;
-
 function ensureBracket(){
   if(!bracketData){
-    bracketData = { double: { players: Array(8).fill(""), scores: {}, winners: {} } };
+    bracketData = { double: { players: Array(8).fill(""), scores: {}, winners: {}, losers: {} } };
   }
 }
 
-async function loadBracket(){
+// Copy your full updateDoubleBracket() function here from index.html
+// (unchanged, it computes winners/losers from scores)
+function updateDoubleBracket(){
   ensureBracket();
-  try {
-    const resp = await fetch("bracket.json?_=" + Date.now());
-    if(!resp.ok) throw new Error("no bracket.json");
-    bracketData = await resp.json();
-  } catch (err) {
-    console.warn("No bracket.json found – using blank bracket");
-  }
-  renderDoubleFromData();
+  // ... paste your full function from index.html here ...
 }
 
-function renderDoubleFromData(){
-  ensureBracket();
-  const d = bracketData.double || { players: Array(8).fill(""), scores:{}, winners:{}, losers:{} };
+// ===== Overlay Rendering =====
+function renderOverlay(){
+  const d = bracketData.double;
 
-  // === Players mapping from index.html seeding ===
-  // Winners seeds (dp1..dp4)
+  // Winners
   document.getElementById("wb_sf1_p1").textContent = d.players[0] || "Seed 1";
   document.getElementById("wb_sf1_p2").textContent = d.players[1] || "Seed 2";
   document.getElementById("wb_sf2_p1").textContent = d.players[2] || "Seed 3";
   document.getElementById("wb_sf2_p2").textContent = d.players[3] || "Seed 4";
 
-  // Losers seeds (dp5..dp8)
+  document.getElementById("wb_final_p1").textContent = d.winners?.wb_sf1 || "Winner SF1";
+  document.getElementById("wb_final_p2").textContent = d.winners?.wb_sf2 || "Winner SF2";
+
+  // Losers
   document.getElementById("lb_r1_m1_p1").textContent = d.players[4] || "Seed 5";
   document.getElementById("lb_r1_m1_p2").textContent = d.players[5] || "Seed 6";
   document.getElementById("lb_r1_m2_p1").textContent = d.players[6] || "Seed 7";
   document.getElementById("lb_r1_m2_p2").textContent = d.players[7] || "Seed 8";
 
-  // Winners filled downstream
-  document.getElementById("wb_final_p1").textContent = d.winners?.wb_sf1 || "Winner SF1";
-  document.getElementById("wb_final_p2").textContent = d.winners?.wb_sf2 || "Winner SF2";
+  document.getElementById("lb_qf_m1_p1").textContent = d.winners?.lb_r1_m1 || "Winner R1M1";
+  document.getElementById("lb_qf_m1_p2").textContent = d.losers?.wb_sf1 || "Loser SF1";
 
-  // Losers R2 from R1 winners & SF losers
-  document.getElementById("lb_r2_m1_p1").textContent = d.winners?.lb_r1_m1 || "Winner R1M1";
-  document.getElementById("lb_r2_m1_p2").textContent = d.losers?.wb_sf1 || "Loser SF1";
+  document.getElementById("lb_qf_m2_p1").textContent = d.winners?.lb_r1_m2 || "Winner R1M2";
+  document.getElementById("lb_qf_m2_p2").textContent = d.losers?.wb_sf2 || "Loser SF2";
 
-  document.getElementById("lb_r2_m2_p1").textContent = d.winners?.lb_r1_m2 || "Winner R1M2";
-  document.getElementById("lb_r2_m2_p2").textContent = d.losers?.wb_sf2 || "Loser SF2";
+  document.getElementById("lb_semi_p1").textContent = d.winners?.lb_qf_m1 || "Winner QF1";
+  document.getElementById("lb_semi_p2").textContent = d.winners?.lb_qf_m2 || "Winner QF2";
 
-  // Losers final
-  document.getElementById("lb_final_p1").textContent = d.winners?.lb_r2_m1 || "Winner R2M1";
-  document.getElementById("lb_final_p2").textContent = d.winners?.lb_r2_m2 || "Winner R2M2";
+  document.getElementById("lb_final_p1").textContent = d.winners?.lb_semi || "Winner LB Semi";
+  document.getElementById("lb_final_p2").textContent = d.losers?.wb_final || "Loser WB Final";
 
-  // Grand Final
   document.getElementById("gf_wb").textContent = d.winners?.wb_final || "WB Winner";
   document.getElementById("gf_lb").textContent = d.winners?.lb_final || "LB Winner";
 
-  // Reset GF
   document.getElementById("gf_reset_p1").textContent = d.winners?.wb_final || "Player A";
   document.getElementById("gf_reset_p2").textContent = d.winners?.lb_final || "Player B";
 
-  // === Scores ===
+  // Scores
   function setPair(mid){
     const sc = d.scores[mid] || [null,null];
     if(document.getElementById(mid+"_s1")) document.getElementById(mid+"_s1").value = sc[0] ?? "";
     if(document.getElementById(mid+"_s2")) document.getElementById(mid+"_s2").value = sc[1] ?? "";
   }
-  ["wb_sf1","wb_sf2","wb_final","lb_r1_m1","lb_r1_m2","lb_r2_m1","lb_r2_m2","lb_final"].forEach(setPair);
+  ["wb_sf1","wb_sf2","wb_final","lb_r1_m1","lb_r1_m2","lb_qf_m1","lb_qf_m2","lb_semi","lb_final"].forEach(setPair);
 
   if(d.scores.grand_final){
     document.getElementById("gf_wb_s").value = d.scores.grand_final[0] ?? "";
@@ -209,36 +307,24 @@ function renderDoubleFromData(){
   }
 }
 
-// Winners Semis
-let sc = d.scores?.wb_sf1 || [null,null];
-document.getElementById("wb_sf1_s1").value = sc[0] ?? "";
-document.getElementById("wb_sf1_s2").value = sc[1] ?? "";
+// ===== Load JSON and refresh =====
+async function loadOverlayDouble(){
+  try{
+    const resp = await fetch("bracket.json?_=" + Date.now());
+    if(!resp.ok) throw new Error("No bracket.json found");
+    const data = await resp.json();
+    if(!data.double || !Array.isArray(data.double.players)) return;
+    bracketData = data;
+    updateDoubleBracket();   // compute winners & losers
+    renderOverlay();         // draw to HTML
+  }catch(err){
+    console.warn("Overlay double load failed:", err);
+  }
+}
 
-sc = d.scores?.wb_sf2 || [null,null];
-document.getElementById("wb_sf2_s1").value = sc[0] ?? "";
-document.getElementById("wb_sf2_s2").value = sc[1] ?? "";
-
-// Winners Final
-sc = d.scores?.wb_final || [null,null];
-document.getElementById("wb_final_s1").value = sc[0] ?? "";
-document.getElementById("wb_final_s2").value = sc[1] ?? "";
-
-// Losers R1
-sc = d.scores?.lb_r1_m1 || [null,null];
-document.getElementById("lb_r1_m1_s1").value = sc[0] ?? "";
-document.getElementById("lb_r1_m1_s2").value = sc[1] ?? "";
-
-sc = d.scores?.lb_r1_m2 || [null,null];
-document.getElementById("lb_r1_m2_s1").value = sc[0] ?? "";
-document.getElementById("lb_r1_m2_s2").value = sc[1] ?? "";
-
-// …repeat for lb_r2_m1, lb_r2_m2, lb_final, gf_wb/gf_lb, gf_reset
-
-
-// Auto load on page open
-window.addEventListener("DOMContentLoaded", () => {
-  loadBracket();
-  setInterval(loadBracket, 1000);
+document.addEventListener("DOMContentLoaded", () => {
+  loadOverlayDouble();
+  setInterval(loadOverlayDouble, 2000); // refresh every 2s
 });
 </script>
 </body>

@@ -3,16 +3,21 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 )
 
-// App holds scoreboard, commentary and brackets
+// App holds scoreboard, commentary, brackets and sponsors
 type App struct {
 	scoreboard Scoreboard
 	commentary Commentary
 	bracket    Bracket
+	sponsorDir string
 }
 
 func NewApp() *App {
+	dir := filepath.Join(".", "sponsors")
+	os.MkdirAll(dir, 0755)
+
 	return &App{
 		scoreboard: Scoreboard{
 			Game:      "sf",
@@ -30,7 +35,8 @@ func NewApp() *App {
 			Description2: "",
 			Visible:      false,
 		},
-		bracket: NewEmptyBracket(),
+		bracket:    NewEmptyBracket(),
+		sponsorDir: dir,
 	}
 }
 
@@ -151,6 +157,35 @@ func (a *App) GetBracket() Bracket {
 func (a *App) SaveBracketJSON(data Bracket) error {
 	a.bracket = data
 	return saveJSON("bracket.json", data)
+}
+
+// -------------------- SPONSORS --------------------
+
+// SaveSponsor saves an uploaded file to sponsors folder
+func (a *App) SaveSponsor(name string, data []byte) error {
+	return os.WriteFile(filepath.Join(a.sponsorDir, name), data, 0644)
+}
+
+// DeleteSponsor removes a file from sponsors folder
+func (a *App) DeleteSponsor(name string) error {
+	return os.Remove(filepath.Join(a.sponsorDir, name))
+}
+
+// GetSponsors lists all sponsor image paths
+func (a *App) GetSponsors() ([]string, error) {
+	var sponsors []string
+	files, err := os.ReadDir(a.sponsorDir)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, f := range files {
+		if !f.IsDir() {
+			path := filepath.Join(a.sponsorDir, f.Name())
+			sponsors = append(sponsors, "file:///"+filepath.ToSlash(path))
+		}
+	}
+	return sponsors, nil
 }
 
 // -------------------- UTILITY --------------------

@@ -24,20 +24,29 @@ body {
  
 }
 
-
 #sponsor-container {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-#sponsor-logo {
-  max-height: 120px;
-  opacity: 0;
+.sponsor-logo {
+  position: absolute;
+  max-width: 200px;
+  max-height: 200px;
+ 
   transition: opacity 1s ease-in-out;
 }
-#sponsor-logo.visible { opacity: 1; }
+
+.sponsor-logo.visible {
+    opacity: 1;
+}
 
 .player {
   position: absolute;

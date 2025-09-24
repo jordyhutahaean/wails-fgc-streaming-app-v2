@@ -238,6 +238,9 @@
       </label>
       <label>Score: <input id="s4" type="number" value="0"></label>
     </div>
+
+ 
+
   </div> <!-- end scoreboard tab -->
 
     <!-- COMMENTARY -->
@@ -280,6 +283,7 @@
         <div id="double" class="inner-tabcontent" style="display:none"></div>
   </div>
 
+ 
 <script>
 /* ---------------------
    Utility + tabs
@@ -380,8 +384,20 @@ function resetCommentary(){
   updateCommentary();
 }
 
-async function toggleCommentary(show){
+async function toggleCommentary(show) {
   commentaryVisible = show;
+  const card = document.getElementById("commentary-card");
+
+  if (card) {
+    if (show) {
+      card.classList.remove("hide");
+      card.classList.add("show");
+    } else {
+      card.classList.remove("show");
+      card.classList.add("hide");
+    }
+  }
+
   const data = {
     commentator1: document.getElementById("com1_name").value||"",
     description1: document.getElementById("com1_desc").value||"",
@@ -393,7 +409,6 @@ async function toggleCommentary(show){
     await window.go.main.App.SaveCommentaryJSON(data);
   }catch(err){
     console.error("SaveCommentaryJSON failed:",err);
-    alert("Error saving commentary JSON (see console).");
   }
 }
 
@@ -1072,7 +1087,7 @@ function setEliminated(id,on){
 
 /* Highlight winners/losers */
 function highlightDoubleWinners(){
-  const matchIds=['wb_sf1','wb_sf2','wb_final','lb_r1_m1','lb_r1_m2','lb_r2_m1','lb_r2_m2','lb_final','grand_final'];
+  const matchIds=['wb_sf1','wb_sf2','wb_final','lb_r1_m1','lb_r1_m2','lb_qf_m1','lb_qf_m2','lb_final','grand_final'];
   matchIds.forEach(mid=>{
     const matchEl=document.getElementById(mid);
     if(!matchEl) return;
@@ -1096,7 +1111,7 @@ function updateDoubleBracket(){
   ensureBracket();
   bracketData.double.eliminated=[];
 
-  // WB Semis → WB Final, losers → LB R2 slots
+  // WB Semis → WB Final, losers → LB QF slots
   [['wb_sf1','wb_final_p1'],['wb_sf2','wb_final_p2']].forEach(([mid,winTarget])=>{
     const a=val(mid+'_s1'), b=val(mid+'_s2');
     bracketData.double.scores[mid]=[a,b];
@@ -1114,8 +1129,8 @@ function updateDoubleBracket(){
     }
   });
 
-  // LB R1 → LB R2
-  [['lb_r1_m1','lb_r2_m1_p1'],['lb_r1_m2','lb_r2_m2_p1']].forEach(([mid,winTarget])=>{
+  // LB R1 → LB Quarterfinals
+  [['lb_r1_m1','lb_qf_m1_p1'],['lb_r1_m2','lb_qf_m2_p1']].forEach(([mid,winTarget])=>{
     const a=val(mid+'_s1'), b=val(mid+'_s2');
     bracketData.double.scores[mid]=[a,b];
     if(a!==null&&b!==null&&a!==b){
@@ -1132,29 +1147,50 @@ function updateDoubleBracket(){
     }
   });
 
-  // Drop WB SF losers into LB R2
+  // Drop WB SF losers into LB QF
   if(bracketData.double.losers){
-    if(bracketData.double.losers['wb_sf1']) setText('lb_r2_m1_p2',bracketData.double.losers['wb_sf1']);
-    if(bracketData.double.losers['wb_sf2']) setText('lb_r2_m2_p2',bracketData.double.losers['wb_sf2']);
+    if(bracketData.double.losers['wb_sf1']) setText('lb_qf_m1_p2',bracketData.double.losers['wb_sf1']);
+    if(bracketData.double.losers['wb_sf2']) setText('lb_qf_m2_p2',bracketData.double.losers['wb_sf2']);
   }
 
-  // LB R2 → LB Final
-  [['lb_r2_m1','lb_final_p1'],['lb_r2_m2','lb_final_p2']].forEach(([mid,winTarget])=>{
+  // LB QF → LB Semifinal
+  [['lb_qf_m1','lb_semi_p1'],['lb_qf_m2','lb_semi_p2']].forEach(([mid,winTarget])=>{
     const a=val(mid+'_s1'), b=val(mid+'_s2');
     bracketData.double.scores[mid]=[a,b];
     if(a!==null&&b!==null&&a!==b){
       const winner=a>b?text(mid+'_p1'):text(mid+'_p2');
       const loser =a>b?text(mid+'_p2'):text(mid+'_p1');
       setText(winTarget,winner);
-      if(a>b) setEliminated(mid+'_p2',true); else setEliminated(mid+'_p1',true);
       bracketData.double.winners[mid]=winner;
       bracketData.double.eliminated.push(loser);
+      if(a>b) setEliminated(mid+'_p2',true); else setEliminated(mid+'_p1',true);
     } else {
       setText(winTarget,'Winner '+mid.toUpperCase());
       setEliminated(mid+'_p1',false); setEliminated(mid+'_p2',false);
       delete bracketData.double.winners[mid];
     }
   });
+
+  // LB Semi → LB Final (vs WB Final loser)
+  const lsa=val('lb_semi_s1'), lsb=val('lb_semi_s2');
+  bracketData.double.scores['lb_semi']=[lsa,lsb];
+  if(lsa!==null&&lsb!==null&&lsa!==lsb){
+    const winner=lsa>lsb?text('lb_semi_p1'):text('lb_semi_p2');
+    const loser =lsa>lsb?text('lb_semi_p2'):text('lb_semi_p1');
+    setText('lb_final_p1',winner); // Winner LB Semi
+    bracketData.double.winners['lb_semi']=winner;
+    bracketData.double.eliminated.push(loser);
+    if(lsa>lsb) setEliminated('lb_semi_p2',true); else setEliminated('lb_semi_p1',true);
+  } else {
+    setText('lb_final_p1','Winner LB Semi');
+    setEliminated('lb_semi_p1',false); setEliminated('lb_semi_p2',false);
+    delete bracketData.double.winners['lb_semi'];
+  }
+
+  // WB Final loser → LB Final slot
+  if(bracketData.double.losers && bracketData.double.losers['wb_final']){
+    setText('lb_final_p2',bracketData.double.losers['wb_final']);
+  }
 
   // LB Final → GF LB slot
   const lfa=val('lb_final_s1'), lfb=val('lb_final_s2');
@@ -1163,9 +1199,9 @@ function updateDoubleBracket(){
     const winner=lfa>lfb?text('lb_final_p1'):text('lb_final_p2');
     const loser =lfa>lfb?text('lb_final_p2'):text('lb_final_p1');
     setText('gf_lb',winner);
-    if(lfa>lfb) setEliminated('lb_final_p2',true); else setEliminated('lb_final_p1',true);
     bracketData.double.winners['lb_final']=winner;
     bracketData.double.eliminated.push(loser);
+    if(lfa>lfb) setEliminated('lb_final_p2',true); else setEliminated('lb_final_p1',true);
   } else {
     setText('gf_lb','LB Winner');
     setEliminated('lb_final_p1',false); setEliminated('lb_final_p2',false);
@@ -1177,8 +1213,11 @@ function updateDoubleBracket(){
   bracketData.double.scores['wb_final']=[wfa,wfb];
   if(wfa!==null&&wfb!==null&&wfa!==wfb){
     const winner=wfa>wfb?text('wb_final_p1'):text('wb_final_p2');
+    const loser =wfa>wfb?text('wb_final_p2'):text('wb_final_p1');
     setText('gf_wb',winner);
     bracketData.double.winners['wb_final']=winner;
+    bracketData.double.losers=bracketData.double.losers||{};
+    bracketData.double.losers['wb_final']=loser;
   } else {
     setText('gf_wb','WB Winner');
     delete bracketData.double.winners['wb_final'];
