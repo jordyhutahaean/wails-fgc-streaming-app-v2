@@ -2,18 +2,13 @@
 
 ## About
 
-This is the official Wails Vanilla template.
+It's time for me to make another Fighting Game scoreboard project. This time, we go all out thanks to wails. 
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+## Run the program
+Currently, you need to access the files in `build/bin`. open the scoreboard-overlay app and set the OBS by 
+selecting Browser and look for the essential files to show. For now, there's:
+1. scoreboard.html (your main scoreboard)
+2. commentary.html (for commentary screen)
+3. bracket_single (for single elimination brackets, ONLY supports Top 8 format)
+4. bracket_double (for double elimination brackets, ONLY supports Top 8 format)
 
-## Live Development
-
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
-
-## Building
-
-To build a redistributable, production mode package, use `wails build`.
