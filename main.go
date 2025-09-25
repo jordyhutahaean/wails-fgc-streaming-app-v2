@@ -16,24 +16,34 @@ var assets embed.FS
 func main() {
 	app := NewApp()
 
-	// Sponsor folder (relative to .exe location)
-	sponsorDir := filepath.Join(".", "sponsors")
+	// Start lightweight webserver in background
+	go func() {
+		mux := http.NewServeMux()
 
-	// Serve files from sponsorDir at /sponsors/*
-	http.Handle("/sponsors/",
-		http.StripPrefix("/sponsors/",
+		// Serve sponsors folder
+		sponsorDir := filepath.Join(".", "sponsors")
+		mux.Handle("/sponsors/", http.StripPrefix("/sponsors/",
 			http.FileServer(http.Dir(sponsorDir)),
-		),
-	)
+		))
 
+		// Serve overlays (scoreboard.html, single.html, double.html, commentary.html)
+		overlayDir := filepath.Join(".", "frontend")
+		mux.Handle("/", http.FileServer(http.Dir(overlayDir)))
+
+		// Listen on port 34115
+		if err := http.ListenAndServe(":34115", mux); err != nil {
+			println("Overlay server error:", err.Error())
+		}
+	}()
+
+	// Run Wails app
 	err := wails.Run(&options.App{
 		Title:  "Fighting Game Scoreboard Control",
-		Width:  900,
-		Height: 700,
+		Width:  800,
+		Height: 600,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
-
 		Bind: []interface{}{
 			app,
 		},

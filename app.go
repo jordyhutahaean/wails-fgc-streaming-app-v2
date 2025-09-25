@@ -78,7 +78,7 @@ func (a *App) GetScoreboard() Scoreboard {
 
 func (a *App) SaveScoreboardJSON(data Scoreboard) error {
 	a.scoreboard = data // keep in memory
-	return saveJSON("scoreboard.json", data)
+	return saveJSON("./frontend/scoreboard.json", data)
 }
 
 // -------------------- COMMENTARY --------------------
@@ -97,7 +97,7 @@ func (a *App) GetCommentary() Commentary {
 
 // SaveCommentaryJSON saves the commentary data to disk
 func (a *App) SaveCommentaryJSON(data map[string]interface{}) error {
-	f, err := os.Create("commentary.json")
+	f, err := os.Create("./frontend/commentary.json")
 	if err != nil {
 		return err
 	}
@@ -156,7 +156,7 @@ func (a *App) GetBracket() Bracket {
 
 func (a *App) SaveBracketJSON(data Bracket) error {
 	a.bracket = data
-	return saveJSON("bracket.json", data)
+	return saveJSON("./frontend/bracket.json", data)
 }
 
 // -------------------- SPONSORS --------------------

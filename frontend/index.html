@@ -37,7 +37,8 @@
   .settings label{display:flex;flex-direction:column;font-weight:700;font-size:13px}
   input[type="text"], input[type="number"], select{margin-top:6px;padding:8px;border:1px solid var(--border);border-radius:6px;min-width:26px}
 
-  .player-block{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .playerflex{display:flex;gap:12px;flex-wrap:wrap;flex-direction: row;}
+  .player-block{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;flex-direction: column;}
   .player-block label{font-weight:700;font-size:13px;min-width:150px}
 
   /* commentary */
@@ -47,6 +48,10 @@
 
   /* Bracket Panel layout (horizontal tournament tree) */
   .bracket-panel{padding:16px;background:var(--panel);border:1px solid var(--border);border-radius:10px}
+
+  .inner-tabs #singleTabBtn, .inner-tabs #doubleTabBtn{font-size:12px}
+
+
   .inner-tabs{display:flex;gap:10px;margin-bottom:14px}
   .inner-tabs button{background:none;border:1px solid var(--border);padding:8px 10px;border-radius:8px;cursor:pointer}
   .inner-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
@@ -119,6 +124,72 @@
 .bracket-tree .player-line input {
   color: #fff;
 }
+
+.custom-select {
+  position: relative;
+  width: 220px;
+  font-family: sans-serif;
+  cursor: pointer;
+}
+ 
+
+.custom-select .selected {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #e4e4e4;
+  border: 1px solid #444;
+  padding: 6px 10px;
+  border-radius: 6px;
+  height: 40%;
+}
+
+.custom-select .selected img {
+  width: 50px;
+  height: 30px;
+}
+ 
+.custom-select .options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: #ececec;
+  border: 1px solid #444;
+  border-radius: 6px;
+  margin-top: 4px;
+  display: none;
+  z-index: 10;
+}
+
+.custom-select .options div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+}
+
+.custom-select .options div:hover {
+  background: #333;
+}
+
+.custom-select .options img {
+  width: 30px;
+  height: 20px;
+}
+
+#gameIcon{
+  position: fixed;
+  top: 20%;
+  right: 2%;
+  max-width:15%;
+  max-height: 10%;
+}
+
+.bracket-top8 label{
+  font-size: 12px;
+}
 </style>
 </head>
 <body>
@@ -139,13 +210,39 @@
       </div>
 
       <div class="settings">
-        <label>Game
+        <!-- <label>Game
           <select id="game" onchange="toggleGameMode()">
-            <option value="sf">Street Fighter</option>
+            <option value="sf" data-icon="./frontend/img/game_ico/SF6_Logo.png" > Street Fighter</option>
             <option value="dbfz">Dragon Ball FighterZ</option>
             <option value="tekken">Tekken</option>
             <option value="2xko">2XKO</option>
           </select>
+        </label> -->
+
+        <!-- hidden input so toggleGameMode() still works -->
+        <input type="hidden" id="game" value="sf">
+
+        <label> Game
+        <div class="custom-select" id="gameDropdown">
+          <div class="selected">
+            <img id="selectedGameIcon" src="./img/game_ico/SF6_Logo.png" alt=""">
+            <span id="selectedGameName">Street Fighter</span>
+          </div>
+          <div class="options">
+            <div data-value="sf" data-icon="./img/game_ico/SF6_Logo.png">
+              <img  src="./img/game_ico/SF6_Logo.png" alt=""> Street Fighter
+            </div>
+            <div data-value="dbfz" data-icon="./img/game_ico/DBFZ_Logo.png">
+              <img src="./img/game_ico/DBFZ_Logo.png"alt=""> Dragon Ball FighterZ
+            </div>
+            <div data-value="tekken" data-icon="./img/game_ico/Tekken_8_Logo.png">
+              <img src="./img/game_ico/Tekken_8_Logo.png" alt=""> Tekken
+            </div>
+            <div data-value="2xko" data-icon="./img/game_ico/2XKO_Logo.png">
+              <img src="./img/game_ico/2XKO_logo.png" style="height: 10px;" alt=""> 2XKO
+            </div>
+          </div>
+        </div>
         </label>
 
         <label>Style
@@ -159,94 +256,98 @@
         <label>Titlecard
           <input id="titlecard" type="text" placeholder="Top 8 / Grand Finals / etc.">
         </label>
+
+        <img id="gameIcon" src="./img/game_ico/SF6_Logo.png " alt="Game Icon" >
       </div>
-
- <!-- Player 1 -->
-    <div class="player-block">
-      <label>Name: <input id="p1" type="text" placeholder="Player 1"></label>
-      <label>Team: <input id="t1" type="text" placeholder="Team 1"></label>
-      <label>Controller:
-        <select id="c1">
-          <option value="">None</option>
-          <option value="arcade">Arcade Stick</option>
-          <option value="leverless">Leverless</option>
-          <option value="gamepad">Gamepad</option>
-          <option value="arcade_white">Arcade Stick White</option>
-          <option value="leverless_white">Leverless White</option>
-          <option value="gamepad_white">Gamepad White</option>
-        </select>
-      </label>
-      <label>Score: <input id="s1" type="number" value="0"></label>
-    </div>
-
-    <!-- Player 2 -->
-    <div class="player-block">
-      <label>Name: <input id="p2" type="text" placeholder="Player 2"></label>
-      <label>Team: <input id="t2" type="text" placeholder="Team 2"></label>
-      <label>Controller:
-        <select id="c2">
-          <option value="">None</option>
-          <option value="arcade">Arcade Stick</option>
-          <option value="leverless">Leverless</option>
-          <option value="gamepad">Gamepad</option>
-          <option value="arcade_white">Arcade Stick White</option>
-          <option value="leverless_white">Leverless White</option>
-          <option value="gamepad_white">Gamepad White</option>
-        </select>
-      </label>
-      <label>Score: <input id="s2" type="number" value="0"></label>
-    </div>
-
-    <!-- Player 3 (2XKO only) -->
-    <div class="player-block" id="p3block" style="display:none;">
-      <span class="checkbox-label">
-        <input type="checkbox" id="v3"> Visible
-      </span>
-      <label>Name: <input id="p3" type="text" placeholder="Player 3"></label>
-      <label>Team: <input id="t3" type="text" placeholder="Team 3"></label>
-      <label>Controller:
-        <select id="c3">
-          <option value="">None</option>
-          <option value="arcade">Arcade Stick</option>
-          <option value="leverless">Leverless</option>
-          <option value="gamepad">Gamepad</option>
-          <option value="arcade_white">Arcade Stick White</option>
-          <option value="leverless_white">Leverless White</option>
-          <option value="gamepad_white">Gamepad White</option>
-        </select>
-      </label>
-      <label>Score: <input id="s3" type="number" value="0"></label>
-    </div>
-
-    <!-- Player 4 (2XKO only) -->
-    <div class="player-block" id="p4block" style="display:none;">
-      <span class="checkbox-label">
-        <input type="checkbox" id="v4"> Visible
-      </span>
-      <label>Name: <input id="p4" type="text" placeholder="Player 4"></label>
-      <label>Team: <input id="t4" type="text" placeholder="Team 4"></label>
-      <label>Controller:
-        <select id="c4">
-          <option value="">None</option>
-          <option value="arcade">Arcade Stick</option>
-          <option value="leverless">Leverless</option>
-          <option value="gamepad">Gamepad</option>
-          <option value="arcade_white">Arcade Stick White</option>
-          <option value="leverless_white">Leverless White</option>
-          <option value="gamepad_white">Gamepad White</option>
-        </select>
-      </label>
-      <label>Score: <input id="s4" type="number" value="0"></label>
-    </div>
 
  
 
+<div class="playerflex">
+  <!-- Player 1 -->
+     <div class="player-block">
+       <label>Name: <input id="p1" type="text" placeholder="Player 1"></label>
+       <label>Team: <input id="t1" type="text" placeholder="Team 1"></label>
+       <label>Controller:
+         <select id="c1">
+           <option value="">None</option>
+           <option value="arcade">Arcade Stick</option>
+           <option value="leverless">Leverless</option>
+           <option value="gamepad">Gamepad</option>
+           <option value="arcade_white">Arcade Stick White</option>
+           <option value="leverless_white">Leverless White</option>
+           <option value="gamepad_white">Gamepad White</option>
+         </select>
+       </label>
+       <label>Score: <input id="s1" type="number" value="0"></label>
+     </div>
+ 
+     <!-- Player 2 -->
+     <div class="player-block">
+       <label>Name: <input id="p2" type="text" placeholder="Player 2"></label>
+       <label>Team: <input id="t2" type="text" placeholder="Team 2"></label>
+       <label>Controller:
+         <select id="c2">
+           <option value="">None</option>
+           <option value="arcade">Arcade Stick</option>
+           <option value="leverless">Leverless</option>
+           <option value="gamepad">Gamepad</option>
+           <option value="arcade_white">Arcade Stick White</option>
+           <option value="leverless_white">Leverless White</option>
+           <option value="gamepad_white">Gamepad White</option>
+         </select>
+       </label>
+       <label>Score: <input id="s2" type="number" value="0"></label>
+     </div>
+ 
+     <!-- Player 3 (2XKO only) -->
+     <div class="player-block" id="p3block" style="display:none;">
+       <span class="checkbox-label">
+         <input type="checkbox" id="v3"> Visible
+       </span>
+       <label>Name: <input id="p3" type="text" placeholder="Player 3"></label>
+       <label>Team: <input id="t3" type="text" placeholder="Team 3"></label>
+       <label>Controller:
+         <select id="c3">
+           <option value="">None</option>
+           <option value="arcade">Arcade Stick</option>
+           <option value="leverless">Leverless</option>
+           <option value="gamepad">Gamepad</option>
+           <option value="arcade_white">Arcade Stick White</option>
+           <option value="leverless_white">Leverless White</option>
+           <option value="gamepad_white">Gamepad White</option>
+         </select>
+       </label>
+       <label>Score: <input id="s3" type="number" value="0"></label>
+     </div>
+ 
+     <!-- Player 4 (2XKO only) -->
+     <div class="player-block" id="p4block" style="display:none;">
+       <span class="checkbox-label">
+         <input type="checkbox" id="v4"> Visible
+       </span>
+       <label>Name: <input id="p4" type="text" placeholder="Player 4"></label>
+       <label>Team: <input id="t4" type="text" placeholder="Team 4"></label>
+       <label>Controller:
+         <select id="c4">
+           <option value="">None</option>
+           <option value="arcade">Arcade Stick</option>
+           <option value="leverless">Leverless</option>
+           <option value="gamepad">Gamepad</option>
+           <option value="arcade_white">Arcade Stick White</option>
+           <option value="leverless_white">Leverless White</option>
+           <option value="gamepad_white">Gamepad White</option>
+         </select>
+       </label>
+       <label>Score: <input id="s4" type="number" value="0"></label>
+     </div>
+</div>
+      <div class="small">* Player 3 and Player 4 are only used in 2XKO mode.</div>
   </div> <!-- end scoreboard tab -->
 
     <!-- COMMENTARY -->
     <div id="commentary" class="tabcontent">
       <div class="commentary-panel">
-        <h2 style="margin-top:0">Commentary Lower Third</h2>
+ 
         <div class="commentator-block">
           <label>Commentator 1 - Name<input id="com1_name" type="text" placeholder="Commentator 1"></label>
           <label>Commentator 1 - Description<input id="com1_desc" type="text" placeholder="FGC Expert"></label>
@@ -269,8 +370,7 @@
     <!-- BRACKETS -->
     <div id="brackets" class="tabcontent">
       <div class="bracket-panel">
-        <h2 style="margin-top:0">Brackets — Single Elimination (Top 8)</h2>
-
+        <!-- <h2 style="margin-top:0">Brackets — Single Elimination (Top 8)</h2> -->
         <div class="inner-tabs" style="margin-bottom:14px">
           <button id="singleTabBtn" class="active" onclick="openInnerTab('single')">Single Elimination</button>
           <button id="doubleTabBtn" onclick="openInnerTab('double')">Double Elimination</button>
@@ -309,9 +409,58 @@ function toggleGameMode(){
   const game = document.getElementById("game").value;
   const p3 = document.getElementById("p3block");
   const p4 = document.getElementById("p4block");
-  if(p3) p3.style.display = (game==="2xko")?"flex":"none";
-  if(p4) p4.style.display = (game==="2xko")?"flex":"none";
+
+  if(p3) p3.style.display = (game==="2xko") ? "flex" : "none";
+  if(p4) p4.style.display = (game==="2xko") ? "flex" : "none";
 }
+
+// Custom dropdown logic
+document.addEventListener("DOMContentLoaded", () => {
+  const dropdown = document.getElementById("gameDropdown");
+  const selected = dropdown.querySelector(".selected");
+  const options = dropdown.querySelector(".options");
+  const hiddenInput = document.getElementById("game");
+  
+  hiddenInput.type = "hidden";
+  hiddenInput.id = "game";
+  hiddenInput.value = "sf"; // default game
+  document.body.appendChild(hiddenInput);
+
+  selected.addEventListener("click", () => {
+    options.style.display = options.style.display === "block" ? "none" : "block";
+  });
+
+  options.querySelectorAll("div").forEach(opt => {
+    opt.addEventListener("click", () => {
+      const val = opt.getAttribute("data-value");
+      const icon = opt.getAttribute("data-icon");
+      const text = opt.innerText;
+
+      hiddenInput.value = val;
+      selected.querySelector("img").src = icon;
+      selected.querySelector("span").textContent = text;
+
+      // update selected block (img + span)
+      document.getElementById("selectedGameIcon").src = icon;
+      document.getElementById("selectedGameName").textContent = text;
+      document.getElementById("gameIcon").src = icon;
+
+      // close dropdown
+      gameDropdown.classList.remove("open");
+
+      options.style.display = "none";
+
+      //Call existing Logic
+      toggleGameMode();
+    });
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if(!dropdown.contains(e.target)) options.style.display = "none";
+  });
+});
+
 
 async function updateScoreboard(){
   const data = {
@@ -1322,6 +1471,7 @@ function finalizeChampion(){
     document.getElementById('gf_reset').style.display='none';
   }
 }
+ 
 </script>
 
 
