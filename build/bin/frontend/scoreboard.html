@@ -65,10 +65,12 @@
   <!-- Sponsor Section -->
    <!-- add more image by following the pattern below -->
     <!-- Add => <img src="[YOUT IMAGE PATHFILE]" class="sponsor-logo">  -->
+
 <div id="sponsor-container">
+<!--   
   <img src="sponsors/sponsor1.png" class="sponsor-logo">
   <img src="sponsors/aaa.png" class="sponsor-logo">
-  <img src="sponsors/Group 5.png" class="sponsor-logo">
+  <img src="sponsors/Group 5.png" class="sponsor-logo"> -->
 </div>
 
  
@@ -164,6 +166,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setInterval(loadScoreboard, 1000);
   loadScoreboard();
+</script>
+
+<script>
+  async function loadSponsors() {
+  try {
+    const resp = await fetch("/sponsors/");
+    // cannot directory-list easily, so better: use Go GetSponsors()
+    const sponsors = await window.go.main.App.GetSponsors();
+
+    const cont = document.getElementById("sponsor-container");
+    cont.innerHTML = "";
+    sponsors.forEach((src,i) => {
+      const img = document.createElement("img");
+      img.src = src;
+      img.className = "sponsor-logo";
+      img.style.opacity = i===0 ? "1" : "0";
+      img.style.transition = "opacity 1s";
+      cont.appendChild(img);
+    });
+
+    startSponsorRotation();
+  } catch(e) {
+    console.error("Sponsor load failed", e);
+  }
+}
+
+function startSponsorRotation(){
+  const images = Array.from(document.querySelectorAll('#sponsor-container .sponsor-logo'));
+  if(images.length <= 1) return;
+  let current=0;
+  setInterval(()=>{
+    images[current].style.opacity="0";
+    current=(current+1)%images.length;
+    images[current].style.opacity="1";
+  },10000);
+}
+
+document.addEventListener("DOMContentLoaded", loadSponsors);
+
+
 </script>
 
 </body>

@@ -267,6 +267,7 @@
         <img id="gameIcon" src="./img/game_ico/SF6_Logo.png " alt="Game Icon" >
       </div>
 
+
  
 
 <div class="playerflex">
@@ -349,6 +350,14 @@
      </div>
 </div>
       <div class="small">* Player 3 and Player 4 are only used in 2XKO mode.</div>
+
+      
+  <h3>Upload Sponsor</h3>
+    <input type="file" id="sponsorFile">
+    <button onclick="uploadSponsor()">Upload</button>
+
+    <ul id="sponsorList"></ul>
+
   </div> <!-- end scoreboard tab -->
 
     <!-- COMMENTARY -->
@@ -1479,6 +1488,43 @@ function finalizeChampion(){
   }
 }
  
+</script>
+
+<script>
+
+  async function uploadSponsor() {
+  const fileInput = document.getElementById("sponsorFile");
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  const arrayBuffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+
+  // call Go backend
+  await window.go.main.App.SaveSponsor(file.name, Array.from(bytes));
+
+  alert("Uploaded " + file.name);
+  loadSponsors();
+}
+
+async function loadSponsors() {
+  try {
+    const sponsors = await window.go.main.App.GetSponsors();
+    const list = document.getElementById("sponsorList");
+    list.innerHTML = "";
+    sponsors.forEach(path => {
+      const li = document.createElement("li");
+      li.textContent = path;
+      list.appendChild(li);
+    });
+  } catch(e) {
+    console.error("Failed to load sponsors", e);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", loadSponsors);
+
+
 </script>
 
 
