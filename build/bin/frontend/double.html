@@ -249,9 +249,68 @@ function ensureBracket(){
 // (unchanged, it computes winners/losers from scores)
 function updateDoubleBracket(){
   ensureBracket();
-  // ... paste your full function from index.html here ...
-}
+  const d = bracketData.double;
+  d.scores = d.scores || {};
+  d.winners = d.winners || {};
+  d.losers = d.losers || {};
 
+  // helper to store scores
+  function store(mid){
+    const s1 = parseInt(document.getElementById(mid+"_s1")?.value)||0;
+    const s2 = parseInt(document.getElementById(mid+"_s2")?.value)||0;
+    d.scores[mid] = [s1,s2];
+    if(s1===s2) return {winner:null,loser:null};
+    if(s1>s2){
+      return {winner: document.getElementById(mid+"_p1").textContent, loser: document.getElementById(mid+"_p2").textContent};
+    }else{
+      return {winner: document.getElementById(mid+"_p2").textContent, loser: document.getElementById(mid+"_p1").textContent};
+    }
+  }
+
+  // === Winners Side ===
+  let m = store("wb_sf1");
+  if(m.winner){ d.winners.wb_sf1=m.winner; d.losers.wb_sf1=m.loser; }
+  m = store("wb_sf2");
+  if(m.winner){ d.winners.wb_sf2=m.winner; d.losers.wb_sf2=m.loser; }
+
+  m = store("wb_final");
+  if(m.winner){ d.winners.wb_final=m.winner; d.losers.wb_final=m.loser; }
+
+  // === Losers R1 ===
+  m = store("lb_r1_m1");
+  if(m.winner) d.winners.lb_r1_m1=m.winner;
+  m = store("lb_r1_m2");
+  if(m.winner) d.winners.lb_r1_m2=m.winner;
+
+  // === Losers QF ===
+  m = store("lb_qf_m1");
+  if(m.winner) d.winners.lb_qf_m1=m.winner;
+  m = store("lb_qf_m2");
+  if(m.winner) d.winners.lb_qf_m2=m.winner;
+
+  // === Losers Semi ===
+  m = store("lb_semi");
+  if(m.winner) d.winners.lb_semi=m.winner;
+
+  // === Losers Final ===
+  m = store("lb_final");
+  if(m.winner) d.winners.lb_final=m.winner;
+
+  // === Grand Final ===
+  const gf1 = parseInt(document.getElementById("gf_wb_s")?.value)||0;
+  const gf2 = parseInt(document.getElementById("gf_lb_s")?.value)||0;
+  d.scores.grand_final = [gf1,gf2];
+  if(gf1!==gf2){
+    d.winners.grand_final = gf1>gf2 ? document.getElementById("gf_wb").textContent : document.getElementById("gf_lb").textContent;
+  }
+
+  const r1 = parseInt(document.getElementById("gf_reset_s1")?.value)||0;
+  const r2 = parseInt(document.getElementById("gf_reset_s2")?.value)||0;
+  d.scores.gf_reset = [r1,r2];
+  if(r1!==r2){
+    d.winners.gf_reset = r1>r2 ? document.getElementById("gf_reset_p1").textContent : document.getElementById("gf_reset_p2").textContent;
+  }
+}
 // ===== Overlay Rendering =====
 function renderOverlay(){
   const d = bracketData.double;
