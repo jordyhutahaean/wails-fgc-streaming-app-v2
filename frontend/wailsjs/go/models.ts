@@ -4,6 +4,7 @@ export namespace main {
 	    players: string[];
 	    scores: Record<string, Array<number>>;
 	    winners: Record<string, string>;
+	    losers: Record<string, string>;
 	    meta: Record<string, string>;
 	
 	    static createFrom(source: any = {}) {
@@ -15,6 +16,7 @@ export namespace main {
 	        this.players = source["players"];
 	        this.scores = source["scores"];
 	        this.winners = source["winners"];
+	        this.losers = source["losers"];
 	        this.meta = source["meta"];
 	    }
 	}

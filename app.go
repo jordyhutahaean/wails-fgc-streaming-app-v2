@@ -127,11 +127,11 @@ type SingleBracket struct {
 }
 
 type DoubleBracket struct {
-	// We'll store players and score buckets — frontend can implement complex flow later.
 	Players []string          `json:"players"` // length 8
 	Scores  map[string][2]int `json:"scores"`
 	Winners map[string]string `json:"winners"`
-	Meta    map[string]string `json:"meta"` // any helper data
+	Losers  map[string]string `json:"losers"` // 👈 add this line
+	Meta    map[string]string `json:"meta"`
 }
 
 func NewEmptyBracket() Bracket {
@@ -145,6 +145,7 @@ func NewEmptyBracket() Bracket {
 			Players: make([]string, 8),
 			Scores:  make(map[string][2]int),
 			Winners: make(map[string]string),
+			Losers:  make(map[string]string), // 👈 add this line
 			Meta:    make(map[string]string),
 		},
 	}

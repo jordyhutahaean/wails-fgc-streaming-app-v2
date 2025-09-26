@@ -237,19 +237,11 @@
   </div>
 
 <script>
-// ===== Bracket Core =====
 let bracketData = null;
 function ensureBracket(){
   if(!bracketData){
     bracketData = { double: { players: Array(8).fill(""), scores: {}, winners: {}, losers: {} } };
   }
-}
-
-// Copy your full updateDoubleBracket() function here from index.html
-// (unchanged, it computes winners/losers from scores)
-function updateDoubleBracket(){
-  ensureBracket();
-  // ... paste your full function from index.html here ...
 }
 
 // ===== Overlay Rendering =====
@@ -271,18 +263,21 @@ function renderOverlay(){
   document.getElementById("lb_r1_m2_p1").textContent = d.players[6] || "Seed 7";
   document.getElementById("lb_r1_m2_p2").textContent = d.players[7] || "Seed 8";
 
+  // Losers bracket progression
   document.getElementById("lb_qf_m1_p1").textContent = d.winners?.lb_r1_m1 || "Winner R1M1";
   document.getElementById("lb_qf_m1_p2").textContent = d.losers?.wb_sf1 || "Loser SF1";
 
   document.getElementById("lb_qf_m2_p1").textContent = d.winners?.lb_r1_m2 || "Winner R1M2";
   document.getElementById("lb_qf_m2_p2").textContent = d.losers?.wb_sf2 || "Loser SF2";
 
+  
   document.getElementById("lb_semi_p1").textContent = d.winners?.lb_qf_m1 || "Winner QF1";
   document.getElementById("lb_semi_p2").textContent = d.winners?.lb_qf_m2 || "Winner QF2";
 
   document.getElementById("lb_final_p1").textContent = d.winners?.lb_semi || "Winner LB Semi";
   document.getElementById("lb_final_p2").textContent = d.losers?.wb_final || "Loser WB Final";
 
+  // Grand Finals
   document.getElementById("gf_wb").textContent = d.winners?.wb_final || "WB Winner";
   document.getElementById("gf_lb").textContent = d.winners?.lb_final || "LB Winner";
 
@@ -315,8 +310,7 @@ async function loadOverlayDouble(){
     const data = await resp.json();
     if(!data.double || !Array.isArray(data.double.players)) return;
     bracketData = data;
-    updateDoubleBracket();   // compute winners & losers
-    renderOverlay();         // draw to HTML
+    renderOverlay();         // just draw to HTML, do NOT recalculate
   }catch(err){
     console.warn("Overlay double load failed:", err);
   }
