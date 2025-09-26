@@ -15,19 +15,19 @@
   },
   "double": {
     "players": [
-      "aa",
-      "vv",
-      "bb",
-      "cc",
-      "kk",
-      "tt",
-      "jj",
-      "yy"
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
     ],
     "scores": {
       "grand_final": [
-        0,
-        0
+        1,
+        3
       ],
       "lb_final": [
         0,
@@ -42,12 +42,12 @@
         0
       ],
       "lb_r1_m1": [
-        3,
-        2
+        0,
+        0
       ],
       "lb_r1_m2": [
-        1,
-        3
+        0,
+        0
       ],
       "lb_semi": [
         0,
@@ -58,24 +58,16 @@
         0
       ],
       "wb_sf1": [
-        3,
-        2
+        0,
+        0
       ],
       "wb_sf2": [
-        2,
-        3
+        0,
+        0
       ]
     },
-    "winners": {
-      "lb_r1_m1": "kk",
-      "lb_r1_m2": "yy",
-      "wb_sf1": "aa",
-      "wb_sf2": "cc"
-    },
-    "losers": {
-      "wb_sf1": "vv",
-      "wb_sf2": "bb"
-    },
-    "meta": {}
+    "winners": {},
+    "losers": {},
+    "meta": null
   }
 }

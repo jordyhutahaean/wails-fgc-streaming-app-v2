@@ -182,11 +182,26 @@
               <div class="player"><span id="gf_lb">—</span><input id="gf_lb_s" class="score" readonly></div>
             </div>
 
-            <h3>Grand Final Reset</h3>
+            <!-- <h3>Grand Final Reset</h3>
             <div class="match">
               <div class="player"><span id="gf_reset_p1">—</span><input id="gf_reset_s1" class="score" readonly></div>
               <div class="player"><span id="gf_reset_p2">—</span><input id="gf_reset_s2" class="score" readonly></div>
+            </div> -->
+
+            <div id="gf_reset_section" style="display: none;">
+              <h3>Grand Final Reset</h3>
+              <div class="match">
+                <div class="player">
+                  <span id="gf_reset_p1">—</span>
+                  <input id="gf_reset_s1" class="score" readonly>
+                </div>
+                <div class="player">
+                  <span id="gf_reset_p2">—</span>
+                  <input id="gf_reset_s2" class="score" readonly>
+                </div>
+              </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -281,6 +296,8 @@ function renderOverlay(){
   document.getElementById("gf_wb").textContent = d.winners?.wb_final || "WB Winner";
   document.getElementById("gf_lb").textContent = d.winners?.lb_final || "LB Winner";
 
+  //Reset
+  
   document.getElementById("gf_reset_p1").textContent = d.winners?.wb_final || "Player A";
   document.getElementById("gf_reset_p2").textContent = d.winners?.lb_final || "Player B";
 
@@ -296,10 +313,29 @@ function renderOverlay(){
     document.getElementById("gf_wb_s").value = d.scores.grand_final[0] ?? "";
     document.getElementById("gf_lb_s").value = d.scores.grand_final[1] ?? "";
   }
-  if(d.scores.gf_reset){
-    document.getElementById("gf_reset_s1").value = d.scores.gf_reset[0] ?? "";
-    document.getElementById("gf_reset_s2").value = d.scores.gf_reset[1] ?? "";
+
+ const gfResetSection = document.getElementById("gf_reset_section");
+
+  // Condition 1: gf_reset exists in JSON
+  const hasResetData = d.scores.gf_reset && Array.isArray(d.scores.gf_reset);
+
+  // Condition 2: Loser bracket player beats winner bracket player in GF (triggers reset)
+  const gfScores = d.scores.grand_final || [0, 0];
+  const gfResetTriggered = (gfScores[1] > gfScores[0]); // loser beats winner
+
+  if (hasResetData || gfResetTriggered) {
+    gfResetSection.style.display = "block";
+
+    document.getElementById("gf_reset_p1").textContent = d.winners?.wb_final || "Player A";
+    document.getElementById("gf_reset_p2").textContent = d.winners?.lb_final || "Player B";
+
+    const resetScores = d.scores.gf_reset || [null, null];
+    document.getElementById("gf_reset_s1").value = resetScores[0] ?? "";
+    document.getElementById("gf_reset_s2").value = resetScores[1] ?? "";
+  } else {
+    gfResetSection.style.display = "none";
   }
+
 }
 
 // ===== Load JSON and refresh =====
