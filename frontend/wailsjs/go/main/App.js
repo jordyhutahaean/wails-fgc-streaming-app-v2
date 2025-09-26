@@ -18,6 +18,10 @@ export function GetScoreboard() {
   return window['go']['main']['App']['GetScoreboard']();
 }
 
+export function GetSponsorList() {
+  return window['go']['main']['App']['GetSponsorList']();
+}
+
 export function GetSponsors() {
   return window['go']['main']['App']['GetSponsors']();
 }
@@ -36,4 +40,8 @@ export function SaveScoreboardJSON(arg1) {
 
 export function SaveSponsor(arg1, arg2) {
   return window['go']['main']['App']['SaveSponsor'](arg1, arg2);
+}
+
+export function UploadSponsor(arg1, arg2) {
+  return window['go']['main']['App']['UploadSponsor'](arg1, arg2);
 }

@@ -10,6 +10,8 @@ export function GetCommentary():Promise<main.Commentary>;
 
 export function GetScoreboard():Promise<main.Scoreboard>;
 
+export function GetSponsorList():Promise<Array<string>>;
+
 export function GetSponsors():Promise<Array<string>>;
 
 export function SaveBracketJSON(arg1:main.Bracket):Promise<void>;
@@ -19,3 +21,5 @@ export function SaveCommentaryJSON(arg1:Record<string, any>):Promise<void>;
 export function SaveScoreboardJSON(arg1:main.Scoreboard):Promise<void>;
 
 export function SaveSponsor(arg1:string,arg2:Array<number>):Promise<void>;
+
+export function UploadSponsor(arg1:string,arg2:Array<number>):Promise<void>;

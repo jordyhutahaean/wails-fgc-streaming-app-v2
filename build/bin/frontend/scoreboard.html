@@ -169,28 +169,31 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <script>
-  async function loadSponsors() {
+async function loadSponsors() {
   try {
-    const resp = await fetch("/sponsors/");
-    // cannot directory-list easily, so better: use Go GetSponsors()
-    const sponsors = await window.go.main.App.GetSponsors();
+    // ✅ load from sponsors.json directly
+    const resp = await fetch("sponsors.json?_=" + Date.now());
+    if (!resp.ok) throw new Error("Failed to fetch sponsors.json");
+    const sponsors = await resp.json();
 
     const cont = document.getElementById("sponsor-container");
     cont.innerHTML = "";
-    sponsors.forEach((src,i) => {
+
+    sponsors.forEach((src, i) => {
       const img = document.createElement("img");
       img.src = src;
       img.className = "sponsor-logo";
-      img.style.opacity = i===0 ? "1" : "0";
+      img.style.opacity = i === 0 ? "1" : "0";
       img.style.transition = "opacity 1s";
       cont.appendChild(img);
     });
 
     startSponsorRotation();
-  } catch(e) {
-    console.error("Sponsor load failed", e);
+  } catch (e) {
+    console.error("Sponsor load failed:", e);
   }
 }
+
 
 function startSponsorRotation(){
   const images = Array.from(document.querySelectorAll('#sponsor-container .sponsor-logo'));
@@ -203,6 +206,7 @@ function startSponsorRotation(){
   },10000);
 }
 
+ 
 document.addEventListener("DOMContentLoaded", loadSponsors);
 
 

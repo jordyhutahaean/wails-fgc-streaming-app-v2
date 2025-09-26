@@ -197,6 +197,97 @@
 .bracket-top8 label{
   font-size: 12px;
 }
+
+ /* sponsor UI */
+  .sponsor-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 20px 0;
+  }
+  .upload-container {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    background: var(--card-bg);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .upload-container.dragover {
+    border-color: var(--accent);
+    background: #f0f9ff;
+    transform: scale(1.01);
+  }
+  .upload-icon { font-size: 28px; margin-bottom:8px }
+  .upload-button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  #statusContainer { margin-top:10px; min-height:24px }
+  .status-message { padding:8px 10px; border-radius:6px; margin-bottom:8px; font-weight:600; }
+  .status-success { background:#f0fdf4; color:#166534; border:1px solid #bbf7d0; }
+  .status-error { background:#fef2f2; color:#991b1b; border:1px solid #fecaca; }
+
+  .preview-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.preview-card {
+    width: 120px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #ddd;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-card img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.preview-name {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: 12px;
+    padding: 4px;
+    text-align: center;
+}
+
+.delete-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+  /* keep rest of UI minimal for brevity */
+  .small{font-size:12px;color:var(--muted);margin-top:8px}
+
 </style>
 </head>
 <body>
@@ -351,12 +442,27 @@
 </div>
       <div class="small">* Player 3 and Player 4 are only used in 2XKO mode.</div>
 
-      
-  <h3>Upload Sponsor</h3>
-    <input type="file" id="sponsorFile">
-    <button onclick="uploadSponsor()">Upload</button>
+    <div class="container">
+        <h1>Fighting Game Control Panel</h1>
 
-    <ul id="sponsorList"></ul>
+        <!-- sponsor section -->
+        <div class="sponsor-section">
+          <h3>🎯 Sponsor Management</h3>
+          
+          <div id="uploadContainer" class="upload-container">
+            <div class="upload-icon">📁</div>
+            <div><strong>Drag & drop images here</strong></div>
+            <div class="small">Supports: JPG, PNG, GIF, SVG</div>
+            <input id="fileInput" type="file" accept="image/*" multiple style="display:none;">
+          </div>
+
+          <div id="statusContainer"></div>
+          <!-- This is where previews will show -->
+          <div id="previewGrid" class="preview-grid"></div>
+        </div>
+
+
+      </div>
 
   </div> <!-- end scoreboard tab -->
 
@@ -1495,42 +1601,258 @@ function finalizeChampion(){
 </script>
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const uploadContainer = document.getElementById("uploadContainer");
+  const fileInput = document.getElementById("fileInput");
+  const previewGrid = document.getElementById("previewGrid");
+  const statusContainer = document.getElementById("statusContainer");
 
-  async function uploadSponsor() {
-  const fileInput = document.getElementById("sponsorFile");
-  const file = fileInput.files[0];
-  if (!file) return;
+  // Drag & Drop handlers
+  uploadContainer.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      uploadContainer.classList.add("dragover");
+  });
 
-  const arrayBuffer = await file.arrayBuffer();
-  const bytes = new Uint8Array(arrayBuffer);
+  uploadContainer.addEventListener("dragleave", () => {
+      uploadContainer.classList.remove("dragover");
+  });
 
-  // call Go backend
-  await window.go.main.App.SaveSponsor(file.name, Array.from(bytes));
+  uploadContainer.addEventListener("drop", async (e) => {
+      e.preventDefault();
+      uploadContainer.classList.remove("dragover");
+      handleFiles(e.dataTransfer.files);
+  });
 
-  alert("Uploaded " + file.name);
+  // File input handler
+  fileInput.addEventListener("change", (e) => {
+      handleFiles(e.target.files);
+      fileInput.value = ''; // Reset input
+  });
+
+  async function handleFiles(files) {
+      if (!files?.length) return;
+
+      for (const file of files) {
+          try {
+              const arrayBuffer = await file.arrayBuffer();
+              const bytes = new Uint8Array(arrayBuffer);
+              await window.go.main.App.SaveSponsor(file.name, Array.from(bytes));
+              showStatus(`Uploaded ${file.name}`);
+          } catch (err) {
+              console.error("Upload failed:", err);
+              showStatus(`Failed to upload ${file.name}`, true);
+          }
+      }
+      loadSponsors(); // Refresh grid after upload
+  }
+
+  function showStatus(message, isError = false) {
+      const status = document.createElement("div");
+      status.className = `status-message status-${isError ? 'error' : 'success'}`;
+      status.textContent = message;
+      statusContainer.innerHTML = '';
+      statusContainer.appendChild(status);
+      setTimeout(() => status.remove(), 3000);
+  }
+
+  async function loadSponsors() {
+      try {
+          const sponsors = await window.go.main.App.GetSponsors();
+          previewGrid.innerHTML = '';
+          
+          sponsors.forEach(path => {
+              const filename = path.split('/').pop();
+              const card = document.createElement("div");
+              card.className = "preview-card";
+              card.innerHTML = `
+                  <img src="${path}?_=${Date.now()}" alt="${filename}">
+                  <button class="delete-btn" title="Delete">×</button>
+                  <div class="preview-name">${filename}</div>
+              `;
+              
+              // Add delete handler
+              card.querySelector('.delete-btn').onclick = async () => {
+                  if (!confirm(`Delete ${filename}?`)) return;
+                  try {
+                      await window.go.main.App.DeleteSponsor(filename);
+                      showStatus(`Deleted ${filename}`);
+                      loadSponsors();
+                  } catch (err) {
+                      showStatus(`Failed to delete ${filename}`, true);
+                  }
+              };
+              
+              previewGrid.appendChild(card);
+          });
+      } catch (err) {
+          console.error("Failed to load sponsors:", err);
+          previewGrid.innerHTML = '<div class="small">No sponsors found</div>';
+      }
+  }
+
+  // Initial load
   loadSponsors();
-}
+});
+</script>
 
-async function loadSponsors() {
-  try {
+<script>
+async function loadSponsorsOverlay(){
+  try{
+    // Get list from backend (returns array like ["sponsors/a.png", ...])
     const sponsors = await window.go.main.App.GetSponsors();
-    const list = document.getElementById("sponsorList");
-    list.innerHTML = "";
-    sponsors.forEach(path => {
-      const li = document.createElement("li");
-      li.textContent = path;
-      list.appendChild(li);
+    const cont = document.getElementById("sponsor-container");
+    cont.innerHTML = "";
+
+    if(!sponsors || sponsors.length === 0) return;
+
+    // Add images
+    sponsors.forEach((src, idx) => {
+      const img = document.createElement("img");
+      img.className = "sponsor-logo";
+      img.src = src;
+      img.style.opacity = idx === 0 ? "1" : "0";
+      cont.appendChild(img);
     });
-  } catch(e) {
-    console.error("Failed to load sponsors", e);
+
+    startRotation();
+  }catch(err){
+    console.error("Failed to load sponsors for overlay:", err);
   }
 }
 
-document.addEventListener("DOMContentLoaded", loadSponsors);
+let sponsorInterval = null;
+function startRotation(){
+  const images = Array.from(document.querySelectorAll('#sponsor-container .sponsor-logo'));
+  if(images.length <= 1){
+    // make sure single is visible
+    if(images[0]) images[0].style.opacity = "1";
+    if(sponsorInterval) { clearInterval(sponsorInterval); sponsorInterval = null; }
+    return;
+  }
+  // clear existing interval if any
+  if(sponsorInterval) clearInterval(sponsorInterval);
+  let current = 0;
+  images.forEach((img,i) => img.style.opacity = i===0 ? "1" : "0");
+  sponsorInterval = setInterval(() => {
+    images[current].style.opacity = "0";
+    current = (current + 1) % images.length;
+    images[current].style.opacity = "1";
+  }, 10000); // 10 seconds per your requirement
+}
 
+document.addEventListener("DOMContentLoaded", () => {
+  loadSponsorsOverlay();
 
+  // Optionally refresh list every 5 seconds to pick up new uploads/deletes
+  setInterval(() => {
+    loadSponsorsOverlay();
+  }, 5000);
+});
 </script>
 
+<script>
+// =============== Sponsor Upload Logic ===============
 
-</body>
-</html>
+// initialize sponsor section on DOM ready
+document.addEventListener("DOMContentLoaded", () => {
+  const uploadContainer = document.getElementById("uploadContainer");
+  const fileInput = document.getElementById("fileInput");
+  const previewGrid = document.getElementById("previewGrid");
+  const statusContainer = document.getElementById("statusContainer");
+
+  // helper to show status
+  function showStatus(msg, isError = false) {
+    const el = document.createElement("div");
+    el.className = `status-message ${isError ? "status-error" : "status-success"}`;
+    el.textContent = msg;
+    statusContainer.innerHTML = "";
+    statusContainer.appendChild(el);
+  }
+
+  // load sponsor.json and render previews
+  async function loadSponsors() {
+    try {
+      const res = await fetch("sponsors.json?_=" + Date.now());
+      if (!res.ok) throw new Error("no sponsors.json");
+      const data = await res.json();
+      previewGrid.innerHTML = "";
+      if (Array.isArray(data) && data.length > 0) {
+        data.forEach(name => {
+          const card = document.createElement("div");
+          card.className = "preview-card";
+
+          const img = document.createElement("img");
+          img.src = "./sponsors/" + name;
+          card.appendChild(img);
+
+          const del = document.createElement("button");
+          del.className = "delete-btn";
+          del.textContent = "×";
+          del.onclick = () => deleteSponsor(name);
+          card.appendChild(del);
+
+          const lbl = document.createElement("div");
+          lbl.className = "preview-name";
+          lbl.textContent = name;
+          card.appendChild(lbl);
+
+          previewGrid.appendChild(card);
+        });
+      }
+    } catch (e) {
+      console.warn("loadSponsors failed:", e);
+      previewGrid.innerHTML = "<div class='small'>No sponsors found</div>";
+    }
+  }
+
+  // upload logic
+  async function uploadFiles(files) {
+    if (!files || files.length === 0) return;
+    for (let file of files) {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const bytes = Array.from(new Uint8Array(arrayBuffer));
+        await window.go.main.App.UploadSponsor(file.name, bytes);
+        showStatus(`✅ Uploaded: ${file.name}`);
+      } catch (e) {
+        console.error("Upload failed:", e);
+        showStatus(`❌ Failed: ${file.name}`, true);
+      }
+    }
+    await loadSponsors();
+  }
+
+  // delete sponsor
+  async function deleteSponsor(name) {
+    try {
+      await window.go.main.App.DeleteSponsor(name);
+      showStatus(`🗑 Deleted: ${name}`);
+      await loadSponsors();
+    } catch (e) {
+      console.error("Delete failed:", e);
+      showStatus(`❌ Failed to delete ${name}`, true);
+    }
+  }
+
+  // handle clicks
+  selectBtn.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", e => uploadFiles(e.target.files));
+
+  // drag-drop
+  uploadContainer.addEventListener("dragover", e => {
+    e.preventDefault();
+    uploadContainer.classList.add("dragover");
+  });
+  uploadContainer.addEventListener("dragleave", e => {
+    uploadContainer.classList.remove("dragover");
+  });
+  uploadContainer.addEventListener("drop", e => {
+    e.preventDefault();
+    uploadContainer.classList.remove("dragover");
+    uploadFiles(e.dataTransfer.files);
+  });
+
+  // init
+  loadSponsors();
+});
+</script>

@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/wailsapp/wails/v2"
@@ -20,12 +21,14 @@ func main() {
 	go func() {
 		mux := http.NewServeMux()
 
-		// Serve sponsors folder
-		sponsorDir := filepath.Join(".", "sponsors")
+		// Serve sponsors folder (resolve path next to binary)
+		exe, _ := os.Executable()
+		base := filepath.Dir(exe)
+		sponsorDir := filepath.Join(base, "sponsors")
+
 		mux.Handle("/sponsors/", http.StripPrefix("/sponsors/",
 			http.FileServer(http.Dir(sponsorDir)),
 		))
-
 		// Serve overlays (scoreboard.html, single.html, double.html, commentary.html)
 		overlayDir := filepath.Join(".", "frontend")
 		mux.Handle("/", http.FileServer(http.Dir(overlayDir)))
