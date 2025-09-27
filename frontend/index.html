@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <title>Scoreboard Control</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
+<script src="https://cdn.jsdelivr.net/npm/mousetrap@1.6.5/mousetrap.min.js"></script>
 <style>
   :root{
     --bg:#f5f7fa;
@@ -1852,7 +1853,100 @@ document.addEventListener("DOMContentLoaded", () => {
     uploadFiles(e.dataTransfer.files);
   });
 
-  // init
+  // iit
   loadSponsors();
+});
+</script>
+ 
+<script>
+// Globals to represent the active view
+let currentTab = "scoreboard";
+let currentSubtab = ""; // e.g. "single" or "double" when currentTab === "brackets"
+
+// Replace / enhance your existing openTab
+function openTab(evt, tabName){
+  document.querySelectorAll(".tabcontent").forEach(el=>el.classList.remove("active"));
+  document.querySelectorAll(".tablinks").forEach(el=>el.classList.remove("active"));
+  const container = document.getElementById(tabName);
+  if (container) container.classList.add("active");
+  if (evt && evt.currentTarget) evt.currentTarget.classList.add("active");
+
+  // update state
+  currentTab = tabName;
+  // clear subtab when switching away from brackets
+  if (tabName !== "brackets") currentSubtab = "";
+
+  console.log("openTab ->", currentTab, currentSubtab);
+}
+
+// Replace / enhance your existing openInnerTab
+function openInnerTab(name){
+  document.querySelectorAll(".inner-tabcontent").forEach(el=>el.style.display = "none");
+  document.querySelectorAll(".inner-tabs button").forEach(b=>b.classList.remove("active"));
+  const container = document.getElementById(name);
+  if (container) container.style.display = "block";
+  const btn = document.getElementById(name + "TabBtn");
+  if (btn) btn.classList.add("active");
+
+  // update state: inner tabs belong to the 'brackets' top tab
+  currentTab = "brackets";
+  currentSubtab = name;
+
+  console.log("openInnerTab ->", currentTab, currentSubtab);
+}
+
+// Global keyboard handler (works inside inputs/textareas too)
+document.addEventListener("keydown", function(e) {
+  const key = (e.key || "").toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && key === "s") {
+    e.preventDefault();
+
+    const view = currentSubtab ? `${currentTab}:${currentSubtab}` : currentTab;
+    console.log("Shortcut: Ctrl/Cmd+S ->", view);
+
+    switch (view) {
+      case "scoreboard":
+        if (typeof updateScoreboard === "function") updateScoreboard();
+        break;
+      case "commentary":
+        if (typeof updateCommentary === "function") updateCommentary();
+        break;
+      case "brackets:single":
+        if (typeof saveSinglePlayers === "function") saveSinglePlayers();
+        break;
+      case "brackets:double":
+        if (typeof saveDoublePlayers === "function") saveDoublePlayers();
+        break;
+      default:
+        console.warn("No save action for view:", view);
+    }
+  }
+});
+
+document.addEventListener("keydown", function(e) {
+  const key = (e.key || "").toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && key === "r") {
+    e.preventDefault();
+
+    const view = currentSubtab ? `${currentTab}:${currentSubtab}` : currentTab;
+    console.log("Shortcut: Ctrl/Cmd+S ->", view);
+
+    switch (view) {
+      case "scoreboard":
+        if (typeof resetScoreboard === "function") resetScoreboard();
+        break;
+      case "commentary":
+        if (typeof resetCommentary === "function") resetCommentary();
+        break;
+      case "brackets:single":
+        if (typeof resetSingle === "function") resetSingle();
+        break;
+      case "brackets:double":
+        if (typeof resetDouble === "function") resetDouble();
+        break;
+      default:
+        console.warn("No save action for view:", view);
+    }
+  }
 });
 </script>
