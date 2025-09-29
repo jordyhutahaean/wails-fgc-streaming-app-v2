@@ -5,6 +5,11 @@
 <title>Scoreboard Control</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <script src="https://cdn.jsdelivr.net/npm/mousetrap@1.6.5/mousetrap.min.js"></script>
+<link rel="stylesheet" href="/node_modules/animate.css/animate.min.css" />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+/>
 <style>
   :root{
     --bg:#f5f7fa;
@@ -286,6 +291,53 @@
     cursor: pointer;
 }
 
+.obs-scoreboard{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-direction: row;
+  gap: 10px;
+
+  text-align: center;
+  padding: 0 16px;
+  background: #eeeeee;
+
+  border-radius: 4px;
+}
+
+.copy-scoreboard{
+  font-size: 10px;
+  background: white;
+  padding: 0px 16px;
+  width: fit-content;
+  border-radius: 4px;
+}
+
+.copy-scoreboard:hover{
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+}
+
+ 
+
+#notifMsg {
+  position: fixed;         /* stays in viewport even if page scrolls */
+  top: 20px;               /* pixel position is more predictable */
+  right: 20px;             /* no negative offset */
+  padding: 8px 12px;
+  background: #e0ffe0;
+  border: 1px solid #b6ffb6;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #155724;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  z-index: 9999;           /* ensure it’s above other elements */
+
+  width: 200px;
+}
+
   /* keep rest of UI minimal for brevity */
   .small{font-size:12px;color:var(--muted);margin-top:8px}
 
@@ -293,8 +345,9 @@
 </head>
 <body>
   <div class="container">
-    <h1>Fighting Game Control Panel</h1>
-
+      <div id="notifMsg" style="display: none; color: green;">
+        Copied to clipboard!
+      </div>
     <div class="tab">
       <button class="tablinks active" onclick="openTab(event,'scoreboard')">🏆 Scoreboard</button>
       <button class="tablinks" onclick="openTab(event,'commentary')">🎙 Commentary</button>
@@ -306,19 +359,17 @@
       <div class="toolbar">
         <button class="btn" onclick="updateScoreboard()">💾 Save Scoreboard</button>
         <button class="btn" onclick="resetScoreboard()">🔄 Reset </button>
+        <div class="obs-scoreboard">
+          <h1 style="font-size: 14px; margin: 0;"> Copy this to your obs</h1>
+          <div class="copy-scoreboard" id="scoreboard-url" onclick="copyCardContent('scoreboard-url')">
+            <p> localhost:34115/scoreboard.html </p>
+          </div>
+        </div>
       </div>
 
-      <div class="settings">
-        <!-- <label>Game
-          <select id="game" onchange="toggleGameMode()">
-            <option value="sf" data-icon="./frontend/img/game_ico/SF6_Logo.png" > Street Fighter</option>
-            <option value="dbfz">Dragon Ball FighterZ</option>
-            <option value="tekken">Tekken</option>
-            <option value="2xko">2XKO</option>
-          </select>
-        </label> -->
 
-        <!-- hidden input so toggleGameMode() still works -->
+
+      <div class="settings">
         <input type="hidden" id="game" value="sf">
 
         <label> Game
@@ -470,7 +521,12 @@
     <!-- COMMENTARY -->
     <div id="commentary" class="tabcontent">
       <div class="commentary-panel">
- 
+          <div class="obs-scoreboard" style="width: 400px;">
+            <h1 style="font-size: 14px; margin: 0;"> Copy this to your obs</h1>
+            <div class="copy-scoreboard" id="commentary-url" onclick="copyCardContent('commentary-url')">
+              <p> localhost:34115/commentary.html </p>
+          </div>
+        </div> 
         <div class="commentator-block">
           <label>Commentator 1 - Name<input id="com1_name" type="text" placeholder="Commentator 1"></label>
           <label>Commentator 1 - Description<input id="com1_desc" type="text" placeholder="FGC Expert"></label>
@@ -1856,6 +1912,39 @@ document.addEventListener("DOMContentLoaded", () => {
   // iit
   loadSponsors();
 });
+</script>
+
+<script>
+  async function copyCardContent(id) {
+  const card = document.getElementById(id);
+  const textToCopy = card.innerText.trim(); // or card.textContent if you prefer plain text
+
+  try {
+    await navigator.clipboard.writeText(textToCopy);
+    const msg = document.getElementById("notifMsg");
+
+    //Reset animation
+    msg.classList.remove("animate__slideInRight", "animate__slideOutRight");
+    //Show message
+    msg.style.display = "block";
+    msg.classList.add("animate__animated", "animate__slideInRight");
+
+    //Fade Out
+    setTimeout(() => {
+      msg.classList.remove("animate__slideInRight");
+      msg.classList.add("animate__slideOutRight");
+    
+    //Hide element after fade out
+    setTimeout(() => {
+        msg.style.display = "none";
+      }, 500); // Match this duration with your CSS animation duration
+    }, 2500); // Hide message after 1.5 seconds
+  } catch (err) {
+    console.error("Failed to copy card content: ", err);
+    alert("Failed to copy card content.");
+  }
+}
+
 </script>
  
 <script>

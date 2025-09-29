@@ -24,11 +24,12 @@ func main() {
 		// Serve sponsors folder (resolve path next to binary)
 		exe, _ := os.Executable()
 		base := filepath.Dir(exe)
-		sponsorDir := filepath.Join(base, "sponsors")
+		sponsorDir := filepath.Join(base, "frontend", "sponsors")
 
 		mux.Handle("/sponsors/", http.StripPrefix("/sponsors/",
 			http.FileServer(http.Dir(sponsorDir)),
 		))
+
 		// Serve overlays (scoreboard.html, single.html, double.html, commentary.html)
 		overlayDir := filepath.Join(".", "frontend")
 		mux.Handle("/", http.FileServer(http.Dir(overlayDir)))
