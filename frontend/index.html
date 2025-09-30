@@ -30,7 +30,7 @@
 
 /* gaagaa */
   html,body{height:100%;margin:0;padding:0;background:var(--bg);font-family:Rubik, Arial, sans-serif;color:var(--text)}
-  .container{padding:20px;max-width:1200px;margin:0 auto}
+  .container{padding:20px;max-width:1200px;margin:0 auto;padding-top: 74px;}
   h1{margin:0 0 18px;font-size:20px;color:var(--accent)}
 
   /* Top tabs */
@@ -40,6 +40,68 @@
   .tabcontent{display:none}
   .tabcontent.active{display:block}
 
+  /* Try UI */
+
+  .channel-bar {
+    position: fixed;
+    top: -40px; /* hide most of it */
+    left: 0;
+    right: 0;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 10px;
+    background: #ffffff1c;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    border-bottom: 2px solid #ccc;
+    border-radius: 0 0 12px 12px;
+    transition: top 0.3s ease;
+    z-index: 1000;
+  }
+
+  /* little tab hanging down */
+  .channel-bar::after {
+    content: "≡"; /* could be an icon or arrow */
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1ea7ff;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 0 0 8px 8px;
+    font-size: 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+
+  /* hover effect → slide down */
+  .channel-bar:hover {
+    top: 0;
+  }
+
+  .channel {
+    background: #eee;
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    height: 8vh;
+  }
+
+  .channel:hover {
+    background: #1ea7ff;
+    color: white;
+    border-color: #1ea7ff;
+  }
+
+  .channel.active {
+    background: #1ea7ff;
+    color: white;
+    border-color: #1ea7ff;
+  }
   /* toolbar & controls */
   .toolbar{display:flex;gap:10px;margin-bottom:18px}
   button.btn{background:var(--accent);color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
@@ -349,15 +411,16 @@
 </style>
 </head>
 <body>
+  <div class="channel-bar">
+    <button class="channel active" onclick="openTab(event,'scoreboard')">🏆 Scoreboard</button>
+    <button class="channel" onclick="openTab(event,'commentary')">🎙 Commentary</button>
+    <button class="channel" onclick="openTab(event,'brackets')">🔀 Brackets</button>
+  </div>
   <div class="container">
       <div id="notifMsg" style="display: none; color: green;">
         Copied to clipboard!
       </div>
-    <div class="tab">
-      <button class="tablinks active" onclick="openTab(event,'scoreboard')">🏆 Scoreboard</button>
-      <button class="tablinks" onclick="openTab(event,'commentary')">🎙 Commentary</button>
-      <button class="tablinks" onclick="openTab(event,'brackets')">🔀 Brackets</button>
-    </div>
+
 
     <!-- SCOREBOARD -->
     <div id="scoreboard" class="tabcontent active">
@@ -572,12 +635,6 @@
 /* ---------------------
    Utility + tabs
    --------------------- */
-function openTab(evt, tabName){
-  document.querySelectorAll(".tabcontent").forEach(el=>el.classList.remove("active"));
-  document.querySelectorAll(".tablinks").forEach(el=>el.classList.remove("active"));
-  document.getElementById(tabName).classList.add("active");
-  evt.currentTarget.classList.add("active");
-}
 
 function openInnerTab(name){
   document.querySelectorAll(".inner-tabcontent").forEach(el=>el.style.display="none");
@@ -2012,20 +2069,68 @@ let currentTab = "scoreboard";
 let currentSubtab = ""; // e.g. "single" or "double" when currentTab === "brackets"
 
 // Replace / enhance your existing openTab
-function openTab(evt, tabName){
-  document.querySelectorAll(".tabcontent").forEach(el=>el.classList.remove("active"));
-  document.querySelectorAll(".tablinks").forEach(el=>el.classList.remove("active"));
-  const container = document.getElementById(tabName);
-  if (container) container.classList.add("active");
-  if (evt && evt.currentTarget) evt.currentTarget.classList.add("active");
+function openTab(evt, tabName) {
+  // Hide all tab content
+  document.querySelectorAll(".tabcontent").forEach(el => {
+    el.style.display = "none";   // hide content
+    el.classList.remove("active");
+  });
 
-  // update state
+  // Remove "active" from all tab buttons
+  document.querySelectorAll(".tablinks").forEach(el => {
+    el.classList.remove("active");
+  });
+
+  // Show the chosen tab
+  const container = document.getElementById(tabName);
+  if (container) {
+    container.style.display = "block";
+    container.classList.add("active");
+  }
+
+  // Mark the clicked button active
+  if (evt && evt.currentTarget) {
+    evt.currentTarget.classList.add("active");
+  }
+
+  // Update state
   currentTab = tabName;
-  // clear subtab when switching away from brackets
   if (tabName !== "brackets") currentSubtab = "";
 
   console.log("openTab ->", currentTab, currentSubtab);
 }
+function openTab(evt, tabName) {
+  // Hide all tab content
+  document.querySelectorAll(".tabcontent").forEach(el => {
+    el.style.display = "none";   // hide content
+    el.classList.remove("active");
+  });
+
+  // Remove "active" from all tab buttons
+  document.querySelectorAll(".tablinks").forEach(el => {
+    el.classList.remove("active");
+  });
+
+  // Show the chosen tab
+  const container = document.getElementById(tabName);
+  if (container) {
+    container.style.display = "block";
+    container.classList.add("active");
+  }
+
+  // Mark the clicked button active
+  if (evt && evt.currentTarget) {
+    evt.currentTarget.classList.add("active");
+  }
+
+  // Update state
+  currentTab = tabName;
+  if (tabName !== "brackets") currentSubtab = "";
+
+  console.log("openTab ->", currentTab, currentSubtab);
+}
+
+
 
 // Replace / enhance your existing openInnerTab
 function openInnerTab(name){
