@@ -134,7 +134,7 @@ body {
 <body>
   <div class="title">
     <h1 id="top8">TOP 8</h1>
-    <h2 id="game-title">Tekken 8</h1>
+    <h2 id="game-title-sbracket">Tekken 8</h1>
   </div>
   <div class="bracket-container">
     <div class="bracket-tree" id="visualBracket">
@@ -209,6 +209,9 @@ function renderSingleFromData(){
   const s = bracketData.single || { players: Array(8).fill(""), scores:{}, winners:{} };
   const players = s.players || Array(8).fill("");
 
+  document.getElementById("game-title-sbracket").textContent = s.title || "Untitled";
+
+
   const qfPairs = {
     qf1: [players[0]||"", players[1]||""],
     qf2: [players[2]||"", players[3]||""],
@@ -255,6 +258,8 @@ window.addEventListener("DOMContentLoaded", () => {
   // Auto-refresh every second
   setInterval(loadBracket, 1000);
 });
+
+
 </script>
 </body>
 </html>

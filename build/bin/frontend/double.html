@@ -150,7 +150,7 @@
 <body>
    <div class="title">
     <h1 id="top8">TOP 8</h1>
-    <h2 id="game-title">Tekken 8</h1>
+    <h2 id="game-title-dbracket">Tekken 8</h1>
   </div>
   <div class="bracket-container">
     <div class="bracket-tree" id="visualBracket">
@@ -263,6 +263,8 @@ function ensureBracket(){
 function renderOverlay(){
   const d = bracketData.double;
 
+  document.getElementById("game-title-dbracket").textContent = d.title || "Untitled";
+
   // Winners
   document.getElementById("wb_sf1_p1").textContent = d.players[0] || "Seed 1";
   document.getElementById("wb_sf1_p2").textContent = d.players[1] || "Seed 2";
@@ -356,6 +358,8 @@ document.addEventListener("DOMContentLoaded", () => {
   loadOverlayDouble();
   setInterval(loadOverlayDouble, 2000); // refresh every 2s
 });
+
+
 </script>
 </body>
 </html>

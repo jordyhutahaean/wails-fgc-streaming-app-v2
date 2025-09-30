@@ -362,7 +362,7 @@
     <!-- SCOREBOARD -->
     <div id="scoreboard" class="tabcontent active">
       <div class="toolbar">
-        <button class="btn" onclick="updateScoreboard()">💾 Save Scoreboard</button>
+        <button class="btn" onclick="updateScoreboard('Scoreboard updated!')">💾 Save Scoreboard</button>
         <button class="btn" onclick="resetScoreboard()">🔄 Reset </button>
         <div class="obs-scoreboard">
           <h1 style="font-size: 14px; margin: 0;"> Copy this to your obs</h1>
@@ -646,7 +646,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-async function updateScoreboard(){
+async function updateScoreboard(msg = "Scoreboard updated!"){
   const data = {
     game: document.getElementById("game").value,
     style: document.getElementById("style").value,
@@ -672,19 +672,26 @@ async function updateScoreboard(){
   };
   try{
     await window.go.main.App.SaveScoreboardJSON(data);
+    copyCardContent(null, msg);
   }catch(err){
     console.error("SaveScoreboardJSON failed:",err);
-    alert("Error saving scoreboard JSON (see console).");
+    copyCardContent(null, "Error saving scoreboard"); // ✅ just show notif
   }
 }
 
 function resetScoreboard(){
   // limit reset to scoreboard form inputs only (avoid wiping bracket seeds by accident)
-  const selectors = ['#p1','#t1','#s1','#c1','#p2','#t2','#s2','#c2','#p3','#t3','#s3','#c3','#p4','#t4','#s4','#c4','#titlecard'];
-  selectors.forEach(sel=>{ const el = document.querySelector(sel); if(el) el.value = (el.type==='number')?0:''; });
+  const selectors = ['#p1','#t1','#s1','#c1','#p2','#t2','#s2',
+  '#c2','#p3','#t3','#s3','#c3','#p4','#t4','#s4','#c4','#titlecard'];
+  selectors.forEach(sel=>{ 
+    const el = document.querySelector(sel); 
+    if(el) el.value = (el.type==='number')?0:''; 
+  });
+  
   const v3 = document.getElementById("v3"), v4 = document.getElementById("v4");
-  if(v3) v3.checked=false; if(v4) v4.checked=false;
-  updateScoreboard();
+  if(v3) v3.checked=false; 
+  if(v4) v4.checked=false;
+  updateScoreboard("Scoreboard reset!");
 }
 
 /* ---------------------
@@ -692,7 +699,7 @@ function resetScoreboard(){
    --------------------- */
 let commentaryVisible = false;
 
-async function updateCommentary(){
+async function updateCommentary(msg="Commentary updated!"){
   const data = {
     commentator1: document.getElementById("com1_name").value || "",
     description1: document.getElementById("com1_desc").value || "",
@@ -703,9 +710,11 @@ async function updateCommentary(){
   try {
     if (window.go?.main?.App?.SaveCommentaryJSON) {
       await window.go.main.App.SaveCommentaryJSON(data);
+      copyCardContent(null, msg);
     }
   } catch (e) {
     alert("Failed to save commentary: " + e);
+    copyCardContent(null, "Error saving commentary");
   }
 }
 
@@ -714,7 +723,7 @@ function resetCommentary(){
   document.getElementById("com1_desc").value="";
   document.getElementById("com2_name").value="";
   document.getElementById("com2_desc").value="";
-  updateCommentary();
+  updateCommentary("Commentary reset!");
 }
 
 async function toggleCommentary(show) {
@@ -1319,30 +1328,39 @@ function setSingleSeedInputs(arr) {
 }
 
 // --- Save/Reset Single Players ---
-async function saveSinglePlayers() {
+async function saveSinglePlayers(msg = "Single-elimination players saved ") {
   ensureBracket();
   const arr = getSingleSeedInputs();
   bracketData.single.players = arr;
   bracketData.single.scores = bracketData.single.scores || {};
   bracketData.single.winners = bracketData.single.winners || {};
+
+    // ✅ also save title
+  bracketData.single.title = document.getElementById("game-title-sbracket").value || "";
+
   try {
     if (typeof saveBracket === "function") await saveBracket();
-    else if (window.go?.main?.App) await window.go.main.App.SaveBracketJSON(bracketData);
+    else if (window.go?.main?.App) 
+    await window.go.main.App.SaveBracketJSON(bracketData);
+    copyCardContent(null, msg);
   } catch (e) {
     console.warn("saveBracket failed", e);
+    copyCardContent(null, "Failed to save players");
   }
   seedSingleVisualBracket();
 }
 
-function resetSingle() {
+function resetSingle(msg = "Single-elimination bracket reset") {
   setSingleSeedInputs(Array(8).fill(""));
   bracketData.single = { players: Array(8).fill(""), scores: {}, winners: {} };
   seedSingleVisualBracket();
   try {
     if (typeof saveBracket === "function") saveBracket();
     else if (window.go?.main?.App) window.go.main.App.SaveBracketJSON(bracketData);
+    copyCardContent(null, msg);
   } catch (e) {
     console.warn("saveBracket failed", e);
+    copyCardContent(null, "Failed to reset players");
   }
 }
 
@@ -1631,19 +1649,37 @@ function populateDoubleFromData(){
 }
 
 /* Save / Reset */
-async function saveDoublePlayers(){
+async function saveDoublePlayers(msg='Double-elimination players saved '){
   ensureBracket();
   const arr=[];
   for(let i=1;i<=8;i++) arr.push(document.getElementById('dp'+i)?.value||'');
   bracketData.double.players=arr;
-  try{ if(typeof saveBracket==='function') await saveBracket(); }catch(e){}
+
+  
+  // ✅ also save title
+  bracketData.double.title = document.getElementById("game-title-dbracket").value || "";
+
+  try{ 
+    if(typeof saveBracket==='function') 
+    await saveBracket();
+    copyCardContent(null, msg);
+   }catch(e){
+    console.warn('saveBracket failed', e);
+    copyCardContent(null, 'Failed to save players');
+   }
   seedDoubleVisualBracket();
 }
-function resetDouble(){
+
+function resetDouble(msg='Double-elimination bracket reset'){
   for(let i=1;i<=8;i++){ const el=document.getElementById('dp'+i); if(el) el.value=''; }
   bracketData.double={players:Array(8).fill(""),scores:{},winners:{},eliminated:[]};
   seedDoubleVisualBracket();
-  try{ if(typeof saveBracket==='function') saveBracket(); }catch(e){}
+  try{ if(typeof saveBracket==='function') saveBracket();
+    copyCardContent(null, msg);
+   }catch(e){
+    console.warn('saveBracket failed', e);
+    copyCardContent(null, 'Failed to reset players');    
+  }
 }
 
 /* GF Reset */
@@ -1920,33 +1956,51 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 <script>
-  async function copyCardContent(id) {
-  const card = document.getElementById(id);
-  const textToCopy = card.innerText.trim(); // or card.textContent if you prefer plain text
+  function showNotif(message, color = "green") {
+  const msg = document.getElementById("notifMsg");
+  msg.textContent = message;
+  msg.style.color = color;
 
+  msg.classList.remove("animate__slideInRight", "animate__slideOutRight");
+  msg.style.display = "block";
+  msg.classList.add("animate__animated", "animate__slideInRight");
+
+  setTimeout(() => {
+    msg.classList.remove("animate__slideInRight");
+    msg.classList.add("animate__slideOutRight");
+    setTimeout(() => { msg.style.display = "none"; }, 500);
+   }, 2500);
+  }
+
+async function copyCardContent(id, customMsg = "Copied to clipboard!") {
   try {
-    await navigator.clipboard.writeText(textToCopy);
+    if (id) {
+      const card = document.getElementById(id);
+      const textToCopy = card.innerText.trim();
+      await navigator.clipboard.writeText(textToCopy);
+    }
+    // Always show notif
     const msg = document.getElementById("notifMsg");
+    msg.textContent = customMsg;
+    msg.style.color = "green";
 
-    //Reset animation
     msg.classList.remove("animate__slideInRight", "animate__slideOutRight");
-    //Show message
     msg.style.display = "block";
     msg.classList.add("animate__animated", "animate__slideInRight");
 
-    //Fade Out
     setTimeout(() => {
       msg.classList.remove("animate__slideInRight");
       msg.classList.add("animate__slideOutRight");
-    
-    //Hide element after fade out
-    setTimeout(() => {
-        msg.style.display = "none";
-      }, 500); // Match this duration with your CSS animation duration
-    }, 2500); // Hide message after 1.5 seconds
+      setTimeout(() => { msg.style.display = "none"; }, 500);
+    }, 2500);
+
   } catch (err) {
     console.error("Failed to copy card content: ", err);
-    alert("Failed to copy card content.");
+
+    const msg = document.getElementById("notifMsg");
+    msg.textContent = "Failed to copy!";
+    msg.style.color = "red";
+    msg.style.display = "block";
   }
 }
 

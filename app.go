@@ -121,12 +121,14 @@ type Bracket struct {
 }
 
 type SingleBracket struct {
+	Title   string            `json:"title"`
 	Players []string          `json:"players"`
 	Scores  map[string][2]int `json:"scores"`
 	Winners map[string]string `json:"winners"`
 }
 
 type DoubleBracket struct {
+	Title   string            `json:"title"`
 	Players []string          `json:"players"`
 	Scores  map[string][2]int `json:"scores"`
 	Winners map[string]string `json:"winners"`
@@ -137,11 +139,13 @@ type DoubleBracket struct {
 func NewEmptyBracket() Bracket {
 	return Bracket{
 		Single: SingleBracket{
+			Title:   "Single Bracket",
 			Players: make([]string, 8),
 			Scores:  make(map[string][2]int),
 			Winners: make(map[string]string),
 		},
 		Double: DoubleBracket{
+			Title:   "Double Bracket",
 			Players: make([]string, 8),
 			Scores:  make(map[string][2]int),
 			Winners: make(map[string]string),

@@ -1,6 +1,7 @@
 export namespace main {
 	
 	export class DoubleBracket {
+	    title: string;
 	    players: string[];
 	    scores: Record<string, Array<number>>;
 	    winners: Record<string, string>;
@@ -13,6 +14,7 @@ export namespace main {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.title = source["title"];
 	        this.players = source["players"];
 	        this.scores = source["scores"];
 	        this.winners = source["winners"];
@@ -21,6 +23,7 @@ export namespace main {
 	    }
 	}
 	export class SingleBracket {
+	    title: string;
 	    players: string[];
 	    scores: Record<string, Array<number>>;
 	    winners: Record<string, string>;
@@ -31,6 +34,7 @@ export namespace main {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.title = source["title"];
 	        this.players = source["players"];
 	        this.scores = source["scores"];
 	        this.winners = source["winners"];
