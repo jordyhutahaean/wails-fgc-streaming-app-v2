@@ -24,7 +24,23 @@
     --text:#222;
     --win:#5a5a5a;
     --lose:#fff5f5;
+        --sumtext:#222;
   }
+
+  /* 🌙 Dark mode variables override */
+[data-theme='dark'] {
+  --bg: #121212;
+  --text: #eee;
+  --card-bg: #1e1e1e;
+  --panel: #1a1a1a;
+  --border: #333;
+  --accent: #1ea7ff;
+  --muted: #aaa;
+  --win: #333;
+  --lose: #442222;
+      --sumtext:#222;
+}
+
 /* googoo */
 
 
@@ -33,6 +49,8 @@
   .container{padding:20px;max-width:1200px;margin:0 auto;padding-top: 74px;}
   h1{margin:0 0 18px;font-size:20px;color:var(--accent)}
 
+  body, .player-block, .sponsor-section {
+  transition: background 0.3s ease, color 0.3s ease;}
   /* Top tabs */
   .tab{display:flex;gap:10px;border-bottom:2px solid var(--border);margin-bottom:18px}
   .tab button{background:none;border:0;padding:10px 14px;cursor:pointer;font-weight:700;border-radius:6px;color:var(--text)}
@@ -44,18 +62,18 @@
 
   .channel-bar {
     position: fixed;
-    top: -40px; /* hide most of it */
+    top: -50px; /* hide most of it */
     left: 0;
     right: 0;
     height: 50px;
     display: flex;
     justify-content: center;
     gap: 20px;
-    padding: 10px;
+    padding: 10px 10px 0 10px;
     background: #ffffff1c;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     border-bottom: 2px solid #ccc;
-    border-radius: 0 0 12px 12px;
+    border-radius: 0 0 120px 120px;
     transition: top 0.3s ease;
     z-index: 1000;
   }
@@ -70,7 +88,7 @@
     background: #1ea7ff;
     color: #fff;
     padding: 4px 12px;
-    border-radius: 0 0 8px 8px;
+    border-radius: 0 0 80px 80px;
     font-size: 18px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
   }
@@ -83,12 +101,17 @@
   .channel {
     background: #eee;
     border: 2px solid #ccc;
-    border-radius: 12px;
-    padding: 10px 16px;
+    border-radius: 4px;
+    padding: 0 16px;
     cursor: pointer;
     font-weight: bold;
     transition: all 0.2s ease;
-    height: 8vh;
+    height: 6vh;
+
+    color: var(--sumtext);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .channel:hover {
@@ -101,19 +124,45 @@
     background: #1ea7ff;
     color: white;
     border-color: #1ea7ff;
+    box-shadow: 3px 3px 1px #0e3d73;
   }
   /* toolbar & controls */
   .toolbar{display:flex;gap:10px;margin-bottom:18px}
-  button.btn{background:var(--accent);color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer}
-  button.btn:hover{filter:brightness(.9)}
+  button{
+    background:var(--accent);
+    color:#fff;border:0;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size: 12px;
+    box-shadow: 2px 2px 1px #0e3d73;
+  }
+
+  button:active{
+    transform:scale(.98);
+  }
+  button:hover
+  {
+    filter:brightness(.9)
+  }
   .settings{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:18px}
   .settings label{display:flex;flex-direction:column;font-weight:700;font-size:13px}
   input[type="text"], input[type="number"], select{margin-top:6px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;}
 
+  .scoreboard-panel{padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:10px}
   .playerflex{display:flex;gap:12px;flex-wrap:nowrap;flex-direction: row;}
   .player-block{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;flex-direction: column;width: 19%;flex: 1;}
   .player-block label{font-weight:700;font-size:13px;min-width:150px ; display: flex; flex-direction: column; width:-webkit-fill-available;}
 
+    .player-block#p1block{background: #e6f1f5; border:1px solid #0e3d73;}
+    .player-block#p2block{background: #fbf2f2; border:1px solid #991b1b; }
+    .player-block#p3block{background: #e7ffe7; border:1px solid #166534; }
+    .player-block#p4block{background: #fff7e7; border:1px solid #ffaa00;}
+
+    .player-block#p1block label{color: #0077ff; }
+    .player-block#p2block label{color: #ff0000; }
+    .player-block#p3block label{color: #00aa00; }
+    .player-block#p4block label{color: #ffaa00; } 
   /* commentary */
   .commentary-panel{padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:10px}
   .commentator-block{margin-top: 15px; display:flex;gap:24px;flex-wrap:nowrap;margin-bottom:8px}
@@ -129,7 +178,7 @@
   /* Bracket Panel layout (horizontal tournament tree) */
   .bracket-panel{padding:16px;background:var(--panel);border:1px solid var(--border);border-radius:10px}
 
-  .inner-tabs #singleTabBtn, .inner-tabs #doubleTabBtn{font-size:12px}
+  .inner-tabs #singleTabBtn, .inner-tabs #doubleTabBtn{font-weight: 600;font-size:12px ; color: var(--text); display: flex; align-items: center; gap: 8px;}
 
 
   .inner-tabs{display:flex;gap:10px;margin-bottom:14px}
@@ -218,7 +267,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #e4e4e4;
+ 
   border: 1px solid #444;
   padding: 6px 10px;
   border-radius: 6px;
@@ -241,6 +290,7 @@
   margin-top: 4px;
   display: none;
   z-index: 10;
+
 }
 
 .custom-select .options div {
@@ -248,6 +298,7 @@
   align-items: center;
   gap: 8px;
   padding: 6px 10px;
+  color: var(--text);
 }
 
 .custom-select .options div:hover {
@@ -379,6 +430,7 @@
   padding: 0px 16px;
   width: fit-content;
   border-radius: 4px;
+  color: black;
 }
 
 .copy-scoreboard:hover{
@@ -387,7 +439,40 @@
   cursor: pointer;
 }
 
- 
+ #settingsPanel {
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+#settingsPanel.hidden {
+  transform: translateX(-120%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggle-btn {
+  align-self: flex-start;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 6px 10px;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn:hover {
+  background: #005bcc;
+  transform: scale(1.05);
+}
+
+#togglePanelBtn {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  top: 16%;
+  right: 4%;
+  z-index: 100;
+}
 
 #notifMsg {
   position: fixed;         /* stays in viewport even if page scrolls */
@@ -408,9 +493,67 @@
   /* keep rest of UI minimal for brevity */
   .small{font-size:12px;color:var(--muted);margin-top:8px}
 
+.toggleNight{
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.tabler--tournament {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M2 4a2 2 0 1 0 4 0a2 2 0 1 0-4 0m16 6a2 2 0 1 0 4 0a2 2 0 1 0-4 0M2 12a2 2 0 1 0 4 0a2 2 0 1 0-4 0m0 8a2 2 0 1 0 4 0a2 2 0 1 0-4 0m4-8h3a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H6'/%3E%3Cpath d='M6 4h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-2m3-6h4'/%3E%3C/g%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.mdi--bracket {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M2 2v2h5v4H2v2h5c1.11 0 2-.89 2-2V7h5v10H9v-1c0-1.11-.89-2-2-2H2v2h5v4H2v2h5c1.11 0 2-.89 2-2v-1h5c1.11 0 2-.89 2-2v-4h6v-2h-6V7c0-1.11-.89-2-2-2H9V4c0-1.11-.89-2-2-2z'/%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.material-symbols--hide-source-outline {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M19.775 22.625L17.5 20.35q-1.225.8-2.612 1.225T12 22q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12q0-1.5.425-2.887T3.65 6.5L1.375 4.225L2.8 2.8l18.4 18.4zM12 20q1.075 0 2.088-.275t1.962-.825L5.1 7.95q-.55.95-.825 1.962T4 12q0 3.325 2.338 5.663T12 20m8.35-2.5l-1.45-1.45q.55-.95.825-1.963T20 12q0-3.325-2.337-5.663T12 4q-1.075 0-2.087.275T7.95 5.1L6.5 3.65q1.225-.8 2.613-1.225T12 2q2.075 0 3.9.788t3.175 2.137T21.213 8.1T22 12q0 1.5-.425 2.888T20.35 17.5m-9.775-4.075'/%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
 </style>
 </head>
 <body>
+
+  <button class="toggleNight" onclick="toggleTheme()">🌙</button>
+
   <div class="channel-bar">
     <button class="channel active" onclick="openTab(event,'scoreboard')">🏆 Scoreboard</button>
     <button class="channel" onclick="openTab(event,'commentary')">🎙 Commentary</button>
@@ -420,168 +563,155 @@
       <div id="notifMsg" style="display: none; color: green;">
         Copied to clipboard!
       </div>
-
-
     <!-- SCOREBOARD -->
     <div id="scoreboard" class="tabcontent active">
-      <div class="toolbar">
-        <button class="btn" onclick="updateScoreboard('Scoreboard updated!')">💾 Save Scoreboard</button>
-        <button class="btn" onclick="resetScoreboard()">🔄 Reset </button>
-        <div class="obs-scoreboard">
-          <h1 style="font-size: 14px; margin: 0;"> Copy this to your obs</h1>
-          <div class="copy-scoreboard" id="scoreboard-url" onclick="copyCardContent('scoreboard-url')">
-            <p> localhost:34115/scoreboard.html </p>
-          </div>
-        </div>
-      </div>
-
-
-
-      <div class="settings">
-        <input type="hidden" id="game" value="sf">
-
-        <label> Game
-        <div class="custom-select" id="gameDropdown">
-          <div class="selected">
-            <img id="selectedGameIcon" src="./img/game_ico/SF6_Logo.png" alt=""">
-            <span id="selectedGameName">Street Fighter</span>
-          </div>
-          <div class="options">
-            <div data-value="sf" data-icon="./img/game_ico/SF6_Logo.png">
-              <img  src="./img/game_ico/SF6_Logo.png" alt=""> Street Fighter
-            </div>
-            <div data-value="dbfz" data-icon="./img/game_ico/DBFZ_Logo.png">
-              <img src="./img/game_ico/DBFZ_Logo.png"alt=""> Dragon Ball FighterZ
-            </div>
-            <div data-value="tekken" data-icon="./img/game_ico/Tekken_8_Logo.png">
-              <img src="./img/game_ico/Tekken_8_Logo.png" alt=""> Tekken
-            </div>
-            <div data-value="2xko" data-icon="./img/game_ico/2XKO_Logo.png">
-              <img src="./img/game_ico/2XKO_Logo.png" alt=""> 2XKO
+      <div class="scoreboard-panel">
+        <div class="toolbar">
+          <button class="btn" title="Ctrl + s for shortcut" onclick="updateScoreboard('Scoreboard updated!')">💾 Save Scoreboard</button>
+          <button class="btn" title="Ctrl + r for shortcut" onclick="resetScoreboard()">🔄 Reset </button>
+          <div class="obs-scoreboard">
+            <h1 style="font-size: 14px; margin: 0;"> Copy this to your obs</h1>
+            <div class="copy-scoreboard" id="scoreboard-url" onclick="copyCardContent('scoreboard-url')">
+              <p> localhost:34115/scoreboard.html </p>
             </div>
           </div>
         </div>
-        </label>
-
-        <label>Style
-          <select id="style" style="padding: 8px; width: 100%;">
-            <option value="minimalist">Minimalist</option>
-            <option value="arcade">Arcade</option>
-            <option value="futuristic">Futuristic</option>
-          </select>
-        </label>
-
-        <label>Titlecard
-          <input style="padding: 9px; width: 100%;" id="titlecard" type="text" placeholder="Top 8 / Grand Finals / etc.">
-        </label>
-
-        <img id="gameIcon" src="./img/game_ico/SF6_Logo.png " alt="Game Icon" >
+        <div class="settings">
+          <input type="hidden" id="game" value="sf">
+          <label> Game
+          <div class="custom-select" id="gameDropdown">
+            <div class="selected">
+              <img id="selectedGameIcon" src="./img/game_ico/SF6_Logo.png" alt=""">
+              <span id="selectedGameName">Street Fighter</span>
+            </div>
+            <div class="options">
+              <div data-value="sf" data-icon="./img/game_ico/SF6_Logo.png">
+                <img  src="./img/game_ico/SF6_Logo.png" alt=""> Street Fighter
+              </div>
+              <div data-value="dbfz" data-icon="./img/game_ico/DBFZ_Logo.png">
+                <img src="./img/game_ico/DBFZ_Logo.png"alt=""> Dragon Ball FighterZ
+              </div>
+              <div data-value="tekken" data-icon="./img/game_ico/Tekken_8_Logo.png">
+                <img src="./img/game_ico/Tekken_8_Logo.png" alt=""> Tekken
+              </div>
+              <div data-value="2xko" data-icon="./img/game_ico/2XKO_Logo.png">
+                <img src="./img/game_ico/2XKO_Logo.png" alt=""> 2XKO
+              </div>
+            </div>
+          </div>
+          </label>
+          <label>Style
+            <select id="style" style="padding: 8px; width: 100%;">
+              <option value="minimalist">Minimalist</option>
+              <option value="arcade">Arcade</option>
+              <option value="futuristic">Futuristic</option>
+            </select>
+          </label>
+          <label>Titlecard
+            <input style="padding: 9px; width: 100%;" id="titlecard" type="text" placeholder="Top 8 / Grand Finals / etc.">
+          </label>
+  
+          <img id="gameIcon" src="./img/game_ico/SF6_Logo.png " alt="Game Icon" >
+        </div>
+      <div class="playerflex">
+        <!-- Player 1 -->
+          <div class="player-block" id="p1block">
+            <label>Name: <input id="p1" type="text" placeholder="Player 1"></label>
+            <label>Team: <input id="t1" type="text" placeholder="Team 1"></label>
+            <label>Controller:
+              <select id="c1">
+                <option value="">None</option>
+                <option value="arcade">Arcade Stick</option>
+                <option value="leverless">Leverless</option>
+                <option value="gamepad">Gamepad</option>
+                <option value="arcade_white">Arcade Stick White</option>
+                <option value="leverless_white">Leverless White</option>
+                <option value="gamepad_white">Gamepad White</option>
+              </select>
+            </label>
+            <label>Score: <input id="s1" type="number" value="0"></label>
+          </div>
+      
+          <!-- Player 2 -->
+          <div class="player-block" id="p2block">
+            <label>Name: <input id="p2" type="text" placeholder="Player 2"></label>
+            <label>Team: <input id="t2" type="text" placeholder="Team 2"></label>
+            <label>Controller:
+              <select id="c2">
+                <option value="">None</option>
+                <option value="arcade">Arcade Stick</option>
+                <option value="leverless">Leverless</option>
+                <option value="gamepad">Gamepad</option>
+                <option value="arcade_white">Arcade Stick White</option>
+                <option value="leverless_white">Leverless White</option>
+                <option value="gamepad_white">Gamepad White</option>
+              </select>
+            </label>
+            <label>Score: <input id="s2" type="number" value="0"></label>
+          </div>
+      
+          <!-- Player 3 (2XKO only) -->
+          <div class="player-block" id="p3block" style="display:none;">
+            <span class="checkbox-label">
+              <input type="checkbox" id="v3"> Visible
+            </span>
+            <label>Name: <input id="p3" type="text" placeholder="Player 3"></label>
+            <label>Team: <input id="t3" type="text" placeholder="Team 3"></label>
+            <label>Controller:
+              <select id="c3">
+                <option value="">None</option>
+                <option value="arcade">Arcade Stick</option>
+                <option value="leverless">Leverless</option>
+                <option value="gamepad">Gamepad</option>
+                <option value="arcade_white">Arcade Stick White</option>
+                <option value="leverless_white">Leverless White</option>
+                <option value="gamepad_white">Gamepad White</option>
+              </select>
+            </label>
+            <label>Score: <input id="s3" type="number" value="0"></label>
+          </div>
+      
+          <!-- Player 4 (2XKO only) -->
+          <div class="player-block" id="p4block" style="display:none;">
+            <span class="checkbox-label">
+              <input type="checkbox" id="v4"> Visible
+            </span>
+            <label>Name: <input id="p4" type="text" placeholder="Player 4"></label>
+            <label>Team: <input id="t4" type="text" placeholder="Team 4"></label>
+            <label>Controller:
+              <select id="c4">
+                <option value="">None</option>
+                <option value="arcade">Arcade Stick</option>
+                <option value="leverless">Leverless</option>
+                <option value="gamepad">Gamepad</option>
+                <option value="arcade_white">Arcade Stick White</option>
+                <option value="leverless_white">Leverless White</option>
+                <option value="gamepad_white">Gamepad White</option>
+              </select>
+            </label>
+            <label>Score: <input id="s4" type="number" value="0"></label>
+          </div>
       </div>
-
-
- 
-
-<div class="playerflex">
-  <!-- Player 1 -->
-     <div class="player-block">
-       <label>Name: <input id="p1" type="text" placeholder="Player 1"></label>
-       <label>Team: <input id="t1" type="text" placeholder="Team 1"></label>
-       <label>Controller:
-         <select id="c1">
-           <option value="">None</option>
-           <option value="arcade">Arcade Stick</option>
-           <option value="leverless">Leverless</option>
-           <option value="gamepad">Gamepad</option>
-           <option value="arcade_white">Arcade Stick White</option>
-           <option value="leverless_white">Leverless White</option>
-           <option value="gamepad_white">Gamepad White</option>
-         </select>
-       </label>
-       <label>Score: <input id="s1" type="number" value="0"></label>
-     </div>
- 
-     <!-- Player 2 -->
-     <div class="player-block">
-       <label>Name: <input id="p2" type="text" placeholder="Player 2"></label>
-       <label>Team: <input id="t2" type="text" placeholder="Team 2"></label>
-       <label>Controller:
-         <select id="c2">
-           <option value="">None</option>
-           <option value="arcade">Arcade Stick</option>
-           <option value="leverless">Leverless</option>
-           <option value="gamepad">Gamepad</option>
-           <option value="arcade_white">Arcade Stick White</option>
-           <option value="leverless_white">Leverless White</option>
-           <option value="gamepad_white">Gamepad White</option>
-         </select>
-       </label>
-       <label>Score: <input id="s2" type="number" value="0"></label>
-     </div>
- 
-     <!-- Player 3 (2XKO only) -->
-     <div class="player-block" id="p3block" style="display:none;">
-       <span class="checkbox-label">
-         <input type="checkbox" id="v3"> Visible
-       </span>
-       <label>Name: <input id="p3" type="text" placeholder="Player 3"></label>
-       <label>Team: <input id="t3" type="text" placeholder="Team 3"></label>
-       <label>Controller:
-         <select id="c3">
-           <option value="">None</option>
-           <option value="arcade">Arcade Stick</option>
-           <option value="leverless">Leverless</option>
-           <option value="gamepad">Gamepad</option>
-           <option value="arcade_white">Arcade Stick White</option>
-           <option value="leverless_white">Leverless White</option>
-           <option value="gamepad_white">Gamepad White</option>
-         </select>
-       </label>
-       <label>Score: <input id="s3" type="number" value="0"></label>
-     </div>
- 
-     <!-- Player 4 (2XKO only) -->
-     <div class="player-block" id="p4block" style="display:none;">
-       <span class="checkbox-label">
-         <input type="checkbox" id="v4"> Visible
-       </span>
-       <label>Name: <input id="p4" type="text" placeholder="Player 4"></label>
-       <label>Team: <input id="t4" type="text" placeholder="Team 4"></label>
-       <label>Controller:
-         <select id="c4">
-           <option value="">None</option>
-           <option value="arcade">Arcade Stick</option>
-           <option value="leverless">Leverless</option>
-           <option value="gamepad">Gamepad</option>
-           <option value="arcade_white">Arcade Stick White</option>
-           <option value="leverless_white">Leverless White</option>
-           <option value="gamepad_white">Gamepad White</option>
-         </select>
-       </label>
-       <label>Score: <input id="s4" type="number" value="0"></label>
-     </div>
-</div>
       <div class="small">* Player 3 and Player 4 are only used in 2XKO mode.</div>
-
-    <div class="container">
-        <h1>Fighting Game Control Panel</h1>
-
+      <div class="container" style="padding-top: 20px;">
         <!-- sponsor section -->
-        <div class="sponsor-section">
-          <h3>🎯 Sponsor Management</h3>
-          
-          <div id="uploadContainer" class="upload-container">
-            <div class="upload-icon">📁</div>
-            <div><strong>Drag & drop images here</strong></div>
-            <div class="small">Supports: JPG, PNG, GIF, SVG</div>
-            <input id="fileInput" type="file" accept="image/*" multiple style="display:none;">
+          <div class="sponsor-section">
+            <h3>🎯 Sponsor Management</h3>
+            
+            <div id="uploadContainer" class="upload-container">
+              <div class="upload-icon">📁</div>
+              <div><strong>Drag & drop images here</strong></div>
+              <div class="small">Supports: JPG, PNG, GIF, SVG</div>
+              <input id="fileInput" type="file" accept="image/*" multiple style="display:none;">
+            </div>
+  
+            <div id="statusContainer"></div>
+            <!-- This is where previews will show -->
+            <div id="previewGrid" class="preview-grid"></div>
           </div>
-
-          <div id="statusContainer"></div>
-          <!-- This is where previews will show -->
-          <div id="previewGrid" class="preview-grid"></div>
-        </div>
-
-
+  
+  
+      </div>
       </div>
 
   </div> <!-- end scoreboard tab -->
@@ -606,8 +736,8 @@
         </div>
 
         <div class="commentary-toolbar">
-          <button class="btn" onclick="updateCommentary()">💾 Save Commentary</button>
-          <button class="btn" onclick="resetCommentary()">🔄 Reset </button>
+          <button class="btn" title="Ctrl + s for shortcut" onclick="updateCommentary()">💾 Save Commentary</button>
+          <button class="btn" title="Ctrl + r for shortcut" onclick="resetCommentary()">🔄 Reset </button>
           <button class="btn" onclick="toggleCommentary(true)">▶ Show</button>
           <button class="btn" onclick="toggleCommentary(false)">⏹ Hide</button>
         </div>
@@ -619,8 +749,9 @@
       <div class="bracket-panel">
         <!-- <h2 style="margin-top:0">Brackets — Single Elimination (Top 8)</h2> -->
         <div class="inner-tabs" style="margin-bottom:14px">
-          <button id="singleTabBtn" class="active" onclick="openInnerTab('single')">Single Elimination</button>
-          <button id="doubleTabBtn" onclick="openInnerTab('double')">Double Elimination</button>
+          <button id="singleTabBtn" class="active" onclick="openInnerTab('single')"><span class="mdi--bracket"></span>Single Elimination</button>
+          <button id="doubleTabBtn" onclick="openInnerTab('double')"><span class="tabler--tournament"></span> Double Elimination</button>
+
         </div>
 
         <!-- Single elimination UI (will be loaded from bracket_single.html) -->
@@ -2013,21 +2144,35 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 
 <script>
-  function showNotif(message, color = "green") {
+let notifTimeout; // global reference for current timer
+
+function showNotif(message, color = "green") {
   const msg = document.getElementById("notifMsg");
+  if (!msg) return;
+
+  // If another notif is already showing, reset animation + timer
+  clearTimeout(notifTimeout);
+
+  // Set text + color
   msg.textContent = message;
   msg.style.color = color;
-
-  msg.classList.remove("animate__slideInRight", "animate__slideOutRight");
   msg.style.display = "block";
-  msg.classList.add("animate__animated", "animate__slideInRight");
 
-  setTimeout(() => {
+  // Reset animation classes (important)
+  msg.classList.remove("animate__slideInRight", "animate__slideOutRight");
+  void msg.offsetWidth; // 🔄 Force reflow to restart animation cleanly
+
+  // Start new slide-in
+  msg.classList.add("animate__animated", "animate__slideInRight", "animate__faster");
+
+  // Schedule hide
+  notifTimeout = setTimeout(() => {
     msg.classList.remove("animate__slideInRight");
-    msg.classList.add("animate__slideOutRight");
+    msg.classList.add("animate__slideOutRight", "animate__faster");
     setTimeout(() => { msg.style.display = "none"; }, 500);
-   }, 2500);
-  }
+  }, 2500);
+}
+
 
 async function copyCardContent(id, customMsg = "Copied to clipboard!") {
   try {
@@ -2036,28 +2181,10 @@ async function copyCardContent(id, customMsg = "Copied to clipboard!") {
       const textToCopy = card.innerText.trim();
       await navigator.clipboard.writeText(textToCopy);
     }
-    // Always show notif
-    const msg = document.getElementById("notifMsg");
-    msg.textContent = customMsg;
-    msg.style.color = "green";
-
-    msg.classList.remove("animate__slideInRight", "animate__slideOutRight");
-    msg.style.display = "block";
-    msg.classList.add("animate__animated", "animate__slideInRight");
-
-    setTimeout(() => {
-      msg.classList.remove("animate__slideInRight");
-      msg.classList.add("animate__slideOutRight");
-      setTimeout(() => { msg.style.display = "none"; }, 500);
-    }, 2500);
-
+    showNotif(customMsg, "green");
   } catch (err) {
     console.error("Failed to copy card content: ", err);
-
-    const msg = document.getElementById("notifMsg");
-    msg.textContent = "Failed to copy!";
-    msg.style.color = "red";
-    msg.style.display = "block";
+    showNotif("Failed to copy!", "red");
   }
 }
 
@@ -2077,7 +2204,7 @@ function openTab(evt, tabName) {
   });
 
   // Remove "active" from all tab buttons
-  document.querySelectorAll(".tablinks").forEach(el => {
+  document.querySelectorAll(".channel").forEach(el => {
     el.classList.remove("active");
   });
 
@@ -2099,39 +2226,7 @@ function openTab(evt, tabName) {
 
   console.log("openTab ->", currentTab, currentSubtab);
 }
-function openTab(evt, tabName) {
-  // Hide all tab content
-  document.querySelectorAll(".tabcontent").forEach(el => {
-    el.style.display = "none";   // hide content
-    el.classList.remove("active");
-  });
-
-  // Remove "active" from all tab buttons
-  document.querySelectorAll(".tablinks").forEach(el => {
-    el.classList.remove("active");
-  });
-
-  // Show the chosen tab
-  const container = document.getElementById(tabName);
-  if (container) {
-    container.style.display = "block";
-    container.classList.add("active");
-  }
-
-  // Mark the clicked button active
-  if (evt && evt.currentTarget) {
-    evt.currentTarget.classList.add("active");
-  }
-
-  // Update state
-  currentTab = tabName;
-  if (tabName !== "brackets") currentSubtab = "";
-
-  console.log("openTab ->", currentTab, currentSubtab);
-}
-
-
-
+ 
 // Replace / enhance your existing openInnerTab
 function openInnerTab(name){
   document.querySelectorAll(".inner-tabcontent").forEach(el=>el.style.display = "none");
@@ -2202,4 +2297,85 @@ document.addEventListener("keydown", function(e) {
     }
   }
 });
+function toggleSinglePanel() {
+  const panel = document.getElementById("settingsSinglePanel");
+  const bracket = document.getElementById("singleBracketContainer");
+  const btn = document.getElementById("toggleSinglePanelBtn");
+
+  if (!panel || !bracket) return;
+
+  const isHidden = panel.classList.toggle("hidden");
+
+  if (isHidden) {
+    panel.style.display = "none";
+    bracket.style.flex = "1 1 100%";
+    btn.textContent = "⏪";
+  } else {
+    panel.style.display = "flex";
+    bracket.style.flex = "1 1 auto";
+    btn.textContent = "⏩";
+  }
+}
+
+function toggleDoublePanel() {
+  const panel = document.getElementById("settingsDoublePanel");
+  const bracket = document.getElementById("doubleBracketContainer");
+  const btn = document.getElementById("toggleDoublePanelBtn");
+
+  if (!panel || !bracket) return;
+
+  const isHidden = panel.classList.toggle("hidden");
+
+  if (isHidden) {
+    panel.style.display = "none";
+    bracket.style.flex = "1 1 100%";
+    btn.textContent = "⏪";
+  } else {
+    panel.style.display = "flex";
+    bracket.style.flex = "1 1 auto";
+    btn.textContent = "⏩";
+  }
+}
+
+</script>
+<script>
+  localStorage.setItem('scoreboard-data', JSON.stringify(data));
+
+const saved = localStorage.getItem('scoreboard-data');
+if (saved) populateScoreboard(JSON.parse(saved));
+
+ localStorage.setItem('commentary-data', JSON.stringify(commentaryData));
+const savedCommentary = localStorage.getItem('commentary-data');
+if (savedCommentary) populateCommentary(JSON.parse(savedCommentary));
+
+  localStorage.setItem('bracket-data', JSON.stringify(bracketData));
+const savedBracket = localStorage.getItem('bracket-data');
+if (savedBracket) {
+  bracketData = JSON.parse(savedBracket);
+  if (bracketData.single) {
+    setSingleSeedInputs(bracketData.single.players || Array(8).fill(''));
+    seedSingleVisualBracket();
+  }
+  if (bracketData.double) {
+    const d = bracketData.double;
+    if (d.players?.length >= 8) {
+      for (let i = 0; i < 8; i++) {
+        const el = document.getElementById('dp' + (i + 1));
+        if (el) el.value = d.players[i] || '';
+      }
+      seedDoubleVisualBracket();
+      populateDoubleFromData();
+    }
+  }
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute("data-theme") === "dark";
+  html.setAttribute("data-theme", isDark ? "light" : "dark");
+}
+
+let history = [];
+function saveState() { history.push(currentData); }
+function undo() { restore(history.pop()); }
 </script>

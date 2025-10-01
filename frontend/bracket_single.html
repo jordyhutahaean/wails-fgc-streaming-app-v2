@@ -75,12 +75,13 @@
 #f1  { top: 25px; left: 0; }
 
 </style>
-<div class="sbracket-container" style="display: flex; flex-direction: row; gap: 12px;">
-  <div style="display:flex;gap:12px;flex-direction:column;align-items:flex-start;margin-top:10px;margin-bottom:12px;flex-wrap:wrap"> 
+<button id="togglePanelBtn" class="btn toggle-btn" onclick="toggleSinglePanel()"><span class="material-symbols--hide-source-outline"></span>Toggle SBracket</button>
+<div id="singleBracket" class="sbracket-container" style="display: flex; flex-direction: row; gap: 12px;">
+  <div id="settingsSinglePanel" style="display:flex;gap:12px;flex-direction:column;align-items:flex-start;margin-top:10px;margin-bottom:12px;flex-wrap:wrap"> 
     <div class="obs-scoreboard">
       <h1 style="font-size: 14px; margin: 0;"> Copy this to your obs</h1>
       <div class="copy-scoreboard" id="single-url" onclick="copyCardContent('single-url')">
-        <p> localhost:34115/single.html </p>
+        <p><code> localhost:34115/single.html </code></p>
       </div>
     </div>
     <div style="flex:1;min-width:260px"> 
@@ -100,13 +101,14 @@
         <label>Player 8: <input id="sp7" type="text"></label> 
       </div> 
       <div style="margin-top:16px;display:flex;gap:8px"> 
-        <button class="btn" onclick="saveSinglePlayers()">💾 Save Bracket</button> 
-        <button class="btn" onclick="resetSingle()">🔄 Reset </button> 
+        <button class="btn" title="Ctrl + s for shortcut" onclick="saveSinglePlayers()">💾 Save Bracket</button> 
+        <button class="btn" title="Ctrl + r for shortcut" onclick="resetSingle()">🔄 Reset </button> 
+ 
       </div> 
     </div> 
   </div>
   
-  <div class="bracket-scroll-container">
+  <div class="bracket-scroll-container" id="singleBracketContainer">
     <div class="bracket-tree" id="visualBracket" aria-label="Bracket tree">
       <!-- Quarterfinals -->
       <div class="round quarterfinal">

@@ -28,19 +28,19 @@
   .player-line.win { background: rgba(0,150,0,0.06); }
   .player-line.lose { background: rgba(150,0,0,0.04); }
 </style>
-
-<div class="dbracket-container" style="display: flex; flex-direction: row; gap: 12px;">
-  <div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start;margin-top:10px;margin-bottom:12px;flex-wrap:wrap">
+<button id="togglePanelBtn" class="btn toggle-btn" onclick="toggleDoublePanel()"><span class="material-symbols--hide-source-outline"></span>Toggle DBracket</button>
+<div id="doubleBracket" class="dbracket-container" style="display: flex; flex-direction: row; gap: 12px;">
+  <div id="settingsDoublePanel" style="display:flex;flex-direction:column;gap:12px;align-items:flex-start;margin-top:10px;margin-bottom:12px;flex-wrap:wrap">
     <div class="obs-scoreboard">
       <h1 style="font-size: 14px; margin: 0;"> Copy this to your obs</h1>
       <div class="copy-scoreboard" id="double-url" onclick="copyCardContent('double-url')">
-        <p> localhost:34115/double.html </p>
+        <p> <code>localhost:34115/double.html </code></p>
       </div>
     </div>
     <div style="flex:1;min-width:260px">
       <div class="settings bracket-top8">
         <label>Double Bracket Title
-          <input id="game-title-dbracket" type="text" placeholder="e.g. Tekken 8 Top 8">
+          <input id="game-title-dckecket" type="text" placeholder="e.g. Tekken 8 Top 8">
         </label>
       </div>
       <div class="bracket-top8" style="display:grid;grid-template-columns:1fr 1fr;gap:8px 12px">
@@ -54,13 +54,14 @@
         <label>Losers 4 <input id="dp8" type="text"></label>
       </div>
       <div style="margin-top:16px;display:flex;gap:8px">
-        <button class="btn" onclick="saveDoublePlayers()">💾 Save Bracket </button>
-        <button class="btn" onclick="resetDouble()">🔄 Reset </button>
+        <button class="btn" title="Ctrl + s for shortcut" onclick="saveDoublePlayers()">💾 Save Bracket </button>
+        <button class="btn" title="Ctrl + r for shortcut" onclick="resetDouble()">🔄 Reset </button>
+        
       </div>
     </div>
   </div>
   
-  <div class="bracket-scroll-container">
+  <div class="bracket-scroll-container" id="doubleBracketContainer">
     <div class="bracket-tree" id="doubleVisual" aria-label="Double-elim bracket">
   
       <!-- Winners Semis / Winners Final -->
