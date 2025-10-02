@@ -330,7 +330,7 @@
 
 .iframe-commentator {
   width: 100%;
- 
+  height: 100%;
   overflow: hidden;
   position: relative;
  
@@ -338,19 +338,27 @@
   align-items: center;
 }
 
+.iframe-commentator {
+  width: 100%;
+  display: flex;
+  overflow: visible; /* don’t cut off the bottom */
+  justify-content: center;
+  align-items: center;
+
+}
+
 .iframe-wrapper {
-  transform: scale(0.6);
+  transform: scale(0.4);
   transform-origin: top left;
-  width: calc(100% / 0.6); /* compensate for scale */
-  height: calc(100% / 0.6);
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
 .iframe-wrapper iframe {
-  width: 100%;
-  height: 100%;
+  width: 250%;
   border: none;
 }
-
 
  /* sponsor UI */
   .sponsor-section {

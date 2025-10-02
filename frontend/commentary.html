@@ -12,55 +12,53 @@
     font-family: Arial, sans-serif;
   }
 
-  #commentary-bar {
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 40px; /* space between commentators */
-  }
+ 
+.commentator {
+  position: relative;
+  background: #6a0dad; /* purple */
+  color: white;
+  padding: 12px 24px;
+  border-radius: 6px;
+  min-width: 280px;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  clip-path: polygon(
+    0% 0%,   /* top left */
+    100% 0%, /* top right */
+    100% 75%,/* bottom right */
+    90% 100%,/* angled bottom */
+    0% 100%  /* bottom left */
+  );
 
-  .commentator {
-    background: rgba(0,0,0,0.7);
-    color: white;
-    padding: 16px 32px;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 400px; /* keeps size consistent */
-  }
+    transform: scale(1.6);
+    gap: 6px;
+}
 
-  /* Hide whole bar */
-  .hidden {
-    display: none !important;
-  }
+.commentator .comm-name {
+  font-weight: bold;
+  font-size: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  .comm-name {
-    font-weight: bold;
-    font-size: 48px;
-    text-align: center;
-  }
+.commentator .comm-desc {
+  font-size: 14px;
+  color: #ddd;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  .comm-desc {
-    font-size: 28px;
-    color: #ccc;
-    text-align: center;
-  }
 
-  /* Example: separate styling for each commentator box */
-  #comm1 {
-    background: rgba(20,20,20,0.8);
-  }
-  #comm2 {
-    background: rgba(50,0,0,0.8);
-  }
+ 
 </style>
 </head>
 <body>
-  <div id="commentary-bar" class="hidden">
-    <div class="commentator" id="comm1">
+  <div id="commentary-bar" class="hide">
+    <div class="commentator commentary-inner" id="comm1">
       <span id="comm1-name" class="comm-name">Commentator 1</span>
       <span id="comm1-desc" class="comm-desc">Description 1</span>
     </div>
@@ -69,8 +67,10 @@
       <span id="comm2-desc" class="comm-desc">Description 2</span>
     </div>
   </div>
+ 
 
 <script>
+  
 async function loadCommentary() {
   try {
     const resp = await fetch("commentary.json?_=" + Date.now());
@@ -78,18 +78,23 @@ async function loadCommentary() {
     const data = await resp.json();
 
     const bar = document.getElementById("commentary-bar");
+    document.getElementById("comm1-name").textContent = data.commentator1 || "Commentator 1";
+    document.getElementById("comm1-desc").textContent = data.description1 || "";
+    document.getElementById("comm2-name").textContent = data.commentator2 || "Commentator 2";
+    document.getElementById("comm2-desc").textContent = data.description2 || "";
+
     if (data.visible) {
-      bar.classList.remove("hidden");
-      document.getElementById("comm1-name").textContent = data.commentator1 || "Commentator 1";
-      document.getElementById("comm1-desc").textContent = data.description1 || "";
-      document.getElementById("comm2-name").textContent = data.commentator2 || "Commentator 2";
-      document.getElementById("comm2-desc").textContent = data.description2 || "";
+      bar.classList.remove("hide");
+      bar.classList.add("show");
     } else {
-      bar.classList.add("hidden");
+      bar.classList.remove("show");
+      bar.classList.add("hide");
     }
   } catch (err) {
     console.warn("No commentary.json yet, hiding bar");
-    document.getElementById("commentary-bar").classList.add("hidden");
+    const bar = document.getElementById("commentary-bar");
+    bar.classList.remove("show");
+    bar.classList.add("hide");
   }
 }
 
