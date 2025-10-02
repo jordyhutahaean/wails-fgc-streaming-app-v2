@@ -80,7 +80,7 @@
 
   /* little tab hanging down */
   .channel-bar::after {
-    content: "≡"; /* could be an icon or arrow */
+    content: "↓"; /* could be an icon or arrow */
     position: absolute;
     bottom: -20px;
     left: 50%;
@@ -147,7 +147,7 @@
   }
   .settings{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:18px}
   .settings label{display:flex;flex-direction:column;font-weight:700;font-size:13px}
-  input[type="text"], input[type="number"], select{margin-top:6px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;}
+  input[type="text"], input[type="number"], select{margin-top:6px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;}
 
   .scoreboard-panel{padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:10px}
   .playerflex{display:flex;gap:12px;flex-wrap:nowrap;flex-direction: row;}
@@ -322,6 +322,36 @@
   font-size: 12px;
 }
 
+.commentary-top{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.iframe-commentator {
+  width: 100%;
+ 
+  overflow: hidden;
+  position: relative;
+ 
+  justify-content: center;
+  align-items: center;
+}
+
+.iframe-wrapper {
+  transform: scale(0.6);
+  transform-origin: top left;
+  width: calc(100% / 0.6); /* compensate for scale */
+  height: calc(100% / 0.6);
+}
+
+.iframe-wrapper iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+
  /* sponsor UI */
   .sponsor-section {
     background: var(--panel);
@@ -474,6 +504,11 @@
   z-index: 100;
 }
 
+#togglePanelBtn:active{
+  background: white;
+  color: var(--accent);
+}
+
 #notifMsg {
   position: fixed;         /* stays in viewport even if page scrolls */
   top: 20px;               /* pixel position is more predictable */
@@ -548,11 +583,75 @@
   mask-size: 100% 100%;
 }
 
+.creator-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 9999;
+}
+
+.creator-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.creator-card {
+  background: var(--card-bg, #fff);
+  color: var(--text, #222);
+  padding: 24px 32px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  animation: fadeInUp 0.4s ease;
+}
+
+.creator-card h2 {
+  margin-top: 0;
+}
+
+.creator-card button {
+  margin-top: 16px;
+  background: var(--accent, #0077ff);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.creator-card button:hover {
+  background: #005bcc;
+}
+
+@keyframes fadeInUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 </style>
 </head>
 <body>
 
   <button class="toggleNight" onclick="toggleTheme()">🌙</button>
+
+  <div id="creatorOverlay" class="creator-overlay">
+  <div class="creator-card">
+    <h2>👋 Hi there!</h2>
+    <p>This app was created by <strong>Your Name</strong></p>
+    <p>Version 1.0.0 — © 2025</p>
+    <button onclick="document.getElementById('creatorOverlay').classList.remove('visible')">Close</button>
+  </div>
+</div>
 
   <div class="channel-bar">
     <button class="channel active" onclick="openTab(event,'scoreboard')">🏆 Scoreboard</button>
@@ -696,7 +795,7 @@
       <div class="container" style="padding-top: 20px;">
         <!-- sponsor section -->
           <div class="sponsor-section">
-            <h3>🎯 Sponsor Management</h3>
+            <h3>🎯Sponsor</h3>
             
             <div id="uploadContainer" class="upload-container">
               <div class="upload-icon">📁</div>
@@ -718,28 +817,38 @@
 
     <!-- COMMENTARY -->
     <div id="commentary" class="tabcontent">
-      <div class="commentary-panel">
-          <div class="obs-scoreboard" style="width: 400px;">
-            <h1 style="font-size: 14px; margin: 0;"> Copy this to your obs</h1>
-            <div class="copy-scoreboard" id="commentary-url" onclick="copyCardContent('commentary-url')">
-              <p> localhost:34115/commentary.html </p>
+      <div class="commentary-top">
+        <div class="commentary-panel">
+            <div class="obs-scoreboard" style="width: 400px;">
+              <h1 style="font-size: 14px; margin: 0;"> Copy this to your obs</h1>
+              <div class="copy-scoreboard" id="commentary-url" onclick="copyCardContent('commentary-url')">
+                <p> localhost:34115/commentary.html </p>
+            </div>
+          </div> 
+          <div class="commentator-block">
+            <label>Commentator 1 - Name<input id="com1_name" type="text" placeholder="Commentator 1"></label>
+            <label>Commentator 1 - Description<input id="com1_desc" type="text" placeholder="FGC Expert"></label>
           </div>
-        </div> 
-        <div class="commentator-block">
-          <label>Commentator 1 - Name<input id="com1_name" type="text" placeholder="Commentator 1"></label>
-          <label>Commentator 1 - Description<input id="com1_desc" type="text" placeholder="FGC Expert"></label>
+  
+          <div class="commentator-block">
+            <label>Commentator 2 - Name<input id="com2_name" type="text" placeholder="Commentator 2"></label>
+            <label>Commentator 2 - Description<input id="com2_desc" type="text" placeholder="Studio Host"></label>
+          </div>
+  
+          <div class="commentary-toolbar">
+            <button class="btn" title="Ctrl + s for shortcut" onclick="updateCommentary()">💾 Save Commentary</button>
+            <button class="btn" title="Ctrl + r for shortcut" onclick="resetCommentary()">🔄 Reset </button>
+            <button class="btn" onclick="toggleCommentary(true)">▶ Show</button>
+            <button class="btn" onclick="toggleCommentary(false)">⏹ Hide</button>
+          </div>
         </div>
-
-        <div class="commentator-block">
-          <label>Commentator 2 - Name<input id="com2_name" type="text" placeholder="Commentator 2"></label>
-          <label>Commentator 2 - Description<input id="com2_desc" type="text" placeholder="Studio Host"></label>
-        </div>
-
-        <div class="commentary-toolbar">
-          <button class="btn" title="Ctrl + s for shortcut" onclick="updateCommentary()">💾 Save Commentary</button>
-          <button class="btn" title="Ctrl + r for shortcut" onclick="resetCommentary()">🔄 Reset </button>
-          <button class="btn" onclick="toggleCommentary(true)">▶ Show</button>
-          <button class="btn" onclick="toggleCommentary(false)">⏹ Hide</button>
+        <div class="iframe-commentator">
+          <div class="iframe-wrapper">
+            <iframe 
+              src="http://localhost:34115/commentary.html"
+              frameborder="0"
+            ></iframe>
+          </div>
         </div>
       </div>
     </div>
@@ -2297,6 +2406,79 @@ document.addEventListener("keydown", function(e) {
     }
   }
 });
+
+document.addEventListener("keydown", function (e) {
+  const key = (e.key || "").toLowerCase();
+
+  if (e.altKey   && key === "1") {
+    e.preventDefault();
+
+    const view = currentSubtab ? `${currentTab}:${currentSubtab}` : currentTab;
+    console.log("Shortcut: Alt/Opt+1 ->", view);
+
+    openTab(e, 'scoreboard');
+  }
+});
+
+document.addEventListener("keydown", function (e) {
+  const key = (e.key || "").toLowerCase();
+
+  if (e.altKey && key === "2") {
+    e.preventDefault();
+
+    const view = currentSubtab ? `${currentTab}:${currentSubtab}` : currentTab;
+    console.log("Shortcut: Alt/Opt+2 ->", view);
+
+    openTab(e, 'commentary');
+  }
+});
+
+document.addEventListener("keydown", function (e) {
+  const key = (e.key || "").toLowerCase();
+
+  if (e.altKey && key === "3") {
+    e.preventDefault();
+
+    const view = currentSubtab ? `${currentTab}:${currentSubtab}` : currentTab;
+    console.log("Shortcut: Alt/Opt+3 ->", view);
+
+    openTab(e, 'brackets');
+  }
+});
+
+// Konami code sequence
+const KONAMI_CODE = [
+  "arrowup", "arrowup",
+  "arrowdown", "arrowdown",
+  "arrowleft", "arrowright",
+  "arrowleft", "arrowright",
+  "b", "a"
+];
+
+let konamiProgress = 0;
+
+document.addEventListener("keydown", (e) => {
+  const key = e.key.toLowerCase();
+
+  if (key === KONAMI_CODE[konamiProgress]) {
+    konamiProgress++;
+    if (konamiProgress === KONAMI_CODE.length) {
+      konamiProgress = 0;
+      showCreatorOverlay();
+    }
+  } else {
+    konamiProgress = 0; // reset if wrong key
+  }
+});
+
+// Show overlay
+function showCreatorOverlay() {
+  const overlay = document.getElementById("creatorOverlay");
+  if (!overlay) return;
+  overlay.classList.add("visible");
+}
+
+
 function toggleSinglePanel() {
   const panel = document.getElementById("settingsSinglePanel");
   const bracket = document.getElementById("singleBracketContainer");
