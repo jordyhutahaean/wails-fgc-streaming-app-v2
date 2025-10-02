@@ -644,11 +644,14 @@
 
   <button class="toggleNight" onclick="toggleTheme()">🌙</button>
 
-  <div id="creatorOverlay" class="creator-overlay">
+<div id="creatorOverlay" class="creator-overlay">
   <div class="creator-card">
-    <h2>👋 Hi there!</h2>
-    <p>This app was created by <strong>Your Name</strong></p>
+    <p></p>
+    <h2>👋 It's Mahvel Baybeh </h2>
+    <p>This app was created by <strong>giogio555</strong></p>
     <p>Version 1.0.0 — © 2025</p>
+    <p> Consider visiting <a href="https://github.com/jordyhutahaeanhttps://github.com/jordyhutahaean"> Github </a> or <a href="https://www.youtube.com/@LunallytheMedanhttps://www.youtube.com/@LunallytheMedan"> Youtube </a></p>
+    <p>If you found bugs and stuff, let me know by reaching <a href="mailto:aklasia404@gmail.com">This mail</a></p>
     <button onclick="document.getElementById('creatorOverlay').classList.remove('visible')">Close</button>
   </div>
 </div>
@@ -897,6 +900,8 @@ function toggleGameMode(){
 
 // Custom dropdown logic
 document.addEventListener("DOMContentLoaded", () => {
+  window.focus();
+  document.body.focus();
   const dropdown = document.getElementById("gameDropdown");
   const selected = dropdown.querySelector(".selected");
   const options = dropdown.querySelector(".options");
@@ -2560,4 +2565,8 @@ function toggleTheme() {
 let history = [];
 function saveState() { history.push(currentData); }
 function undo() { restore(history.pop()); }
+
+window.addEventListener("load", () => {
+  setTimeout(() => document.body.focus(), 100);
+});
 </script>
