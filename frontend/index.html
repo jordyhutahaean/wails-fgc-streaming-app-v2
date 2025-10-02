@@ -1175,21 +1175,29 @@ function updateDoubleBracket(){
     delete bracketData.double.winners['lb_final'];
   }
 
-  // --- Winners Final → Grand Final WB slot ---
-  const wfa = val('wb_final_s1'), wfb = val('wb_final_s2');
-  bracketData.double.scores['wb_final'] = [wfa, wfb];
-  if(wfa !== null && wfb !== null && wfa !== wfb){
-    const winner = wfa > wfb ? text('wb_final_p1') : text('wb_final_p2');
-    const loser  = wfa > wfb ? text('wb_final_p2') : text('wb_final_p1');
-    setText('gf_wb', winner);
+// Combined Winners Final logic (both Losers Final and Grand Final slots)
+const wfa = val('wb_final_s1'), wfb = val('wb_final_s2');
+bracketData.double.scores['wb_final'] = [wfa, wfb];
 
+if(wfa !== null && wfb !== null && wfa !== wfb){
+    // Determine winner and loser
+    const winner = wfa > wfb ? text('wb_final_p1') : text('wb_final_p2');
+    const loser = wfa > wfb ? text('wb_final_p2') : text('wb_final_p1');
+    
+    // Update both slots
+    setText('gf_wb', winner);
+    setText('lb_final_p2', loser);
+    
+    // Store in bracket data
     bracketData.double.winners['wb_final'] = winner;
-    bracketData.double.losers['wb_final']  = loser;
-  } else {
-    setText('gf_wb','WB Winner');
+    bracketData.double.losers['wb_final'] = loser;
+} else {
+    // Reset both slots if no valid result
+    setText('gf_wb', 'WB Winner');
+    setText('lb_final_p2', 'Loser WB Final');
     delete bracketData.double.winners['wb_final'];
     delete bracketData.double.losers['wb_final'];
-  }
+}
 
   // --- Grand Final (Champion or Reset) ---
   const gfa = val('gf_wb_s'), gfb = val('gf_lb_s');
@@ -1385,6 +1393,71 @@ function attachBracketListeners(){
 
 /* ---------- end replacements ---------- */
 
+function renderOverlay() {
+  const d = bracketData?.double || {};
+  
+  // Set the title
+  document.getElementById("game-title-dbracket").textContent = d.title || "Untitled";
+
+  // Set player names
+  if (Array.isArray(d.players)) {
+    // Winners bracket
+    setText("wb_sf1_p1", d.players[0] || "Seed 1");
+    setText("wb_sf1_p2", d.players[1] || "Seed 2");
+    setText("wb_sf2_p1", d.players[2] || "Seed 3");
+    setText("wb_sf2_p2", d.players[3] || "Seed 4");
+
+    // Losers bracket
+    setText("lb_r1_m1_p1", d.players[4] || "Seed 5");
+    setText("lb_r1_m1_p2", d.players[5] || "Seed 6");
+    setText("lb_r1_m2_p1", d.players[6] || "Seed 7");
+    setText("lb_r1_m2_p2", d.players[7] || "Seed 8");
+  }
+
+  // Set winners progression
+  setText("wb_final_p1", d.winners?.wb_sf1 || "Winner SF1");
+  setText("wb_final_p2", d.winners?.wb_sf2 || "Winner SF2");
+
+  // Set losers progression
+  setText("lb_qf_m1_p1", d.winners?.lb_r1_m1 || "Winner R1M1");
+  setText("lb_qf_m1_p2", d.losers?.wb_sf1 || "Loser SF1");
+  setText("lb_qf_m2_p1", d.winners?.lb_r1_m2 || "Winner R1M2");
+  setText("lb_qf_m2_p2", d.losers?.wb_sf2 || "Loser SF2");
+  setText("lb_semi_p1", d.winners?.lb_qf_m1 || "Winner QF1");
+  setText("lb_semi_p2", d.winners?.lb_qf_m2 || "Winner QF2");
+  setText("lb_final_p1", d.winners?.lb_semi || "Winner LB Semi");
+  setText("lb_final_p2", d.losers?.wb_final || "Loser WB Final");
+
+  // Set grand finals
+  setText("gf_wb", d.winners?.wb_final || "WB Winner");
+  setText("gf_lb", d.winners?.lb_final || "LB Winner");
+
+  // Set scores
+  if (d.scores) {
+    Object.entries(d.scores).forEach(([matchId, scores]) => {
+      if (Array.isArray(scores) && scores.length === 2) {
+        const [s1, s2] = scores;
+        const s1Input = document.getElementById(`${matchId}_s1`);
+        const s2Input = document.getElementById(`${matchId}_s2`);
+        if (s1Input) s1Input.value = s1 ?? "";
+        if (s2Input) s2Input.value = s2 ?? "";
+      }
+    });
+  }
+
+  // Handle reset visibility
+  const resetSection = document.getElementById("gf_reset_section");
+  if (resetSection) {
+    const showReset = d.scores?.grand_final?.[1] > d.scores?.grand_final?.[0];
+    resetSection.style.display = showReset ? "block" : "none";
+  }
+}
+
+// Helper function
+function setText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text || "";
+}
 
 function renderDoubleFromData(){
   ensureBracket();
@@ -1951,25 +2024,48 @@ function populateDoubleFromData(){
 }
 
 /* Save / Reset */
-async function saveDoublePlayers(msg='Double-elimination players saved '){
+async function saveDoublePlayers(msg = 'Double-elimination players saved') {
   ensureBracket();
-  const arr=[];
-  for(let i=1;i<=8;i++) arr.push(document.getElementById('dp'+i)?.value||'');
-  bracketData.double.players=arr;
 
-  
-  // ✅ also save title
-  bracketData.double.title = document.getElementById("game-title-dbracket").value || "";
+  // 1. Get the double bracket title
+  const title = document.getElementById("game-title-dckecket")?.value || "";
 
-  try{ 
-    if(typeof saveBracket==='function') 
-    await saveBracket();
-    copyCardContent(null, msg);
-   }catch(e){
-    console.warn('saveBracket failed', e);
-    copyCardContent(null, 'Failed to save players');
-   }
-  seedDoubleVisualBracket();
+  // 2. Get all player names
+  const players = [];
+  for (let i = 1; i <= 8; i++) {
+    const input = document.getElementById(`dp${i}`);
+    players.push(input?.value || "");
+  }
+
+  // 3. Build the bracket data structure
+  bracketData.double = {
+    ...bracketData.double,  // preserve existing scores/winners/losers
+    title: title,
+    players: players,
+    scores: bracketData.double?.scores || {},
+    winners: bracketData.double?.winners || {},
+    losers: bracketData.double?.losers || {},
+    meta: bracketData.double?.meta || {}
+  };
+
+  // 4. Save to backend
+  try {
+    if (typeof saveBracket === 'function') {
+      await saveBracket();
+    } else if (window.go?.main?.App) {
+      await window.go.main.App.SaveBracketJSON(bracketData);
+    }
+    
+    // 5. Update visual bracket
+    seedDoubleVisualBracket();
+    updateDoubleBracket();
+    
+    // 6. Show success notification
+    showNotif(msg);
+  } catch (err) {
+    console.error('Failed to save double bracket:', err);
+    showNotif('Failed to save bracket', 'red');
+  }
 }
 
 function resetDouble(msg='Double-elimination bracket reset'){
