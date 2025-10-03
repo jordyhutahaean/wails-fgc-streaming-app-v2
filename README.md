@@ -25,9 +25,23 @@ Easily control scoreboards, commentators, brackets, and sponsor logos, and use t
 - Auto JSON Save – All overlay data stored locally
 
 - Built-in Local Web Server – Overlays served on http://localhost:34115
+ 
 
-- Neo-Brutalist + Halftone UI – Clean, bold interface for production
+ ## Shortcuts:
 
+- Ctrl + S - save Scoreboard, Commentator, and Brackets
+  
+- Ctrl + R - reset Scoreboard, Commentator, and Brackets
+  
+- Alt + [1,2,3] - Switch between Scoreboard, Commentator, and Brackets tab
+
+- Alt + S - Show Commentators
+
+- Alt + D - Hide Commentators
+  
+- Try inputting Konami Code
+
+  
 ## How to Use (for Users)
 
 After downloading the ZIP:
@@ -57,7 +71,7 @@ build/bin/sponsors/
 
 They will automatically appear in rotation on overlays.
 
-🧩 Folder Structure (Source)
+Folder Structure (Source)
 frontend/
 scoreboard.html     # Scoreboard overlay
 commentary.html     # Commentary overlay
