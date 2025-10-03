@@ -102,7 +102,7 @@ async function loadScoreboard() {
       card.style.display = visible ? "flex" : "none";
 
       card.querySelector(".name").textContent = data[`player${i+1}`] || `Player ${i+1}`;
-      card.querySelector(".team").textContent = data[`team${i+1}`] || `Team ${i+1}`;
+      card.querySelector(".team").textContent = data[`team${i+1}`] || "";
       card.querySelector(".score").textContent = data[`score${i+1}`] || 0;
 
       // controller image logic

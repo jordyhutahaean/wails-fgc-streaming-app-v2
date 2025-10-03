@@ -428,20 +428,21 @@ body {
   transform: translateY(18px) translateX(-70px);
 }
 
+ 
 .minimalist._2XKO.has-left-duo #p1-card .player-info{
-  transform: scale(.6) translateY(-40%);
+  transform: scale(.7) translateY(-50%) translateX(10%);
 }
 
 .minimalist._2XKO.has-right-duo #p2-card .player-info{
-  transform: scale(.6) translateY(-40%) translateX(-10%);
+  transform: scale(.7) translateY(-50%) translateX(-10%);
 }
 
 .minimalist._2XKO.has-left-duo #p3-card .player-info{
-  transform: scale(.6) translateY(-374%) translateX(-20%);
+  transform: scale(.7) translateY(-250%) translateX(10%);
 }
 
 .minimalist._2XKO.has-right-duo #p4-card .player-info{
-  transform: scale(.6) translateY(-374%) translateX(14%);
+  transform: scale(.7) translateY(-250%) translateX(-10%);
 }
 
 .minimalist ._2XKO #p1-card .score {
@@ -539,6 +540,28 @@ body {
  .arcade.dbfz #p2-card .score{
   transform: translateX(-400px) translateY(-10px);
  }
+
+ 
+.arcade._2XKO #p1-card .player-info{
+  transform: scale(1) translateX(10px);
+}
+.arcade._2XKO.has-left-duo #p1-card .player-info{
+   transform: scale(.8) translateY(10%) translateX(10%);
+}
+.arcade._2XKO.has-left-duo #p3-card .player-info{
+   transform: scale(.8) translateY(-270%) translateX(-10%) ;
+   z-index: -111;
+}
+.arcade._2XKO #p2-card .player-info{
+  transform: scale(1) translateX(-20px);
+}
+.arcade._2XKO.has-right-duo #p2-card .player-info{
+   transform: scale(.8) translateY(10%) translateX(-10%);
+}
+.arcade._2XKO.has-right-duo #p4-card .player-info{
+   transform: scale(.8) translateY(-270%) translateX(12%);
+   z-index: -111;
+}
 /* Futuristic */
 
 @font-face {
@@ -659,11 +682,20 @@ body {
 }
 
 .futuristic._2XKO #p1-card .player-info{
-  transform: scale(.8) translateX(10px);
+  transform: scale(1) translateX(10px);
 }
 .futuristic._2XKO.has-left-duo #p1-card .player-info{
    transform: scale(.7) translateY(20%);
 }
 .futuristic._2XKO.has-left-duo #p3-card .player-info{
    transform: scale(.7) translateY(-320%) translateX(10%);
+}
+.futuristic._2XKO #p2-card .player-info{
+  transform: scale(1) translateX(-20px);
+}
+.futuristic._2XKO.has-right-duo #p2-card .player-info{
+   transform: scale(.7) translateY(20%);
+}
+.futuristic._2XKO.has-right-duo #p4-card .player-info{
+   transform: scale(.7) translateY(-320%) translateX(-10%);
 }

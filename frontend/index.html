@@ -216,6 +216,101 @@
   {
     filter:brightness(.9)
   }
+
+  /* Toggle */
+  .toggle {
+  display: none;
+}
+
+.toggle + label {
+  display: inline-block;
+  width: 4em;
+  height: 2em;
+  background: #ebebeb;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+  line-height: 2em;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  transform: skew(-10deg);
+  position: relative;
+  overflow: hidden;
+}
+.toggle + label span {
+  display: block;
+  transform: skew(10deg);
+}
+
+
+#v3:checked + label {
+  background: #86d993; /* green */
+}
+#v4:checked + label {
+  background: #ffd986; /* yellow */
+}
+
+.toggle + label:before,
+.toggle + label:after {
+  content: attr(data-tg-off);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform: skew(10deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.toggle + label:after {
+  content: attr(data-tg-on);
+  left: 100%;
+}
+
+.toggle:checked + label {
+  background: #86d993;
+}
+
+.toggle:checked + label:before {
+  left: -100%;
+}
+
+.toggle:checked + label:after {
+  left: 0;
+}
+.toggle + label:before,
+.toggle + label:after {
+  content: attr(data-tg-off);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform: skew(10deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.toggle + label:after {
+  content: attr(data-tg-on);
+  left: 100%;
+}
+
+.toggle:checked + label {
+  background: #86d993;
+}
+
+.toggle:checked + label:before {
+  left: -100%;
+}
+
+.toggle:checked + label:after {
+  left: 0;
+}
+
+
   .settings{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:18px}
   .settings label{display:flex;flex-direction:column;font-weight:700;font-size:13px}
   input[type="text"], input[type="number"], select{margin-top:6px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;}
@@ -1252,9 +1347,11 @@
       
           <!-- Player 3 (2XKO only) -->
           <div class="player-block" id="p3block" style="display:none;">
-            <span class="checkbox-label">
-              <input type="checkbox" id="v3"> Visible
-            </span>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="v3" class="toggle toggle-green">
+              <label for="v3" data-tg-on="ON" data-tg-off="OFF"></label>
+            </div>
+
             <label>Name: <input id="p3" type="text" placeholder="Player 3"></label>
             <label>Team: <input id="t3" type="text" placeholder="Team 3"></label>
             <label>Controller:
@@ -1270,12 +1367,14 @@
             </label>
             <label>Score: <input id="s3" type="number" value="0"></label>
           </div>
-      
+
           <!-- Player 4 (2XKO only) -->
           <div class="player-block" id="p4block" style="display:none;">
-            <span class="checkbox-label">
-              <input type="checkbox" id="v4"> Visible
-            </span>
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="v4" class="toggle toggle-yellow">
+              <label for="v4" data-tg-on="ON" data-tg-off="OFF"> </label>
+            </div>
+
             <label>Name: <input id="p4" type="text" placeholder="Player 4"></label>
             <label>Team: <input id="t4" type="text" placeholder="Team 4"></label>
             <label>Controller:
@@ -1291,6 +1390,7 @@
             </label>
             <label>Score: <input id="s4" type="number" value="0"></label>
           </div>
+
       </div>
       <div class="small">* Player 3 and Player 4 are only used in 2XKO mode.</div>
       <div class="container" style="padding-top: 20px;">
@@ -1434,6 +1534,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       //Call existing Logic
       toggleGameMode();
+      handleGameSwitch(val);   // ✅ reset when switching game
     });
   });
 
@@ -1486,10 +1587,54 @@ function resetScoreboard(){
     if(el) el.value = (el.type==='number')?0:''; 
   });
   
-  const v3 = document.getElementById("v3"), v4 = document.getElementById("v4");
+  const v3 = document.getElementById("v3"), 
+        v4 = document.getElementById("v4");
   if(v3) v3.checked=false; 
   if(v4) v4.checked=false;
   updateScoreboard("Scoreboard reset!");
+}
+
+// Auto-clean extra players when switching game
+document.addEventListener("DOMContentLoaded", () => {
+  const titleInput = document.getElementById("titlecard");
+  if (titleInput) {
+    titleInput.addEventListener("change", (e) => {
+      const game = e.target.value.toLowerCase();
+
+      // If not 2XKO, reset player 3 & 4
+      if (game !== "2xko") {
+        const v3 = document.getElementById("v3"),
+              v4 = document.getElementById("v4");
+        if(v3) v3.checked = false;
+        if(v4) v4.checked = false;
+
+        // Clear values for P3 & P4
+        ["#p3","#t3","#s3","#c3","#p4","#t4","#s4","#c4"].forEach(sel => {
+          const el = document.querySelector(sel);
+          if(el) el.value = (el.type==='number') ? 0 : '';
+        });
+
+        updateScoreboard("Switched game → extra players cleared!");
+      }
+    });
+  }
+});
+
+function handleGameSwitch(val) {
+  if (val !== "2xko") {
+    const v3 = document.getElementById("v3"),
+          v4 = document.getElementById("v4");
+    if (v3) v3.checked = false;
+    if (v4) v4.checked = false;
+
+    // Clear values for P3 & P4
+    ["#p3","#t3","#s3","#c3","#p4","#t4","#s4","#c4"].forEach(sel => {
+      const el = document.querySelector(sel);
+      if (el) el.value = (el.type === "number") ? 0 : "";
+    });
+
+    updateScoreboard("Switched game → extra players cleared!");
+  }
 }
 
 /* ---------------------
@@ -3007,6 +3152,28 @@ document.addEventListener("keydown", function(e) {
 document.addEventListener("keydown", function (e) {
   const key = (e.key || "").toLowerCase();
 
+  // Alt + S → show commentary
+  if (e.altKey && key === "s") {
+    e.preventDefault();
+    if (typeof toggleCommentary === "function") {
+      toggleCommentary(true);
+      showNotif("🎙 Commentary Shown", "green");
+    }
+  }
+
+  // Alt + D → hide commentary
+  if (e.altKey && key === "d") {
+    e.preventDefault();
+    if (typeof toggleCommentary === "function") {
+      toggleCommentary(false);
+      showNotif("🎙 Commentary Hidden", "red");
+    }
+  }
+});
+
+document.addEventListener("keydown", function (e) {
+  const key = (e.key || "").toLowerCase();
+
   if (e.altKey   && key === "1") {
     e.preventDefault();
 
@@ -3115,6 +3282,36 @@ function toggleDoublePanel() {
     btn.textContent = "⏩";
   }
 }
+
+</script>
+
+<script>
+  
+  // Auto-clean extra players when switching game
+document.addEventListener("DOMContentLoaded", () => {
+  const titleInput = document.getElementById("titlecard");
+  if (titleInput) {
+    titleInput.addEventListener("change", (e) => {
+      const game = e.target.value.toLowerCase();
+
+      // If not 2XKO, reset player 3 & 4
+      if (game !== "2xko") {
+        const v3 = document.getElementById("v3"),
+              v4 = document.getElementById("v4");
+        if(v3) v3.checked = false;
+        if(v4) v4.checked = false;
+
+        // Clear values for P3 & P4
+        ["#p3","#t3","#s3","#c3","#p4","#t4","#s4","#c4"].forEach(sel => {
+          const el = document.querySelector(sel);
+          if(el) el.value = (el.type==='number') ? 0 : '';
+        });
+
+        updateScoreboard("Switched game → extra players cleared!");
+      }
+    });
+  }
+});
 
 </script>
 <script>
