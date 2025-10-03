@@ -43,10 +43,10 @@ It starts a local server on http://localhost:34115
 In OBS, add Browser Sources:
 
 Overlay	URL
-🏆 Scoreboard	http://localhost:34115/scoreboard.html
-🎙 Commentary	http://localhost:34115/commentary.html
-🔀 Single Elim	http://localhost:34115/single.html
-🌀 Double Elim	http://localhost:34115/double.html
+Scoreboard	http://localhost:34115/scoreboard.html
+Commentary	http://localhost:34115/commentary.html
+Single Elim	http://localhost:34115/single.html
+Double Elim	http://localhost:34115/double.html
 
 Set Width & Height in OBS as needed (e.g. 1280×720)
 
@@ -59,11 +59,11 @@ They will automatically appear in rotation on overlays.
 
 🧩 Folder Structure (Source)
 frontend/
- ├── scoreboard.html     # Scoreboard overlay
- ├── commentary.html     # Commentary overlay
- ├── single.html         # Single elim bracket overlay
- ├── double.html         # Double elim bracket overlay
- └── sponsors/           # Sponsor logos (auto-detected)
+scoreboard.html     # Scoreboard overlay
+commentary.html     # Commentary overlay
+single.html         # Single elim bracket overlay
+double.html         # Double elim bracket overlay
+sponsors/           # Sponsor logos (auto-detected)
 app.go                   # App logic (scoreboard, commentary, brackets, sponsors)
 main.go                  # Wails entry point + overlay webserver
 
@@ -97,17 +97,6 @@ wails build
 Your compiled app will be located in:
 
 ./build/bin/
-
-Example Structure
-build/bin/
- ├── Fighting Game Scoreboard Control.exe  (on Windows)
- ├── frontend/
- │   ├── scoreboard.html
- │   ├── commentary.html
- │   ├── single.html
- │   ├── double.html
- │   └── sponsors/
- └── sponsors/   # created automatically if not exists
 
 
 When you run the .exe, it will automatically start the overlay webserver on port 34115.
