@@ -398,6 +398,10 @@ body {
   transform: scale(.8);
 }
 
+.minimalist.dbfz #p1-card .player-info{
+  transform: translateY(-10%);
+} 
+
 .minimalist._2XKO.has-left-duo #p1-card .player-info{
   transform: scale(.6) translateY(-40%);
 }

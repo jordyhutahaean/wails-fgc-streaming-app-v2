@@ -399,12 +399,33 @@ body {
   transform: translateX(-56%);
 }
 
-.minimalist #p1-card .player-info{
-  transform: scale(.8);
+.minimalist.sf #p1-card .player-info{
+  transform:  translateY(-10px) translateX(10px);
 }
 
-.minimalist #p2-card .player-info{
-  transform: scale(.8);
+.minimalist.sf #p2-card .player-info{
+  transform:  translateY(-10px) translateX(-10px);
+}
+
+.minimalist.dbfz #p1-card .player-info{
+  transform: translateY(-10px);
+}
+.minimalist.dbfz #p2-card .player-info{
+  transform: translateY(-10px);
+}
+
+.minimalist.tekken #p1-card {
+  transform: translateX(-100px);
+}
+.minimalist.tekken #p1-card .score{
+  transform: translateY(18px) translateX(70px);
+}
+
+.minimalist.tekken #p2-card {
+  transform: translateX( 100px);
+}
+.minimalist.tekken #p2-card .score{
+  transform: translateY(18px) translateX(-70px);
 }
 
 .minimalist._2XKO.has-left-duo #p1-card .player-info{
@@ -492,23 +513,157 @@ body {
   background-image: url("./img/tokon/1x/player_right.png");
 }
 
+
+.arcade.sf #p1-card .player-info{
+  transform: translateX(16%);
+}
+.arcade.sf #p1-card .score{
+  transform: translateX(60%);
+ }
+.arcade.sf #p2-card .player-info{
+  transform: translateX(-16%);
+}
+.arcade.sf #p2-card .score{
+  transform: translateX(-60%);
+ }
+
+ .arcade.dbfz #p1-card .player-info{
+  transform: translateY(-10px);
+ }
+ .arcade.dbfz #p1-card .score{
+  transform: translateX(400px) translateY(-10px);
+ }
+ .arcade.dbfz #p2-card .player-info{
+    transform: translateY(-10px) translateX(-10px);
+ }
+ .arcade.dbfz #p2-card .score{
+  transform: translateX(-400px) translateY(-10px);
+ }
 /* Futuristic */
 
+@font-face {
+  font-family: 'Segoe UI';
+  src: url('./fonts/Segoe UI.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Segoe UI';
+  src: url('./fonts/Segoe UI Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Segoe UI';
+  src: url('./fonts/Segoe UI Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Segoe UI';
+  src: url('./fonts/Segoe UI Bold Italic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+}
+
+.futuristic .name, .futuristic .score{
+  font-family: Segoe UI;
+  color: black;
+}
+.futuristic #titlecard{
+  font-family: Segoe UI;
+  color: white;
+}
+
+.futuristic .team{
+  font-family: Segoe UI;
+  color: #7c7c7c;
+  font-size: 24px;
+}
+.futuristic #titlecard{
+  position: absolute; 
+  
+  padding-top: 16px;
+ 
+  background-image: url("./img/halftones/1x/mid.png");
+  font-size: 24px;
+  top: -10px;
+  left: 50%;
+
+  transform:translateX(-50%) ;
+  width: 300px;
+  height: 150px;
+ 
+}
+
 .futuristic #p1-card .score {
-  background-image: url("./img/tokon/1x/score_left.png");
+  background-image: url("./img/halftones/1x/sc_left.png");
 }
 .futuristic #p1-card .player-info {
-  background-image: url("./img/tokon/1x/player_left.png");
+  background-image: url("./img/halftones/1x/p_left.png");
 }
 .futuristic #p2-card .score {
-  background-image: url("./img/tokon/1x/score_right.png");
+  background-image: url("./img/halftones/1x/sc_right.png");
 }
 .futuristic #p2-card .player-info {
-  background-image: url("./img/tokon/1x/player_right.png");
+  background-image: url("./img/halftones/1x/p_right.png");
 }
 .futuristic #p3-card .player-info {
-  background-image: url("./img/tokon/1x/player_left.png");
+  background-image: url("./img/halftones/1x/p_left.png");
 }
 .futuristic #p4-card .player-info {
-  background-image: url("./img/tokon/1x/player_right.png");
+  background-image: url("./img/halftones/1x/p_right.png");
+}
+
+.futuristic.sf #p1-card .player-info{
+  transform: translateX(60px);
+}
+
+.futuristic.sf #p2-card .player-info{
+  transform: translateX(-60px);
+}
+
+.futuristic.dbfz #p1-card .player-info{
+  transform: translateY(-10px) translateX(40px);
+}
+
+.futuristic.dbfz #p1-card .score{
+  transform: translateY(-10px) ;
+}
+
+.futuristic.dbfz #p2-card .player-info{
+  transform: translateY(-10px) translateX(-40px);
+}
+
+.futuristic.dbfz #p2-card .score{
+  transform: translateY(-10px) ;
+}
+
+.futuristic.tekken #p1-card .player-info{
+  transform: translateY(10px);
+}
+
+.futuristic.tekken #p1-card .score{
+  transform: translateY(10px) ;
+}
+
+.futuristic.tekken #p2-card .player-info{
+  transform: translateY(10px);
+}
+
+.futuristic.tekken #p2-card .score{
+  transform: translateY(10px) ;
+}
+
+.futuristic._2XKO #p1-card .player-info{
+  transform: scale(.8) translateX(10px);
+}
+.futuristic._2XKO.has-left-duo #p1-card .player-info{
+   transform: scale(.7) translateY(20%);
+}
+.futuristic._2XKO.has-left-duo #p3-card .player-info{
+   transform: scale(.7) translateY(-320%) translateX(10%);
 }

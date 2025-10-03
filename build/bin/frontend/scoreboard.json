@@ -1,6 +1,6 @@
 {
-  "game": "sf",
-  "style": "minimalist",
+  "game": "2xko",
+  "style": "futuristic",
   "titlecard": "",
   "player1": "",
   "team1": "",
@@ -16,7 +16,7 @@
   "team3": "",
   "controller3": "",
   "score3": 0,
-  "visible3": false,
+  "visible3": true,
   "player4": "",
   "team4": "",
   "controller4": "",
