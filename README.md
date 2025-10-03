@@ -1,6 +1,6 @@
 # README
 
-🏆 Fighting Game Scoreboard Control
+ Fighting Game Scoreboard Control
 
 A desktop app built with Wails
  for managing fighting game tournaments.
@@ -8,7 +8,7 @@ Easily control scoreboards, commentators, brackets, and sponsor logos, and use t
 
 
 
-🖼️ (placeholders with screenshots or GIFs from the docs/ folder.)
+  (placeholders with screenshots or GIFs from the docs/ folder.)
 
 
 
