@@ -14,6 +14,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
   :root{
     --bg:#f5f7fa;
     --card-bg:#fff;
@@ -25,6 +27,8 @@
     --win:#5a5a5a;
     --lose:#fff5f5;
         --sumtext:#222;
+        --dot-color: rgba(0, 0, 0, 0.1);
+        --buttonbg: #dcdfe3;
   }
 
   /* 🌙 Dark mode variables override */
@@ -39,14 +43,16 @@
   --win: #333;
   --lose: #442222;
       --sumtext:#222;
+      --dot-color: rgba(255, 255, 255, 0.08);
+      --buttonbg : #dcdfe3;
 }
 
 /* googoo */
 
 
 /* gaagaa */
-  html,body{height:100%;margin:0;padding:0;background:var(--bg);font-family:Rubik, Arial, sans-serif;color:var(--text)}
-  .container{padding:20px;max-width:1200px;margin:0 auto;padding-top: 74px;}
+  html,body{height:100%;margin:0;padding:0;background:var(--bg);font-family:Space Grotesk, sans-serif;color:var(--text)}
+  .container{padding:20px;max-width:1200px;margin:0 auto;padding-top: 30px;position: relative;z-index: 20;}
   h1{margin:0 0 18px;font-size:20px;color:var(--accent)}
 
   body, .player-block, .sponsor-section {
@@ -57,6 +63,69 @@
   .tab button.active{background:var(--accent);color:#fff}
   .tabcontent{display:none}
   .tabcontent.active{display:block}
+
+  /* Halftone bG */
+  
+/* Halftone overlay */
+.halftone-bg {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* Create dot grid overlay */
+.halftone-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+  background-size: 6px 6px;
+  opacity: 1;
+  z-index: 0;
+
+  /* Optional subtle animation */
+  animation: drift 10s linear infinite;
+}
+
+@keyframes drift {
+  0% { background-position: 0 0; }
+  100% { background-position: 6px 6px; }
+}
+
+/* Ensure your content sits above */
+.halftone-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+.halftone-gradual{
+  overflow: hidden;
+
+}
+.halftone-gradual::before,
+.halftone-gradual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.halftone-gradual::before {
+  background-image: radial-gradient(var(--dot-color) 0.8px, transparent 0.8px);
+  background-size: 5px 5px;
+  mask-image: linear-gradient(to right, black 0%, transparent 50%);
+  -webkit-mask-image: linear-gradient(to right, black 0%, transparent 50%);
+}
+
+.halftone-gradual::after {
+  background-image: radial-gradient(var(--dot-color) 2px, transparent 2px);
+  background-size: 8px 8px;
+  mask-image: linear-gradient(to right, transparent 50%, black 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 50%, black 100%);
+}
+
 
   /* Try UI */
 
@@ -121,9 +190,9 @@
   }
 
   .channel.active {
-    background: #1ea7ff;
+    background: #3B4FFF;
     color: white;
-    border-color: #1ea7ff;
+    border-color: #3B4FFF;
     box-shadow: 3px 3px 1px #0e3d73;
   }
   /* toolbar & controls */
@@ -178,11 +247,17 @@
   /* Bracket Panel layout (horizontal tournament tree) */
   .bracket-panel{padding:16px;background:var(--panel);border:1px solid var(--border);border-radius:10px}
 
-  .inner-tabs #singleTabBtn, .inner-tabs #doubleTabBtn{font-weight: 600;font-size:12px ; color: var(--text); display: flex; align-items: center; gap: 8px;}
+  .inner-tabs #singleTabBtn, .inner-tabs #doubleTabBtn{font-weight: 1000;font-size:12px ; color: var(--text); display: flex; align-items: center; gap: 8px;}
+  #singleTabBtn.active {
+  background: linear-gradient(135deg, #0077FF, #005BCC);
+  }
+  #doubleTabBtn.active {
+    background: linear-gradient(135deg, #7A5FFF, #5939FF);
+  }
 
 
-  .inner-tabs{display:flex;gap:10px;margin-bottom:14px}
-  .inner-tabs button{background:none;border:1px solid var(--border);padding:8px 10px;border-radius:8px;cursor:pointer}
+  .inner-tabs{display:flex;gap:0px;margin-bottom:14px;justify-content: center;}
+  .inner-tabs button{background:var(--buttonbg);border:1px solid var(--border);padding:8px 10px;border-radius:8px;cursor:pointer}
   .inner-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 
   .round{display:flex;flex-direction:column;gap:18px;min-width:220px}
@@ -227,7 +302,7 @@
     }
 
     .player-line input {
-      width: 26px;
+      width: 20%;
       font-size: 12px;
       text-align: center;
       background: #000;
@@ -298,7 +373,7 @@
   align-items: center;
   gap: 8px;
   padding: 6px 10px;
-  color: var(--text);
+  color: var(--sumtext);
 }
 
 .custom-select .options div:hover {
@@ -312,7 +387,7 @@
 
 #gameIcon{
   position: absolute;
-  top: 20%;
+  top: 10%;
   right: 2%;
   max-width:15%;
   max-height: 10%;
@@ -446,38 +521,73 @@
     border-radius: 50%;
     cursor: pointer;
 }
-
-.obs-scoreboard{
+.obs-scoreboard {
   display: flex;
   align-items: center;
-  justify-content: center;
-
+  justify-content: space-between;
   flex-direction: row;
   gap: 10px;
+  padding: 10px 16px;
+  width: 100%;
+  max-width: 420px;
 
-  text-align: center;
-  padding: 0 16px;
-  background: #eeeeee;
+  background: var(--panel);
+  border: 3px solid var(--border);
+  box-shadow: 4px 4px 0 var(--border);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
 
-  border-radius: 4px;
+  width: auto;
+  /* subtle halftone texture */
+  isolation: isolate;
+}
+.obs-scoreboard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(0,0,0,0.1) 1px, transparent 1px);
+  background-size: 6px 6px;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: -1;
 }
 
-.copy-scoreboard{
-  font-size: 10px;
-  background: white;
-  padding: 0px 16px;
-  width: fit-content;
-  border-radius: 4px;
-  color: black;
+.obs-scoreboard h1 {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
 }
 
-.copy-scoreboard:hover{
-  background: var(--accent);
-  color: white;
+/* URL Chip */
+.copy-scoreboard {
+  background: #fffce2;
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: 6px;
+  padding: 4px 12px;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
- #settingsPanel {
+.copy-scoreboard p {
+  margin: 0;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.copy-scoreboard:hover {
+  background: var(--accent);
+  color: #000;
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--border);
+}
+
+/* Hide panel animation */
+#settingsPanel {
   transition: transform 0.4s ease, opacity 0.4s ease;
 }
 
@@ -487,6 +597,7 @@
   pointer-events: none;
 }
 
+/*-------- Button ------------- */
 .toggle-btn {
   align-self: flex-start;
   background: var(--accent);
@@ -507,7 +618,7 @@
   position: absolute;
   display: flex;
   align-items: center;
-  top: 16%;
+  top: 10%;
   right: 4%;
   z-index: 100;
 }
@@ -525,7 +636,7 @@
   background: #e0ffe0;
   border: 1px solid #b6ffb6;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 12px;
   color: #155724;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   z-index: 9999;           /* ensure it’s above other elements */
@@ -535,6 +646,325 @@
 
   /* keep rest of UI minimal for brevity */
   .small{font-size:12px;color:var(--muted);margin-top:8px}
+
+.halftone-btn {
+  position: relative;
+  padding: 12px 28px;
+  font-weight: 700;
+  font-family: "Arial Black", sans-serif;
+  text-transform: uppercase;
+  color: #222;
+  background: #ffeb3b;              /* bright base color */
+  border: 3px solid #222;
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 4px 4px 0 #222;
+}
+
+/* dotted halftone overlay */
+.halftone-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(#000 1px, transparent 1px);
+  background-size: 4px 4px;          /* density of dots */
+  opacity: 0.15;                     /* subtle effect */
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* slight lift on hover */
+.halftone-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #222;
+}
+
+/* animate dots to “shake” */
+@keyframes halftone-move {
+  0%, 100% { background-position: 0 0; }
+  50% { background-position: 2px 2px; }
+}
+
+/* start animation on hover */
+.halftone-btn:hover::before {
+  animation: halftone-move 0.4s steps(2, jump-none) infinite;
+  opacity: 0.25;
+}
+
+/* pressed effect */
+.halftone-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #222;
+}
+
+:root {
+  --btn-bg: #3B4FFF;
+  --btn-text: #fff;
+  --dot-color: rgba(255,255,255,0.5);
+}
+
+[data-theme='dark'] {
+  --btn-bg: #1e1e1e;
+  --btn-text: #eee;
+  --dot-color: rgba(255,255,255,0.2);
+}
+
+.corner-halftone-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  border: 3px solid #000;
+  border-radius: 8px;
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  overflow: hidden;
+  letter-spacing: 0.5px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 4px 4px 0 #000;
+  
+}
+
+/* Gentle scaling animation */
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+.corner-halftone-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 6px 6px 0 #000;
+}
+
+/* Top-left halftone dots */
+.corner-halftone-btn::before {
+  content: "";
+  position: absolute;
+  top: 0cm;
+  left: 0px;
+  width: 24px;
+  height: 24px;
+  background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+  background-size: 4px 4px;
+  opacity: 0.8;
+  transform-origin: top left;
+  animation: dotscale 4s ease-in-out infinite;
+}
+
+/* Bottom-right halftone dots */
+.corner-halftone-btn::after {
+  content: "";
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 24px;
+  height: 24px;
+  background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+  background-size: 4px 4px;
+  opacity: 0.8;
+  transform-origin: bottom right;
+  animation: dotscale 4s ease-in-out infinite reverse;
+}
+
+/* Optional pulsing dots */
+@keyframes dotscale {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 0.5; }
+}
+
+/* Pressed state */
+.corner-halftone-btn:active {
+  transform: scale(0.97);
+  box-shadow: 2px 2px 0 #000;
+}
+
+/* === Inner Tab Buttons (Single / Double Elimination) === */
+.inner-tab-btn {
+  --bg: #fdfdf5;
+  --text: #222;
+  --dot: rgba(0, 0, 0, 0.08);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  border: 2px solid #333;
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font-weight: 600;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  clip-path: polygon(6px 0%, calc(100% - 6px) 0%, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0% calc(100% - 6px), 0% 6px);
+}
+
+.inner-tab-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+  background-size: 5px 5px;
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.inner-tab-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0 #000;
+}
+
+.inner-tab-btn.active {
+  background: linear-gradient(135deg, #0077ff, #005bcc);
+  color: #fff;
+  border-color: #002266;
+  box-shadow: 4px 4px 0 #002266;
+}
+
+.inner-tab-btn.active::before {
+  background-image: radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px);
+}
+
+/* Dark mode */
+[data-theme='dark'] .inner-tab-btn {
+  border-color: var(--border-dark);
+  background: linear-gradient(145deg, #2a2a2a, var(--buttonbg));
+  color: var(---dark);
+  box-shadow: 2px 2px 0 #000;
+}
+
+[data-theme='dark'] .inner-tab-btn::before,
+[data-theme='dark'] .inner-tab-btn::after {
+  background-image: radial-gradient(var(--dot-dark) 1px, transparent 1px);
+}
+
+[data-theme='dark'] .inner-tab-btn:hover {
+  box-shadow: 3px 3px 0 #000;
+  background: linear-gradient(145deg, #2e2e2e, #252525);
+}
+
+[data-theme='dark'] .inner-tab-btn.active {
+  background: linear-gradient(145deg, #0077ff, #005bcc);
+  border-color: #0044bb;
+  color: #fff;
+  box-shadow: 3px 3px 0 #002266;
+}
+
+ 
+/* === Unique Toggle Panel Button === */
+#togglePanelBtn {
+  --bg-light: #f7f8fa;
+  --bg-dark: #1f1f1f;
+  --border-light: #ccc;
+  --border-dark: #444;
+  --text-light: #222;
+  --text-dark: #eee;
+  --dot-light: rgba(0, 0, 0, 0.12);
+  --dot-dark: rgba(255, 255, 255, 0.1);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 14px;
+  border-radius: 10px;
+  border: 2px solid var(--border-light);
+  background: linear-gradient(145deg, #ffffff, var(--bg-light));
+  color: var(--text-light);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  position: absolute;
+  overflow: hidden;
+
+  box-shadow: 2px 2px 0 #888;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+
+  animation: toggle-breathe 5s ease-in-out infinite;
+}
+
+/* Icon */
+#togglePanelBtn span {
+  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Light halftone corners */
+#togglePanelBtn::before,
+#togglePanelBtn::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-image: radial-gradient(var(--dot-light) 1px, transparent 1px);
+  background-size: 3px 3px;
+  pointer-events: none;
+  transition: background-size 0.3s ease;
+}
+
+#togglePanelBtn::before {
+  top: 4px;
+  left: 4px;
+}
+
+#togglePanelBtn::after {
+  bottom: 4px;
+  right: 4px;
+}
+
+/* Hover = subtle lift */
+#togglePanelBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 3px 3px 0 #555;
+  background: linear-gradient(145deg, #fafafa, #e8ebf0);
+}
+
+#togglePanelBtn:hover::before,
+#togglePanelBtn:hover::after {
+  background-size: 2.5px 2.5px;
+  opacity: 0.8;
+}
+
+/* Pressed = tactile push */
+#togglePanelBtn:active {
+  transform: scale(0.96);
+  box-shadow: 1px 1px 0 #666;
+}
+
+/* Subtle breathing */
+@keyframes toggle-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* === Dark Mode === */
+[data-theme='dark'] #togglePanelBtn {
+  border-color: var(--border-dark);
+  background: linear-gradient(145deg, #2a2a2a, var(--bg-dark));
+  color: var(--text-dark);
+  box-shadow: 2px 2px 0 #000;
+}
+
+[data-theme='dark'] #togglePanelBtn::before,
+[data-theme='dark'] #togglePanelBtn::after {
+  background-image: radial-gradient(var(--dot-dark) 1px, transparent 1px);
+}
+
+[data-theme='dark'] #togglePanelBtn:hover {
+  background: linear-gradient(145deg, #2e2e2e, #252525);
+  box-shadow: 3px 3px 0 #000;
+}
+
+
 
 .toggleNight{
   position: fixed;
@@ -549,6 +979,7 @@
   z-index: 1000;
 }
 
+/* Tabler */
 .tabler--tournament {
   display: inline-block;
   width: 24px;
@@ -582,6 +1013,63 @@
   width: 16px;
   height: 16px;
   --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M19.775 22.625L17.5 20.35q-1.225.8-2.612 1.225T12 22q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12q0-1.5.425-2.887T3.65 6.5L1.375 4.225L2.8 2.8l18.4 18.4zM12 20q1.075 0 2.088-.275t1.962-.825L5.1 7.95q-.55.95-.825 1.962T4 12q0 3.325 2.338 5.663T12 20m8.35-2.5l-1.45-1.45q.55-.95.825-1.963T20 12q0-3.325-2.337-5.663T12 4q-1.075 0-2.087.275T7.95 5.1L6.5 3.65q1.225-.8 2.613-1.225T12 2q2.075 0 3.9.788t3.175 2.137T21.213 8.1T22 12q0 1.5-.425 2.888T20.35 17.5m-9.775-4.075'/%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.bi--save-fill {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M8.5 1.5A1.5 1.5 0 0 1 10 0h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h6c-.314.418-.5.937-.5 1.5v7.793L4.854 6.646a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l3.5-3.5a.5.5 0 0 0-.708-.708L8.5 9.293z'/%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  transform: rotate(180deg);
+}
+
+.ic--outline-reset-tv {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M22 8V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4v2h8v-2h4c1.1 0 1.99-.9 1.99-2v-5H22c0-1.1-.9-2-2-2h-7.17l1.83-1.83l-1.41-1.41C9.69 10.31 10.88 9.12 9 11l4.24 4.24l1.41-1.41L12.83 12H20v5H4V5h16v3z'/%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.line-md--play-filled {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 6l10 6l-10 6Z'/%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.material-symbols--stop-rounded {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M6 16V8q0-.825.588-1.412T8 6h8q.825 0 1.413.588T18 8v8q0 .825-.587 1.413T16 18H8q-.825 0-1.412-.587T6 16'/%3E%3C/svg%3E");
   background-color: currentColor;
   -webkit-mask-image: var(--svg);
   mask-image: var(--svg);
@@ -649,8 +1137,8 @@
 </style>
 </head>
 <body>
-
-  <button class="toggleNight" onclick="toggleTheme()">🌙</button>
+<div class="halftone-gradual"></div>
+  <button class="halftone-btn toggleNight" onclick="toggleTheme()">🌙</button>
 
 <div id="creatorOverlay" class="creator-overlay">
   <div class="creator-card">
@@ -665,9 +1153,9 @@
 </div>
 
   <div class="channel-bar">
-    <button class="channel active" onclick="openTab(event,'scoreboard')">🏆 Scoreboard</button>
-    <button class="channel" onclick="openTab(event,'commentary')">🎙 Commentary</button>
-    <button class="channel" onclick="openTab(event,'brackets')">🔀 Brackets</button>
+    <button class="channel active halftone-btn" onclick="openTab(event,'scoreboard')">🏆 Scoreboard</button>
+    <button class="channel halftone-btn" onclick="openTab(event,'commentary')">🎙 Commentary</button>
+    <button class="channel halftone-btn" onclick="openTab(event,'brackets')">🔀 Brackets</button>
   </div>
   <div class="container">
       <div id="notifMsg" style="display: none; color: green;">
@@ -677,10 +1165,10 @@
     <div id="scoreboard" class="tabcontent active">
       <div class="scoreboard-panel">
         <div class="toolbar">
-          <button class="btn" title="Ctrl + s for shortcut" onclick="updateScoreboard('Scoreboard updated!')">💾 Save Scoreboard</button>
-          <button class="btn" title="Ctrl + r for shortcut" onclick="resetScoreboard()">🔄 Reset </button>
+          <button class="btn corner-halftone-btn" title="Ctrl + s for shortcut" onclick="updateScoreboard('Scoreboard updated!')"><span class="bi--save-fill"></span> Save Scoreboard</button>
+          <button class="btn corner-halftone-btn" title="Ctrl + r for shortcut" onclick="resetScoreboard()"><span class="ic--outline-reset-tv"></span> Reset </button>
           <div class="obs-scoreboard">
-            <h1 style="font-size: 14px; margin: 0;"> Copy this to your obs</h1>
+            <h1> Copy this to your obs</h1>
             <div class="copy-scoreboard" id="scoreboard-url" onclick="copyCardContent('scoreboard-url')">
               <p> localhost:34115/scoreboard.html </p>
             </div>
@@ -830,8 +1318,14 @@
     <div id="commentary" class="tabcontent">
       <div class="commentary-top">
         <div class="commentary-panel">
+          <div class="commentary-toolbar" style="margin-bottom: 16px;">
+            <button class="btn corner-halftone-btn" title="Ctrl + s for shortcut" onclick="updateCommentary()"><span class="bi--save-fill"></span> Save Commentary</button>
+            <button class="btn corner-halftone-btn" title="Ctrl + r for shortcut" onclick="resetCommentary()"><span class="ic--outline-reset-tv"></span> Reset </button>
+            <button class="btn corner-halftone-btn" onclick="toggleCommentary(true)"><span class="line-md--play-filled"></span> Show</button>
+            <button class="btn corner-halftone-btn" onclick="toggleCommentary(false)"><span class="material-symbols--stop-rounded"></span> Hide</button>
+          </div>
             <div class="obs-scoreboard" style="width: 400px;">
-              <h1 style="font-size: 14px; margin: 0;"> Copy this to your obs</h1>
+              <h1> Copy this to your obs</h1>
               <div class="copy-scoreboard" id="commentary-url" onclick="copyCardContent('commentary-url')">
                 <p> localhost:34115/commentary.html </p>
             </div>
@@ -840,17 +1334,9 @@
             <label>Commentator 1 - Name<input id="com1_name" type="text" placeholder="Commentator 1"></label>
             <label>Commentator 1 - Description<input id="com1_desc" type="text" placeholder="FGC Expert"></label>
           </div>
-  
           <div class="commentator-block">
             <label>Commentator 2 - Name<input id="com2_name" type="text" placeholder="Commentator 2"></label>
             <label>Commentator 2 - Description<input id="com2_desc" type="text" placeholder="Studio Host"></label>
-          </div>
-  
-          <div class="commentary-toolbar">
-            <button class="btn" title="Ctrl + s for shortcut" onclick="updateCommentary()">💾 Save Commentary</button>
-            <button class="btn" title="Ctrl + r for shortcut" onclick="resetCommentary()">🔄 Reset </button>
-            <button class="btn" onclick="toggleCommentary(true)">▶ Show</button>
-            <button class="btn" onclick="toggleCommentary(false)">⏹ Hide</button>
           </div>
         </div>
         <div class="iframe-commentator">
@@ -869,8 +1355,8 @@
       <div class="bracket-panel">
         <!-- <h2 style="margin-top:0">Brackets — Single Elimination (Top 8)</h2> -->
         <div class="inner-tabs" style="margin-bottom:14px">
-          <button id="singleTabBtn" class="active" onclick="openInnerTab('single')"><span class="mdi--bracket"></span>Single Elimination</button>
-          <button id="doubleTabBtn" onclick="openInnerTab('double')"><span class="tabler--tournament"></span> Double Elimination</button>
+          <button id="singleTabBtn" class="active inner-tab-btn" onclick="openInnerTab('single')"><span class="mdi--bracket"></span>Single Elimination</button>
+          <button id="doubleTabBtn" class="inner-tab-btn" onclick="openInnerTab('double')"><span class="tabler--tournament"></span> Double Elimination</button>
 
         </div>
 

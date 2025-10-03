@@ -28,11 +28,15 @@
   .player-line.win { background: rgba(0,150,0,0.06); }
   .player-line.lose { background: rgba(150,0,0,0.04); }
 </style>
-<button id="togglePanelBtn" class="btn toggle-btn" onclick="toggleDoublePanel()"><span class="material-symbols--hide-source-outline"></span>Toggle DBracket</button>
+<button id="togglePanelBtn" class="btn " onclick="toggleDoublePanel()"><span class="material-symbols--hide-source-outline"></span>Toggle DBracket</button>
 <div id="doubleBracket" class="dbracket-container" style="display: flex; flex-direction: row; gap: 12px;">
   <div id="settingsDoublePanel" style="display:flex;flex-direction:column;gap:12px;align-items:flex-start;margin-top:10px;margin-bottom:12px;flex-wrap:wrap">
+    <div style="margin-bottom:10px;display:flex;gap:8px">
+      <button class="btn corner-halftone-btn" title="Ctrl + s for shortcut" onclick="saveDoublePlayers()"><span class="bi--save-fill"></span> Save Bracket </button>
+      <button class="btn corner-halftone-btn" title="Ctrl + r for shortcut" onclick="resetDouble()"><span class="ic--outline-reset-tv"></span> Reset </button>
+    </div> 
     <div class="obs-scoreboard">
-      <h1 style="font-size: 14px; margin: 0;"> Copy this to your obs</h1>
+      <h1> Copy this to your obs</h1>
       <div class="copy-scoreboard" id="double-url" onclick="copyCardContent('double-url')">
         <p> <code>localhost:34115/double.html </code></p>
       </div>
@@ -52,11 +56,6 @@
         <label>Losers 2 <input id="dp6" type="text"></label>
         <label>Losers 3 <input id="dp7" type="text"></label>
         <label>Losers 4 <input id="dp8" type="text"></label>
-      </div>
-      <div style="margin-top:16px;display:flex;gap:8px">
-        <button class="btn" title="Ctrl + s for shortcut" onclick="saveDoublePlayers()">💾 Save Bracket </button>
-        <button class="btn" title="Ctrl + r for shortcut" onclick="resetDouble()">🔄 Reset </button>
-        
       </div>
     </div>
   </div>

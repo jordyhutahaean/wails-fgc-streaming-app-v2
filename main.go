@@ -43,7 +43,7 @@ func main() {
 	// Run Wails app
 	err := wails.Run(&options.App{
 		Title:  "Fighting Game Scoreboard Control",
-		Width:  800,
+		Width:  860,
 		Height: 600,
 		AssetServer: &assetserver.Options{
 			Assets: assets,

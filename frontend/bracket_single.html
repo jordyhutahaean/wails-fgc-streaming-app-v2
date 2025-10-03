@@ -75,11 +75,15 @@
 #f1  { top: 25px; left: 0; }
 
 </style>
-<button id="togglePanelBtn" class="btn toggle-btn" onclick="toggleSinglePanel()"><span class="material-symbols--hide-source-outline"></span>Toggle SBracket</button>
+<button id="togglePanelBtn" class="btn " onclick="toggleSinglePanel()"><span class="material-symbols--hide-source-outline"></span>Toggle SBracket</button>
 <div id="singleBracket" class="sbracket-container" style="display: flex; flex-direction: row; gap: 12px;">
   <div id="settingsSinglePanel" style="display:flex;gap:12px;flex-direction:column;align-items:flex-start;margin-top:10px;margin-bottom:12px;flex-wrap:wrap"> 
+    <div style="margin-bottom:10px;display:flex;gap:8px"> 
+      <button class="btn corner-halftone-btn" title="Ctrl + s for shortcut" onclick="saveSinglePlayers()"><span class="bi--save-fill"></span> Save Bracket</button> 
+      <button class="btn corner-halftone-btn" title="Ctrl + r for shortcut" onclick="resetSingle()"><span class="ic--outline-reset-tv"></span> Reset </button> 
+    </div> 
     <div class="obs-scoreboard">
-      <h1 style="font-size: 14px; margin: 0;"> Copy this to your obs</h1>
+      <h1> Copy this to your obs</h1>
       <div class="copy-scoreboard" id="single-url" onclick="copyCardContent('single-url')">
         <p><code> localhost:34115/single.html </code></p>
       </div>
@@ -99,11 +103,6 @@
         <label>Player 6: <input id="sp6" type="text"></label> 
         <label>Player 7: <input id="sp2" type="text"></label> 
         <label>Player 8: <input id="sp7" type="text"></label> 
-      </div> 
-      <div style="margin-top:16px;display:flex;gap:8px"> 
-        <button class="btn" title="Ctrl + s for shortcut" onclick="saveSinglePlayers()">💾 Save Bracket</button> 
-        <button class="btn" title="Ctrl + r for shortcut" onclick="resetSingle()">🔄 Reset </button> 
- 
       </div> 
     </div> 
   </div>
