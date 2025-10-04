@@ -7,10 +7,10 @@ A desktop app built with Wails
 Easily control scoreboards, commentators, brackets, and sponsor logos, and use them directly in OBS through local overlays.
 
 
-
-  (placeholders with screenshots or GIFs from the docs/ folder.)
-
-
+## Screenshots
+<p align="center">
+  <img src="frontend/ss/ss1.png" alt="Game Select." width="75%">
+</p>
 
 ## Features:
 
