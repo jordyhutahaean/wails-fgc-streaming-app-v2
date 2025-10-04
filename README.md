@@ -164,3 +164,6 @@ This project uses semantic versioning:
 
 Version	Description
 v1.0.0	First public release (scoreboard, commentary, brackets, sponsors)
+
+## License
+Usage is provided under the [MIT License](http://http//opensource.org/licenses/mit-license.php). See LICENSE for the full details.
