@@ -9,7 +9,19 @@ Easily control scoreboards, commentators, brackets, and sponsor logos, and use t
 
 ## Screenshots
 <p align="center">
-  <img src="build/bin/frontend/ss/ss1.png" alt="Game Select." width="75%">
+ <h2> Interface </h2>
+ <img src="build/bin/frontend/ss/ss1.png" alt="Game Select." width="75%">
+ <img src="build/bin/frontend/ss/ss2.png" alt="2XKO Input" width="75%">
+ <img src="build/bin/frontend/ss/ss3.png" alt="Sponsors Interface" width="75%">  
+ <img src="build/bin/frontend/ss/ss4.png" alt="Topbar" width="75%">
+ <img src="build/bin/frontend/ss/ss5.png" alt=" Commentator" width="75%">
+ <img src="build/bin/frontend/ss/ss6.png" alt="Bracket editor" width="75%">
+ <h2> Some Overlay Screenshots </h2>
+ <img src="build/bin/frontend/ss/ss8.png" alt="2XKO" width="75%">
+ <img src="build/bin/frontend/ss/ss9.png" alt="SF6" width="75%">
+ <img src="build/bin/frontend/ss/ss10.png" alt="Tekken8" width="75%">
+ <img src="build/bin/frontend/ss/ss11.png" alt="DBFZ" width="75%">
+ <img src="build/bin/frontend/ss/ss12.png" alt="Single Bracket Overlat" width="75%">
 </p>
 
 ## Features:
