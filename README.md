@@ -9,7 +9,7 @@ Easily control scoreboards, commentators, brackets, and sponsor logos, and use t
 
 ## Screenshots
 <p align="center">
-  <img src="frontend/ss/ss1.png" alt="Game Select." width="75%">
+  <img src="build/bin/frontend/ss/ss1.png" alt="Game Select." width="75%">
 </p>
 
 ## Features:
