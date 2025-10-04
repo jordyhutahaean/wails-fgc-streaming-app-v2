@@ -527,20 +527,36 @@ body {
 .arcade.sf #p2-card .score{
   transform: translateX(-60%);
  }
+ 
 
  .arcade.dbfz #p1-card .player-info{
-  transform: translateY(-10px);
+  transform: translateY(-10px) translateX(64px);
  }
  .arcade.dbfz #p1-card .score{
-  transform: translateX(400px) translateY(-10px);
+  transform: translateX(460px) translateY(-4px) scale(.8);
  }
  .arcade.dbfz #p2-card .player-info{
-    transform: translateY(-10px) translateX(-10px);
+    transform: translateY(-10px) translateX(-64px);
  }
  .arcade.dbfz #p2-card .score{
-  transform: translateX(-400px) translateY(-10px);
+  transform: translateX(-450px) translateY(-4px) scale(.8);
  }
 
+ .arcade.tekken #p1-card .player-info{
+  transform: translateY(10px);
+ }
+
+ .arcade.tekken #p1-card .score{
+  transform: translateY(10px)  ;
+ }
+ 
+  .arcade.tekken #p2-card .player-info{
+  transform: translateY(10px);
+ }
+
+ .arcade.tekken #p2-card .score{
+  transform: translateY(10px)  ;
+ }
  
 .arcade._2XKO #p1-card .player-info{
   transform: scale(1) translateX(10px);

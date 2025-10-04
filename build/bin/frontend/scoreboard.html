@@ -169,9 +169,10 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <script>
+
 async function loadSponsors() {
   try {
-    // ✅ load from sponsors.json directly
+    // ✅ Since scoreboard.html is in frontend/, and sponsors.json is also in frontend/
     const resp = await fetch("sponsors.json?_=" + Date.now());
     if (!resp.ok) throw new Error("Failed to fetch sponsors.json");
     const sponsors = await resp.json();
@@ -181,7 +182,7 @@ async function loadSponsors() {
 
     sponsors.forEach((src, i) => {
       const img = document.createElement("img");
-      img.src = src;
+      img.src = src; // "sponsors/jabo.png"
       img.className = "sponsor-logo";
       img.style.opacity = i === 0 ? "1" : "0";
       img.style.transition = "opacity 1s";

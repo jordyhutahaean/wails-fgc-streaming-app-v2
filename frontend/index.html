@@ -1238,17 +1238,6 @@
 <div class="halftone-gradual"></div>
   <button class="halftone-btn toggleNight" onclick="toggleTheme()">🌙</button>
 
-<div id="creatorOverlay" class="creator-overlay">
-  <div class="creator-card">
-    <p></p>
-    <h2>👋 It's Mahvel Baybeh </h2>
-    <p>This app was created by <strong>giogio555</strong></p>
-    <p>Version 1.0.0 — © 2025</p>
-    <p> Consider visiting <a href="https://github.com/jordyhutahaeanhttps://github.com/jordyhutahaean"> Github </a> or <a href="https://www.youtube.com/@LunallytheMedanhttps://www.youtube.com/@LunallytheMedan"> Youtube </a></p>
-    <p>If you found bugs and stuff, let me know by reaching <a href="mailto:aklasia404@gmail.com">This mail</a></p>
-    <button onclick="document.getElementById('creatorOverlay').classList.remove('visible')">Close</button>
-  </div>
-</div>
 
   <div class="channel-bar">
     <button class="channel active halftone-btn" onclick="openTab(event,'scoreboard')">🏆 Scoreboard</button>
@@ -1469,6 +1458,25 @@
         <!-- Double elimination UI (will be loaded from bracket_double.html) -->
         <div id="double" class="inner-tabcontent" style="display:none"></div>
   </div>
+  </div>
+
+  
+<div id="creatorOverlay" class="creator-overlay">
+  <div class="creator-card">
+    <p></p>
+    <h2>👋 It's Mahvel Baybeh </h2>
+    <p>This app was created by <strong>giogio555</strong></p>
+    <p>Version 1.0.0 — © 2025</p>
+ <p>
+  Consider visiting 
+  <a href="#" onclick="openExternal('https://github.com/jordyhutahaean')">Github</a> 
+  or 
+  <a href="#" onclick="openExternal('https://www.youtube.com/@LunallytheMedan')">Youtube</a>
+</p>
+    <p>If you found bugs and stuff, let me know by reaching <a href="mailto:aklasia404@gmail.com">This mail</a></p>
+    <button onclick="document.getElementById('creatorOverlay').classList.remove('visible')">Close</button>
+  </div>
+</div>
 
  
 <script>
@@ -3343,6 +3351,19 @@ if (savedBracket) {
       seedDoubleVisualBracket();
       populateDoubleFromData();
     }
+  }
+}
+
+function openExternal(url) {
+  if (window.runtime && window.runtime.BrowserOpenURL) {
+    // Wails v2 way
+    window.runtime.BrowserOpenURL(url);
+  } else if (window.wails && window.wails.Browser) {
+    // Sometimes exposed under window.wails
+    window.wails.Browser.OpenURL(url);
+  } else {
+    // fallback for normal browser
+    window.open(url, '_blank');
   }
 }
 

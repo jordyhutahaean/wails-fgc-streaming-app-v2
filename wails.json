@@ -1,7 +1,9 @@
 {
   "$schema": "https://wails.io/schemas/config.v2.json",
-  "name": "scoreboard-wails",
-  "outputfilename": "scoreboard-wails",
+  "name": "J's FGC Scoreboard ",
+  "description": "My Wails App",
+  "icon": "build/appicon.png",
+  "outputfilename": "J's FGC Scoreboard",
   "static": ["./sponsors"],
   "frontend": {
     "install": "npm install",
