@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 )
 
 // App holds scoreboard, commentary, brackets and sponsors
@@ -296,4 +298,91 @@ func saveJSON(filename string, v interface{}) error {
 	enc := json.NewEncoder(file)
 	enc.SetIndent("", "  ")
 	return enc.Encode(v)
+}
+
+//  SAVE CSV
+
+func (a *App) SavePlayersCSV(players []map[string]string) error {
+	exe, _ := os.Executable()
+	base := filepath.Dir(exe)
+	filePath := filepath.Join(base, "frontend", "data.csv")
+
+	// ✅ Ensure the file exists
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		f, _ := os.Create(filePath)
+		defer f.Close()
+		f.WriteString("name,team\n")
+	}
+
+	// Read existing data
+	existing := map[string]string{}
+	file, err := os.Open(filePath)
+	if err == nil {
+		defer file.Close()
+		r := csv.NewReader(file)
+		records, _ := r.ReadAll()
+		for _, row := range records[1:] { // skip header
+			if len(row) >= 2 {
+				existing[strings.TrimSpace(row[0])] = strings.TrimSpace(row[1])
+			}
+		}
+	}
+
+	// Add new players
+	for _, p := range players {
+		name := strings.TrimSpace(p["name"])
+		team := strings.TrimSpace(p["team"])
+		if name == "" {
+			continue
+		}
+		if _, exists := existing[strings.ToLower(name)]; !exists {
+			existing[name] = team
+		}
+	}
+
+	// Rewrite CSV
+	f, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	w := csv.NewWriter(f)
+	defer w.Flush()
+
+	w.Write([]string{"name", "team"})
+	for name, team := range existing {
+		w.Write([]string{name, team})
+	}
+
+	return nil
+}
+
+func (a *App) LoadPlayersCSV() ([]map[string]string, error) {
+	exe, _ := os.Executable()
+	base := filepath.Dir(exe)
+	filePath := filepath.Join(base, "frontend", "data.csv")
+
+	f, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	r := csv.NewReader(f)
+	records, err := r.ReadAll()
+	if err != nil || len(records) < 2 {
+		return []map[string]string{}, nil
+	}
+
+	var players []map[string]string
+	for _, row := range records[1:] {
+		if len(row) >= 2 {
+			players = append(players, map[string]string{
+				"name": strings.TrimSpace(row[0]),
+				"team": strings.TrimSpace(row[1]),
+			})
+		}
+	}
+	return players, nil
 }

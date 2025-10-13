@@ -26,12 +26,20 @@ export function GetSponsors() {
   return window['go']['main']['App']['GetSponsors']();
 }
 
+export function LoadPlayersCSV() {
+  return window['go']['main']['App']['LoadPlayersCSV']();
+}
+
 export function SaveBracketJSON(arg1) {
   return window['go']['main']['App']['SaveBracketJSON'](arg1);
 }
 
 export function SaveCommentaryJSON(arg1) {
   return window['go']['main']['App']['SaveCommentaryJSON'](arg1);
+}
+
+export function SavePlayersCSV(arg1) {
+  return window['go']['main']['App']['SavePlayersCSV'](arg1);
 }
 
 export function SaveScoreboardJSON(arg1) {

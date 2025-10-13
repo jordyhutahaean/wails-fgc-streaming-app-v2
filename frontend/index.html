@@ -1466,7 +1466,7 @@
     <p></p>
     <h2>👋 It's Mahvel Baybeh </h2>
     <p>This app was created by <strong>giogio555</strong></p>
-    <p>Version 1.0.0 — © 2025</p>
+    <p>Version 1.0.1 — © 2025</p>
  <p>
   Consider visiting 
   <a href="#" onclick="openExternal('https://github.com/jordyhutahaean')">Github</a> 
@@ -1554,7 +1554,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-async function updateScoreboard(msg = "Scoreboard updated!"){
+async function updateScoreboard(msg = "Scoreboard updated!") {
   const data = {
     game: document.getElementById("game").value,
     style: document.getElementById("style").value,
@@ -1578,14 +1578,34 @@ async function updateScoreboard(msg = "Scoreboard updated!"){
     score4: parseInt(document.getElementById("s4")?.value||0,10),
     visible4: document.getElementById("v4")?.checked??false
   };
-  try{
+
+  try {
     await window.go.main.App.SaveScoreboardJSON(data);
+
+    // ✅ Also save player names to CSV
+    const players = [
+      { name: data.player1, team: data.team1 },
+      { name: data.player2, team: data.team2 },
+      { name: data.player3, team: data.team3 },
+      { name: data.player4, team: data.team4 },
+    ].filter(p => p.name);
+
+    await window.go.main.App.SavePlayersCSV(players);
+    console.log("✅ Saved player list to CSV");
+  
+    // 🔁 Refresh suggestions right away
+    await loadPlayerSuggestions();
+    await loadPlayersCSV(); 
+    
+    // ✅ Show notification again
     copyCardContent(null, msg);
-  }catch(err){
-    console.error("SaveScoreboardJSON failed:",err);
-    copyCardContent(null, "Error saving scoreboard"); // ✅ just show notif
+  } catch (err) {
+    console.error("SaveScoreboardJSON failed:", err);
   }
+  copyCardContent(null, msg);
+  loadPlayersCSV(); // Refresh suggestions after update
 }
+
 
 function resetScoreboard(){
   // limit reset to scoreboard form inputs only (avoid wiping bracket seeds by accident)
@@ -1766,9 +1786,9 @@ function updateDoubleBracket(){
   // --- Drop WB SF losers into Losers QF ---
   if(bracketData.double.losers){
     if(bracketData.double.losers['wb_sf1'])
-      setText('lb_qf_m1_p2', bracketData.double.losers['wb_sf1']);
+      setText('lb_qf_m2_p2', bracketData.double.losers['wb_sf1']);
     if(bracketData.double.losers['wb_sf2'])
-      setText('lb_qf_m2_p2', bracketData.double.losers['wb_sf2']);
+      setText('lb_qf_m1_p2', bracketData.double.losers['wb_sf2']);
   }
 
   // --- Losers QF → Losers Semi ---
@@ -3382,4 +3402,49 @@ window.addEventListener("load", () => {
 });
 </script>
 
- 
+<script>
+// === Load Player List from CSV ===
+async function loadPlayersCSV() {
+  try {
+    const players = await window.go.main.App.LoadPlayersCSV();
+    window.playerList = players || [];
+    console.log("✅ Loaded players from Go:", window.playerList);
+    setupAutocomplete();
+  } catch (err) {
+    console.warn("⚠ Couldn't load players:", err);
+    window.playerList = [];
+  }
+}
+
+function setupAutocomplete() {
+  const playerInputs = ["p1", "p2", "p3", "p4"].map(id => document.getElementById(id));
+  playerInputs.forEach(input => {
+    if (!input) return;
+    const listId = input.id + "-list";
+    let datalist = document.getElementById(listId);
+    if (!datalist) {
+      datalist = document.createElement("datalist");
+      datalist.id = listId;
+      document.body.appendChild(datalist);
+      input.setAttribute("list", listId);
+    }
+    datalist.innerHTML = "";
+    window.playerList.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = p.name;
+      opt.label = p.team ? `${p.name} (${p.team})` : p.name;
+      datalist.appendChild(opt);
+    });
+    input.addEventListener("change", () => {
+      const found = window.playerList.find(p => p.name.toLowerCase() === input.value.toLowerCase());
+      if (found) {
+        const teamInput = document.getElementById("t" + input.id.slice(1));
+        if (teamInput) teamInput.value = found.team;
+      }
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", loadPlayersCSV);
+
+</script>

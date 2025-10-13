@@ -14,9 +14,13 @@ export function GetSponsorList():Promise<Array<string>>;
 
 export function GetSponsors():Promise<Array<string>>;
 
+export function LoadPlayersCSV():Promise<Array<Record<string, string>>>;
+
 export function SaveBracketJSON(arg1:main.Bracket):Promise<void>;
 
 export function SaveCommentaryJSON(arg1:Record<string, any>):Promise<void>;
+
+export function SavePlayersCSV(arg1:Array<Record<string, string>>):Promise<void>;
 
 export function SaveScoreboardJSON(arg1:main.Scoreboard):Promise<void>;
 
