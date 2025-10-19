@@ -33,12 +33,22 @@ func main() {
 
 		// --- Serve frontend folder ---
 		overlayDir := filepath.Join(base, "frontend")
+		os.MkdirAll(overlayDir, 0755)
 		fs := http.FileServer(http.Dir(overlayDir))
 		mux.Handle("/", fs)
-		mux.Handle("/frontend/", http.StripPrefix("/frontend/", fs)) // optional: supports both
-		// Listen on port 34115
-		if err := http.ListenAndServe(":34115", mux); err != nil {
-			println("Overlay server error:", err.Error())
+		mux.Handle("/frontend/", http.StripPrefix("/frontend/", fs))
+
+		// --- Multi-port startup ---
+		ports := []string{":34115", ":34116", ":34117"}
+
+		for _, p := range ports {
+			go func(port string) {
+				println("🔌 Starting overlay server on port", port, "...")
+				println("✅ Access via: http://localhost" + port + "/scoreboard.html")
+				if err := http.ListenAndServe(port, mux); err != nil {
+					println("❌ Port", port, "failed:", err.Error())
+				}
+			}(p)
 		}
 	}()
 
