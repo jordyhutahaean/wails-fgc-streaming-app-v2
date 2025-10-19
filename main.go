@@ -31,10 +31,11 @@ func main() {
 			http.FileServer(http.Dir(sponsorDir)),
 		))
 
-		// Serve bin/frontend/ at root (this should come AFTER more specific routes)
-		overlayDir := filepath.Join(".", "frontend")
-		mux.Handle("/", http.FileServer(http.Dir(overlayDir)))
-
+		// --- Serve frontend folder ---
+		overlayDir := filepath.Join(base, "frontend")
+		fs := http.FileServer(http.Dir(overlayDir))
+		mux.Handle("/", fs)
+		mux.Handle("/frontend/", http.StripPrefix("/frontend/", fs)) // optional: supports both
 		// Listen on port 34115
 		if err := http.ListenAndServe(":34115", mux); err != nil {
 			println("Overlay server error:", err.Error())
