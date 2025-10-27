@@ -1,5 +1,8 @@
 # README
 
+## DL Link
+https://drive.google.com/drive/folders/1fg2BLdyyFPhFgZ8oYdBHFWeM1Is8eOso?usp=sharing
+
  Fighting Game Scoreboard Control
 
 A desktop app built with Wails
