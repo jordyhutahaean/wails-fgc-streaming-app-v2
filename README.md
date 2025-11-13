@@ -1,14 +1,39 @@
 # README
 
 ## DL Link
-https://drive.google.com/drive/folders/1fg2BLdyyFPhFgZ8oYdBHFWeM1Is8eOso?usp=sharing
+https://drive.google.com/file/d/1xmd8-QkhpCS2xlDZHLAGB4NjtJ7Wtm1L/view?usp=drive_link
 
- Fighting Game Scoreboard Control
+Fighting Game Scoreboard Control
 
 A desktop app built with Wails
  for managing fighting game tournaments.
 Easily control scoreboards, commentators, brackets, and sponsor logos, and use them directly in OBS through local overlays.
 
+## Changelog 
+
+### 1.0.2
+
+Added streamer mode.
+Streamer mode allows the scoreboard to be opened in a separate windows, because the main app is too big and not suitable for fast-paced fighting game tournament environment. Because it's html, it's also possible to use Custom Browser Docks from OBS to pin the html into OBS.
+
+Just add this line to custom docks when the scoreboard is open
+
+> http://localhost:34115/miniscoreboard.html
+
+### emerge-release
+
+Fixed frontend file issue
+if localhost 34115 cant be accessed, try "34116" or "34117" (e.g. http://localhost:34116/scoreboard.html)
+
+### 1.0.1
+
+Fixed Double Bracket losers semi placement issue
+Fixed truncating names in scoreboard overlay
+added csv to help PlayerName input
+
+### 1.0.0
+
+Initial Release
 
 ## Screenshots
 <p align="center">
@@ -96,6 +121,14 @@ sponsors/           # Sponsor logos (auto-detected)
 app.go                   # App logic (scoreboard, commentary, brackets, sponsors)
 main.go                  # Wails entry point + overlay webserver
 
+# Streamer Mode
+
+I realized this app is kinda big on it's size, so i made a mini-window for the scoreboard only.
+You can access it in 2 ways
+
+1. From the app, just press "Stream Mode" button on top right, a window  will pop-up and it'll do the same thing the scoreboard tab do
+   
+2. You can use OBS Custom Browser Docks, just paste localhost:34115/miniscoreboard.html (34115 is default port, adjust if you use 34116 or 34117), and you're done.
 
 ## Requirements (for Developers)
 
