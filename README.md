@@ -121,6 +121,14 @@ sponsors/           # Sponsor logos (auto-detected)
 app.go                   # App logic (scoreboard, commentary, brackets, sponsors)
 main.go                  # Wails entry point + overlay webserver
 
+# Streamer Mode
+
+I realized this app is kinda big on it's size, so i made a mini-window for the scoreboard only.
+You can access it in 2 ways
+
+1. From the app, just press "Stream Mode" button on top right, a window  will pop-up and it'll do the same thing the scoreboard tab do
+   
+2. You can use OBS Custom Browser Docks, just paste localhost:34115/miniscoreboard.html (34115 is default port, adjust if you use 34116 or 34117), and you're done.
 
 ## Requirements (for Developers)
 
