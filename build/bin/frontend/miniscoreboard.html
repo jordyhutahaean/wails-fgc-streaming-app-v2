@@ -1,0 +1,689 @@
+
+
+  <div class="settings">
+      <input type="hidden" id="game" value="sf">
+      <label> Game
+      <div class="custom-select" id="gameDropdown">
+        <div class="selected">
+
+          <span id="selectedGameName">Street Fighter</span>
+        </div>
+        <div class="options">
+          <div data-value="sf" data-icon="./img/game_ico/SF6_Logo.png">
+            <img  src="./img/game_ico/SF6_Logo.png" alt=""> Street Fighter
+          </div>
+          <div data-value="dbfz" data-icon="./img/game_ico/DBFZ_Logo.png">
+            <img src="./img/game_ico/DBFZ_Logo.png"alt=""> Dragon Ball FighterZ
+          </div>
+          <div data-value="tekken" data-icon="./img/game_ico/Tekken_8_Logo.png">
+            <img src="./img/game_ico/Tekken_8_Logo.png" alt=""> Tekken
+          </div>
+          <div data-value="2xko" data-icon="./img/game_ico/2XKO_Logo.png">
+            <img src="./img/game_ico/2XKO_Logo.png" alt=""> 2XKO
+          </div>
+        </div>
+      </div>
+      </label>
+      <label>Style
+        <select id="style" style="padding: 8px; width: 100%;">
+          <option value="minimalist">Minimalist</option>
+          <option value="arcade">Arcade</option>
+          <option value="futuristic">Futuristic</option>
+        </select>
+      </label>
+      <label>Titlecard
+        <input style="padding: 9px; width: 100%;" id="titlecard" type="text" placeholder="Top 8 / Grand Finals / etc.">
+      </label>
+  </div>
+  <div class="toolbar">
+      <button class="btn corner-halftone-btn" title="Ctrl + s for shortcut" onclick="updateScoreboard('Scoreboard updated!')"><span class="bi--save-fill"></span> Save Scoreboard</button>
+      <button class="btn corner-halftone-btn" title="Ctrl + r for shortcut" onclick="resetScoreboard()"><span class="ic--outline-reset-tv"></span> Reset </button>
+
+  </div>
+
+        <div class="playerflex">
+          <!-- Player 1 -->
+            <div class="player-block" id="p1block">
+              <label>Name: <input id="p1" type="text" placeholder="Player 1"></label>
+              <label>Team: <input id="t1" type="text" placeholder="Team 1"></label>
+              <label>Controller:
+                <select id="c1">
+                  <option value="">None</option>
+                  <option value="arcade">Arcade Stick</option>
+                  <option value="leverless">Leverless</option>
+                  <option value="gamepad">Gamepad</option>
+                  <option value="arcade_white">Arcade Stick White</option>
+                  <option value="leverless_white">Leverless White</option>
+                  <option value="gamepad_white">Gamepad White</option>
+                </select>
+              </label>
+              <label>Score: <input id="s1" type="number" value="0"></label>
+            </div>
+        
+            <!-- Player 2 -->
+            <div class="player-block" id="p2block">
+              <label>Name: <input id="p2" type="text" placeholder="Player 2"></label>
+              <label>Team: <input id="t2" type="text" placeholder="Team 2"></label>
+              <label>Controller:
+                <select id="c2">
+                  <option value="">None</option>
+                  <option value="arcade">Arcade Stick</option>
+                  <option value="leverless">Leverless</option>
+                  <option value="gamepad">Gamepad</option>
+                  <option value="arcade_white">Arcade Stick White</option>
+                  <option value="leverless_white">Leverless White</option>
+                  <option value="gamepad_white">Gamepad White</option>
+                </select>
+              </label>
+              <label>Score: <input id="s2" type="number" value="0"></label>
+            </div>
+        
+            <!-- Player 3 (2XKO only) -->
+            <div class="player-block" id="p3block" style="display:none;">
+              <div class="checkbox-wrapper">
+                <input type="checkbox" id="v3" class="toggle toggle-green">
+                <label for="v3" data-tg-on="ON" data-tg-off="OFF"> Toggle Player 3 </label>
+              </div>
+
+              <div class="inputfield">
+                <label>Name: <input id="p3" type="text" placeholder="Player 3"></label>
+                <label>Team: <input id="t3" type="text" placeholder="Team 3"></label>
+                <label>Controller:
+                  <select id="c3">
+                    <option value="">None</option>
+                    <option value="arcade">Arcade Stick</option>
+                    <option value="leverless">Leverless</option>
+                    <option value="gamepad">Gamepad</option>
+                    <option value="arcade_white">Arcade Stick White</option>
+                    <option value="leverless_white">Leverless White</option>
+                    <option value="gamepad_white">Gamepad White</option>
+                  </select>
+                </label>
+                <label>Score: <input id="s3" type="number" value="0"></label>
+              </div>
+            </div>
+
+            <!-- Player 4 (2XKO only) -->
+            <div class="player-block" id="p4block" style="display:none;">
+              <div class="checkbox-wrapper">
+                <input type="checkbox" id="v4" class="toggle toggle-yellow">
+                <label for="v4" data-tg-on="ON" data-tg-off="OFF"> Toggle Player 4 </label>
+              </div>
+
+              <div class="inputfield">
+                <label>Name: <input id="p4" type="text" placeholder="Player 4"></label>
+                <label>Team: <input id="t4" type="text" placeholder="Team 4"></label>
+                <label>Controller:
+                  <select id="c4">
+                    <option value="">None</option>
+                    <option value="arcade">Arcade Stick</option>
+                    <option value="leverless">Leverless</option>
+                    <option value="gamepad">Gamepad</option>
+                    <option value="arcade_white">Arcade Stick White</option>
+                    <option value="leverless_white">Leverless White</option>
+                    <option value="gamepad_white">Gamepad White</option>
+                  </select>
+                </label>
+                <label>Score: <input id="s4" type="number" value="0"></label>
+              </div>
+            </div>
+
+        </div>
+  <script>
+  // ===== Stream Mode Scoreboard =====
+
+  async function loadStreamScoreboard() {
+    try {
+      const resp = await fetch("scoreboard.json?_=" + Date.now());
+      if (!resp.ok) throw new Error("no scoreboard.json");
+      const data = await resp.json();
+      
+      // Populate form
+      document.getElementById("game").value = data.game || "sf";
+      document.getElementById("style").value = data.style || "minimalist";
+      document.getElementById("titlecard").value = data.titlecard || "";
+      
+      document.getElementById("p1").value = data.player1 || "";
+      document.getElementById("t1").value = data.team1 || "";
+      document.getElementById("c1").value = data.controller1 || "";
+      document.getElementById("s1").value = data.score1 || 0;
+      
+      document.getElementById("p2").value = data.player2 || "";
+      document.getElementById("t2").value = data.team2 || "";
+      document.getElementById("c2").value = data.controller2 || "";
+      document.getElementById("s2").value = data.score2 || 0;
+      
+      document.getElementById("p3").value = data.player3 || "";
+      document.getElementById("t3").value = data.team3 || "";
+      document.getElementById("c3").value = data.controller3 || "";
+      document.getElementById("s3").value = data.score3 || 0;
+      document.getElementById("v3").checked = data.visible3 || false;
+      
+      document.getElementById("p4").value = data.player4 || "";
+      document.getElementById("t4").value = data.team4 || "";
+      document.getElementById("c4").value = data.controller4 || "";
+      document.getElementById("s4").value = data.score4 || 0;
+      document.getElementById("v4").checked = data.visible4 || false;
+
+      // Update dropdown visual
+      updateDropdownVisual(data.game || "sf");
+      toggleGameMode();
+    } catch (err) {
+      console.warn("loadStreamScoreboard failed:", err);
+    }
+  }
+
+  function updateDropdownVisual(gameValue) {
+  
+    
+    const gameNames = {
+      'sf': 'Street Fighter',
+      'dbfz': 'Dragon Ball FighterZ',
+      'tekken': 'Tekken',
+      '2xko': '2XKO'
+    };
+
+  
+    document.getElementById("selectedGameName").textContent = gameNames[gameValue] || gameNames['sf'];
+  
+  }
+
+  function toggleGameMode() {
+    const game = document.getElementById("game").value;
+    const p3 = document.getElementById("p3block");
+    const p4 = document.getElementById("p4block");
+
+    if (p3) p3.style.display = (game === "2xko") ? "block" : "none";
+    if (p4) p4.style.display = (game === "2xko") ? "block" : "none";
+  }
+
+  async function updateScoreboard(msg = "Scoreboard updated!") {
+    const data = {
+      game: document.getElementById("game").value,
+      style: document.getElementById("style").value,
+      titlecard: document.getElementById("titlecard").value,
+      player1: document.getElementById("p1").value,
+      team1: document.getElementById("t1").value,
+      controller1: document.getElementById("c1").value,
+      score1: parseInt(document.getElementById("s1").value || 0, 10),
+      player2: document.getElementById("p2").value,
+      team2: document.getElementById("t2").value,
+      controller2: document.getElementById("c2").value,
+      score2: parseInt(document.getElementById("s2").value || 0, 10),
+      player3: document.getElementById("p3")?.value || "",
+      team3: document.getElementById("t3")?.value || "",
+      controller3: document.getElementById("c3")?.value || "",
+      score3: parseInt(document.getElementById("s3")?.value || 0, 10),
+      visible3: document.getElementById("v3")?.checked ?? false,
+      player4: document.getElementById("p4")?.value || "",
+      team4: document.getElementById("t4")?.value || "",
+      controller4: document.getElementById("c4")?.value || "",
+      score4: parseInt(document.getElementById("s4")?.value || 0, 10),
+      visible4: document.getElementById("v4")?.checked ?? false
+    };
+
+    try {
+      // Try Wails bridge first (if in main window)
+      if (window.go?.main?.App?.SaveScoreboardJSON) {
+        await window.go.main.App.SaveScoreboardJSON(data);
+        await window.go.main.App.SavePlayersCSV([
+          { name: data.player1, team: data.team1 },
+          { name: data.player2, team: data.team2 },
+          { name: data.player3, team: data.team3 },
+          { name: data.player4, team: data.team4 },
+        ].filter(p => p.name));
+      } else {
+        // Fallback: POST to backend HTTP server
+        const resp = await fetch("http://localhost:34115/api/save-scoreboard", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        if (!resp.ok) throw new Error("HTTP save failed");
+      }
+
+      showStreamNotif(msg);
+    } catch (err) {
+      console.error("Save failed:", err);
+      showStreamNotif("Failed to save: " + err.message, "red");
+    }
+  }
+
+  function resetScoreboard() {
+    const selectors = ['#p1', '#t1', '#s1', '#c1', '#p2', '#t2', '#s2',
+      '#c2', '#p3', '#t3', '#s3', '#c3', '#p4', '#t4', '#s4', '#c4', '#titlecard'];
+    selectors.forEach(sel => {
+      const el = document.querySelector(sel);
+      if (el) el.value = (el.type === 'number') ? 0 : '';
+    });
+
+    const v3 = document.getElementById("v3"),
+      v4 = document.getElementById("v4");
+    if (v3) v3.checked = false;
+    if (v4) v4.checked = false;
+
+    updateScoreboard("Scoreboard reset!");
+  }
+
+  function showStreamNotif(msg, color = "green") {
+    const notif = document.createElement("div");
+    notif.textContent = msg;
+    notif.style.cssText = `
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: ${color === "red" ? "#fee" : "#efe"};
+      color: ${color === "red" ? "#900" : "#060"};
+      padding: 10px 14px;
+      border: 1px solid ${color === "red" ? "#fcc" : "#cfc"};
+      border-radius: 6px;
+      z-index: 9999;
+      font-weight: 600;
+    `;
+    document.body.appendChild(notif);
+    setTimeout(() => notif.remove(), 2500);
+  }
+
+  // Auto-save on any input change
+  document.addEventListener("DOMContentLoaded", () => {
+    loadStreamScoreboard();
+
+    // Setup custom dropdown
+    const dropdown = document.getElementById("gameDropdown");
+    const selected = dropdown.querySelector(".selected");
+    const options = dropdown.querySelector(".options");
+    const hiddenInput = document.getElementById("game");
+
+    selected.addEventListener("click", () => {
+      const isOpen = options.classList.contains("active");
+      options.classList.toggle("active", !isOpen);
+    });
+
+    options.querySelectorAll("div").forEach(opt => {
+      opt.addEventListener("click", () => {
+        const val = opt.getAttribute("data-value");
+        const icon = opt.getAttribute("data-icon");
+        const text = opt.textContent.trim();
+
+        hiddenInput.value = val;
+        updateDropdownVisual(val);
+        options.classList.remove("active");
+        
+        toggleGameMode();
+        updateScoreboard("Game switched!");
+      });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!dropdown.contains(e.target)) {
+        options.classList.remove("active");
+      }
+    });
+
+    // Auto-save on input changes (debounced)
+    let autoSaveTimer;
+    const inputs = document.querySelectorAll(".player-block input, .player-block select, #titlecard, #style");
+    inputs.forEach(inp => {
+      inp.addEventListener("input", () => {
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(() => {
+          updateScoreboard("Auto-saved");
+        }, 500);
+      });
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener("keydown", (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        updateScoreboard("Saved!");
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r") {
+        e.preventDefault();
+        if (confirm("Reset scoreboard?")) resetScoreboard();
+      }
+    });
+  });
+  </script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap');
+
+:root {
+  --bg: #fafafa;
+  --text: #111;
+  --border: #111;
+  --accent: #00fff0;
+  --panel: #fff;
+}
+
+[data-theme='dark'] {
+  --bg: #0f0f0f;
+  --text: #eee;
+  --border: #333;
+  --panel: #1a1a1a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: 0.3px;
+  font-size: 10px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+main {
+  max-width: 100%;
+  padding: 6px;
+}
+
+/* Compact Toolbar */
+.toolbar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+/* Buttons */
+.btn {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font-weight: 700;
+  padding: 4px 8px;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 1px 1px 0 var(--border);
+  transition: all 0.2s ease;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0 var(--border);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* Inputs */
+input, select, textarea {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  padding: 3px 4px;
+  font-family: inherit;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 9px;
+  width: 100%;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+/* Labels & Blocks */
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  font-size: 8px;
+}
+
+.player-block {
+  border: 1px solid var(--border);
+  padding: 6px;
+  background: var(--panel);
+  box-shadow: 1px 1px 0 var(--border);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  flex-direction: column;
+  gap: 4px;
+}
+
+.player-block#p1block {
+  background: #c9f3ff;
+  border-color: #94c4eb;
+}
+
+.player-block#p2block {
+  background: #fbf2f2;
+  border-color: #991b1b;
+}
+
+.player-block#p3block {
+  background: #3ae6ac;
+  border-color: #0b5f12;
+}
+
+.player-block#p4block {
+  background: #d4df76;
+  border-color: #5b7a05;
+}
+
+[data-theme='dark'] .player-block#p2block {
+  background: #2a1a1a;
+  border-color: #cc3333;
+}
+
+/* Compact Settings */
+.settings {
+  border: 1px solid var(--border);
+  padding: 4px;
+  background: var(--panel);
+  box-shadow: 1px 1px 0 var(--border);
+  margin-bottom: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 4px;
+  align-items: center;
+}
+
+.settings label {
+  margin-bottom: 0;
+  font-size: 8px;
+}
+
+/* Compact Player Grid */
+.playerflex {
+  display: flex;
+  flex-direction: column;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  margin-bottom: 0;
+}
+
+.inputfield {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+
+/* Custom Select - Compact */
+.custom-select {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  box-shadow: 1px 1px 0 var(--border);
+  position: relative;
+}
+
+.custom-select .selected {
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 9px;
+}
+
+.custom-select .selected img {
+  max-width: 16px;
+  max-height: 16px;
+}
+
+.custom-select .options {
+  display: none;
+  border-top: 1px solid var(--border);
+  background: var(--panel);
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.custom-select .options.active {
+  display: block;
+}
+
+.custom-select .options div {
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.2s;
+  font-size: 8px;
+}
+
+.custom-select .options div:hover {
+  background: var(--accent);
+  color: #000;
+}
+
+.custom-select .options div img {
+  max-width: 14px;
+  max-height: 14px;
+}
+
+/* Toggle compact */
+.checkbox-wrapper {
+  margin-bottom: 4px;
+}
+
+.toggle {
+  display: none;
+}
+
+.toggle + label {
+  display: inline-block;
+  width: 3em;
+  height: 1.5em;
+  background: #ebebeb;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1.5em;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+  transform: skew(-10deg);
+  position: relative;
+  overflow: hidden;
+  font-size: 8px;
+}
+
+.toggle + label span {
+  display: block;
+  transform: skew(10deg);
+}
+
+#v3:checked + label {
+  background: #86d993;
+}
+
+#v4:checked + label {
+  background: #ffd986;
+}
+
+.toggle + label:before,
+.toggle + label:after {
+  content: attr(data-tg-off);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform: skew(10deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 7px;
+}
+
+.toggle + label:after {
+  content: attr(data-tg-on);
+  left: 100%;
+}
+
+.toggle:checked + label:before {
+  left: -100%;
+}
+
+.toggle:checked + label:after {
+  left: 0;
+}
+
+/* Icons */
+.bi--save-fill,
+.ic--outline-reset-tv {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+}
+
+.bi--save-fill {
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M8.5 1.5A1.5 1.5 0 0 1 10 0h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h6c-.314.418-.5.937-.5 1.5v7.793L4.854 6.646a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l3.5-3.5a.5.5 0 0 0-.708-.708L8.5 9.293z'/%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  transform: rotate(180deg);
+}
+
+.ic--outline-reset-tv {
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M22 8V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4v2h8v-2h4c1.1 0 1.99-.9 1.99-2v-5H22c0-1.1-.9-2-2-2h-7.17l1.83-1.83l-1.41-1.41C9.69 10.31 10.88 9.12 9 11l4.24 4.24l1.41-1.41L12.83 12H20v5H4V5h16v3z'/%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--panel);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+</style>

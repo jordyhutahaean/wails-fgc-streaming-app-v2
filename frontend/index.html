@@ -1260,6 +1260,11 @@
               <p> localhost:34115/scoreboard.html </p>
             </div>
           </div>
+
+          <button class="corner-halftone-btn" id="toggleStreamBtn" onclick="openStreamMode()">
+             Stream Mode
+          </button>
+
         </div>
         <div class="settings">
           <input type="hidden" id="game" value="sf">
@@ -3447,4 +3452,10 @@ function setupAutocomplete() {
 
 document.addEventListener("DOMContentLoaded", loadPlayersCSV);
 
+</script>
+<script>
+  function openStreamMode() {
+  window.open("http://localhost:34115/miniscoreboard.html", "StreamMode",
+              "width=620,height=260,resizable=yes");
+}
 </script>

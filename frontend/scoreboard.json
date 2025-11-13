@@ -1,8 +1,8 @@
 {
   "game": "sf",
-  "style": "arcade",
+  "style": "minimalist",
   "titlecard": "",
-  "player1": "",
+  "player1": "aaa",
   "team1": "",
   "controller1": "",
   "score1": 0,
