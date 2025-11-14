@@ -23,10 +23,15 @@
   },
 
   "mac": {
-    "package": {
-      "dmg": {
-        "enabled": true
-      }
-    }
+  "package": {
+    "dmg": {
+      "enabled": true
+    },
+    "resources": [
+      "frontend",
+      "sponsors"
+    ]
   }
+}
+
 }
