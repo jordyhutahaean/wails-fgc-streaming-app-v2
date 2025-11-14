@@ -1,4 +1,4 @@
-name: Build macOS App
+name: Build macOS App (DMG)
 
 on:
   push:
@@ -26,8 +26,7 @@ jobs:
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
-      # --- Optional frontend build section ---
-      - name: Setup Node (for frontend build)
+      - name: Setup Node (optional frontend build)
         uses: actions/setup-node@v4
         with:
           node-version: '18'
@@ -46,13 +45,41 @@ jobs:
             cd frontend
             npm run build --if-present
           fi
-      # --- End frontend section ---
 
-      - name: Build macOS app
+      - name: Build macOS app (universal)
         run: wails build -platform darwin/universal
 
-      - name: Upload build artifact
+      - name: Find .app and create DMG
+        working-directory: build/bin
+        run: |
+          set -e
+          # find first .app produced by Wails
+          APP=$(ls -1 *.app 2>/dev/null | head -n1 || true)
+          if [ -z "$APP" ]; then
+            echo "::error::No .app found in build/bin. Listing build/bin contents:"
+            ls -la
+            exit 1
+          fi
+          APP_BASENAME="${APP%.app}"
+          DMG_NAME="${APP_BASENAME}.dmg"
+          echo "Packaging $APP -> $DMG_NAME"
+          # Create a temporary staging dir for a nicer DMG layout
+          STAGEDIR="$(mktemp -d)"
+          mkdir -p "$STAGEDIR/Applications"
+          # copy app (preserve resource forks)
+          rsync -a --delete "$APP" "$STAGEDIR/"
+          # create dmg (compressed, read-only)
+          hdiutil create -srcfolder "$STAGEDIR" -volname "$APP_BASENAME" -fs HFS+ -format UDZO "$DMG_NAME"
+          # move dmg up to build/bin root (already here), ensure file exists
+          if [ ! -f "$DMG_NAME" ]; then
+            echo "::error::DMG creation failed"
+            exit 1
+          fi
+          # cleanup
+          rm -rf "$STAGEDIR"
+
+      - name: Upload DMG artifact
         uses: actions/upload-artifact@v4
         with:
-          name: macos-build
-          path: build/bin/
+          name: macos-dmg
+          path: build/bin/*.dmg
