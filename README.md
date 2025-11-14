@@ -1,7 +1,7 @@
 # README
 
 ## DL Link
-https://drive.google.com/file/d/1xmd8-QkhpCS2xlDZHLAGB4NjtJ7Wtm1L/view?usp=drive_link
+https://drive.google.com/drive/folders/1fg2BLdyyFPhFgZ8oYdBHFWeM1Is8eOso?usp=sharing
 
 Fighting Game Scoreboard Control
 
