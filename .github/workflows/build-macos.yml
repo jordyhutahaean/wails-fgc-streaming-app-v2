@@ -1,4 +1,4 @@
-name: Build macOS App (DMG)
+name: Build macOS App (ZIP)
 
 on:
   push:
@@ -26,11 +26,10 @@ jobs:
           go install github.com/wailsapp/wails/v2/cmd/wails@latest
           echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
 
-      - name: Setup Node (optional frontend build)
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '18'
- 
 
       - name: Install frontend dependencies (if present)
         run: |
@@ -50,63 +49,33 @@ jobs:
         run: wails build -platform darwin/universal
 
       # ---------------------------------------------------------
-      # FIXED SECTION: Find .app anywhere inside build/bin
+      # ZIP the .app bundle
       # ---------------------------------------------------------
-      - name: Find .app and create DMG with dependencies
+      - name: Find .app and zip it
         run: |
           set -e
-          
-          echo "Searching for .app bundle under build/bin..."
+
+          echo "Searching for .app bundle..."
           APP=$(find build/bin -maxdepth 3 -name "*.app" | head -n 1)
 
           if [ -z "$APP" ]; then
-            echo "::error::No .app found under build/bin"
-            echo "Listing build/bin contents:"
+            echo "::error::No .app found in build/bin"
             ls -R build/bin
             exit 1
           fi
 
           echo "Found app: $APP"
+          
+          ZIP_NAME="$(basename "$APP" .app).zip"
+          echo "Creating ZIP: $ZIP_NAME"
 
-          APP_BASENAME=$(basename "$APP" .app)
-          DMG_NAME="${APP_BASENAME}.dmg"
+          cd build/bin
+          zip -r "$ZIP_NAME" "$(basename "$APP")"
 
-          echo "Packaging $APP into $DMG_NAME with frontend/ and sponsors/"
+          echo "ZIP created at build/bin/$ZIP_NAME"
 
-          STAGEDIR="$(mktemp -d)"
-
-          # Copy .app into staging directory
-          rsync -a "$APP" "$STAGEDIR/"
-
-          # Copy frontend/ and sponsors/ folders
-          if [ -d "build/bin/frontend" ]; then
-            echo "Including frontend/ folder..."
-            rsync -a "build/bin/frontend" "$STAGEDIR/"
-          fi
-
-          if [ -d "build/bin/sponsors" ]; then
-            echo "Including sponsors/ folder..."
-            rsync -a "build/bin/sponsors" "$STAGEDIR/"
-          fi
-
-          # Create DMG with all contents
-          hdiutil create \
-            -srcfolder "$STAGEDIR" \
-            -volname "$APP_BASENAME" \
-            -fs HFS+ \
-            -format UDZO \
-            "build/bin/$DMG_NAME"
-
-          echo "DMG created: build/bin/$DMG_NAME with:"
-          echo "  - $APP_BASENAME.app"
-          echo "  - frontend/"
-          echo "  - sponsors/"
-
-          rm -rf "$STAGEDIR"
-      # ---------------------------------------------------------
-
-      - name: Upload DMG artifact
+      - name: Upload ZIP artifact
         uses: actions/upload-artifact@v4
         with:
-          name: macos-dmg
-          path: build/bin/*.dmg
+          name: macos-zip
+          path: build/bin/*.zip
