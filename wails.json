@@ -16,6 +16,14 @@
   "author": {
     "name": "giogio555",
     "email": "jordyhutahaean555@gmail.com"
+  },
+
+   "mac": {
+    "package": {
+      "dmg": {
+        "enabled": true
+      }
+    }
   }
   
 }
