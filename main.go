@@ -15,6 +15,25 @@ import (
 //go:embed frontend/*
 var assets embed.FS
 
+// ------------------------------------------------------------
+// FIX #2 — Cross-platform resource directory resolver
+// ------------------------------------------------------------
+func resourcePath(subpath string) string {
+	exe, _ := os.Executable()
+	base := filepath.Dir(exe)
+
+	// macOS .app bundle: binary is in Contents/MacOS
+	macPath := filepath.Join(base, "..", "Resources", subpath)
+	if _, err := os.Stat(macPath); err == nil {
+		return macPath
+	}
+
+	// Windows/Linux
+	return filepath.Join(base, subpath)
+}
+
+// ------------------------------------------------------------
+
 func main() {
 	app := NewApp()
 
@@ -22,18 +41,14 @@ func main() {
 	go func() {
 		mux := http.NewServeMux()
 
-		// Resolve path next to binary
-		exe, _ := os.Executable()
-		base := filepath.Dir(exe)
-
-		// ✅ Serve bin/sponsors/ at /sponsors/
-		sponsorDir := filepath.Join(base, "sponsors")
+		// Serve sponsors folder
+		sponsorDir := resourcePath("sponsors")
 		mux.Handle("/sponsors/", http.StripPrefix("/sponsors/",
 			http.FileServer(http.Dir(sponsorDir)),
 		))
 
-		// --- Serve frontend folder ---
-		overlayDir := filepath.Join(base, "frontend")
+		// Serve frontend assets
+		overlayDir := resourcePath("frontend")
 		os.MkdirAll(overlayDir, 0755)
 		fs := http.FileServer(http.Dir(overlayDir))
 		mux.Handle("/", fs)
@@ -51,9 +66,7 @@ func main() {
 				return
 			}
 
-			exe, _ := os.Executable()
-			base := filepath.Dir(exe)
-			jsonPath := filepath.Join(base, "frontend", "scoreboard.json")
+			jsonPath := filepath.Join(resourcePath("frontend"), "scoreboard.json")
 
 			out, _ := json.MarshalIndent(data, "", "  ")
 			if err := os.WriteFile(jsonPath, out, 0644); err != nil {
@@ -65,9 +78,7 @@ func main() {
 			json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 		})
 
-		// --- Multi-port startup ---
 		ports := []string{":34115", ":34116", ":34117"}
-
 		for _, p := range ports {
 			go func(port string) {
 				println("🔌 Starting overlay server on port", port, "...")
@@ -102,24 +113,17 @@ func main() {
 func startOverlayServer() {
 	mux := http.NewServeMux()
 
-	// Resolve path next to binary
-	exe, _ := os.Executable()
-	base := filepath.Dir(exe)
-
-	// ✅ Serve bin/sponsors/ at /sponsors/
-	sponsorDir := filepath.Join(base, "sponsors")
+	sponsorDir := resourcePath("sponsors")
 	mux.Handle("/sponsors/", http.StripPrefix("/sponsors/",
 		http.FileServer(http.Dir(sponsorDir)),
 	))
 
-	// --- Serve frontend folder ---
-	overlayDir := filepath.Join(base, "frontend")
+	overlayDir := resourcePath("frontend")
 	os.MkdirAll(overlayDir, 0755)
 	fs := http.FileServer(http.Dir(overlayDir))
 	mux.Handle("/", fs)
 	mux.Handle("/frontend/", http.StripPrefix("/frontend/", fs))
 
-	// ✅ Add this endpoint for Stream Mode saves
 	mux.HandleFunc("/api/save-scoreboard", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -132,8 +136,7 @@ func startOverlayServer() {
 			return
 		}
 
-		// Save to scoreboard.json (same as your Go app does)
-		jsonPath := filepath.Join(filepath.Dir(exe), "frontend", "scoreboard.json")
+		jsonPath := filepath.Join(resourcePath("frontend"), "scoreboard.json")
 
 		out, _ := json.MarshalIndent(data, "", "  ")
 		if err := os.WriteFile(jsonPath, out, 0644); err != nil {

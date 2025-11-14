@@ -1,6 +1,6 @@
 {
   "$schema": "https://wails.io/schemas/config.v2.json",
-  "name": "J's FGC Scoreboard ",
+  "name": "J's FGC Scoreboard",
   "description": "My Wails App",
   "icon": "build/appicon.png",
   "outputfilename": "J's FGC Scoreboard",
@@ -13,9 +13,16 @@
       "serverUrl": "auto"
     }
   },
+  "platform": {
+    "windows": {
+      "ldflags": "-H=windowsgui"
+    },
+    "darwin": {
+      "ldflags": ""
+    }
+  },
   "author": {
     "name": "giogio555",
     "email": "jordyhutahaean555@gmail.com"
   }
-  
 }
