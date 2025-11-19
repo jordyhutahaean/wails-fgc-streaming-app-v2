@@ -392,6 +392,10 @@ body {
   transform: translateX(52%);
 }
 
+.minimalist #p2-card .player-info{
+  right: 10px;
+}
+
 .minimalist #p2-card .score {
   top: -62px;
   padding: 24px;
@@ -496,6 +500,9 @@ body {
  
 }
 
+.arcade #p2-card .player-info{
+  right: 10px;
+}
 .arcade #p1-card .score {
   background-image: url("./img/tokon/1x/score_left.png");
 }
@@ -639,6 +646,10 @@ body {
  
 }
 
+.futuristic #p2-card .player-info{
+  right: 10px;
+}
+
 .futuristic #p1-card .score {
   background-image: url("./img/halftones/1x/sc_left.png");
 }
@@ -764,6 +775,9 @@ body {
   height: 150px;
 }
 
+.white_outline #p2-card .player-info{
+  right: 10px;
+}
 /* SF */
 .white_outline.sf #p1-card .score {
   transform:translateX(390px) translateY(4px) scale(1.2) ;

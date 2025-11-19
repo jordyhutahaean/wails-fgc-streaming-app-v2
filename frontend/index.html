@@ -1281,6 +1281,9 @@
               <div data-value="dbfz" data-icon="./img/game_ico/DBFZ_Logo.png">
                 <img src="./img/game_ico/DBFZ_Logo.png" alt=""> Dragon Ball FighterZ
               </div>
+              <div data-value="gbvsr" data-icon="./img/game_ico/DBFZ_Logo.png">
+                <img src="./img/game_ico/GBVSR_Logo.png" alt=""> Granblue Fantasy Versus Rising
+              </div>
               <div data-value="tekken" data-icon="./img/game_ico/Tekken_8_Logo.png">
                 <img src="./img/game_ico/Tekken_8_Logo.png" alt=""> Tekken
               </div>
@@ -1309,16 +1312,8 @@
           <div class="player-block" id="p1block">
             <label>Name: <input id="p1" type="text" placeholder="Player 1"></label>
             <label>Team: <input id="t1" type="text" placeholder="Team 1"></label>
-            <label>Controller:
-              <select id="c1">
-                <option value="">None</option>
-                <option value="arcade">Arcade Stick</option>
-                <option value="leverless">Leverless</option>
-                <option value="gamepad">Gamepad</option>
-                <option value="arcade_white">Arcade Stick White</option>
-                <option value="leverless_white">Leverless White</option>
-                <option value="gamepad_white">Gamepad White</option>
-              </select>
+            <label>Nation:
+              <input id="n1" type="text" maxlength="2" placeholder="ID">
             </label>
             <label>Score: <input id="s1" type="number" value="0"></label>
           </div>
@@ -1327,16 +1322,8 @@
           <div class="player-block" id="p2block">
             <label>Name: <input id="p2" type="text" placeholder="Player 2"></label>
             <label>Team: <input id="t2" type="text" placeholder="Team 2"></label>
-            <label>Controller:
-              <select id="c2">
-                <option value="">None</option>
-                <option value="arcade">Arcade Stick</option>
-                <option value="leverless">Leverless</option>
-                <option value="gamepad">Gamepad</option>
-                <option value="arcade_white">Arcade Stick White</option>
-                <option value="leverless_white">Leverless White</option>
-                <option value="gamepad_white">Gamepad White</option>
-              </select>
+            <label>Nation:
+              <input id="n2" type="text" maxlength="2" placeholder="ID">
             </label>
             <label>Score: <input id="s2" type="number" value="0"></label>
           </div>
@@ -1350,16 +1337,8 @@
 
             <label>Name: <input id="p3" type="text" placeholder="Player 3"></label>
             <label>Team: <input id="t3" type="text" placeholder="Team 3"></label>
-            <label>Controller:
-              <select id="c3">
-                <option value="">None</option>
-                <option value="arcade">Arcade Stick</option>
-                <option value="leverless">Leverless</option>
-                <option value="gamepad">Gamepad</option>
-                <option value="arcade_white">Arcade Stick White</option>
-                <option value="leverless_white">Leverless White</option>
-                <option value="gamepad_white">Gamepad White</option>
-              </select>
+            <label>Nation:
+              <input id="n3" type="text" maxlength="2" placeholder="ID">
             </label>
             <label>Score: <input id="s3" type="number" value="0"></label>
           </div>
@@ -1373,16 +1352,8 @@
 
             <label>Name: <input id="p4" type="text" placeholder="Player 4"></label>
             <label>Team: <input id="t4" type="text" placeholder="Team 4"></label>
-            <label>Controller:
-              <select id="c4">
-                <option value="">None</option>
-                <option value="arcade">Arcade Stick</option>
-                <option value="leverless">Leverless</option>
-                <option value="gamepad">Gamepad</option>
-                <option value="arcade_white">Arcade Stick White</option>
-                <option value="leverless_white">Leverless White</option>
-                <option value="gamepad_white">Gamepad White</option>
-              </select>
+            <label>Nation:
+              <input id="n4" type="text" maxlength="2" placeholder="ID">
             </label>
             <label>Score: <input id="s4" type="number" value="0"></label>
           </div>
@@ -1567,20 +1538,20 @@ async function updateScoreboard(msg = "Scoreboard updated!") {
     titlecard: document.getElementById("titlecard").value,
     player1: document.getElementById("p1").value,
     team1: document.getElementById("t1").value,
-    controller1: document.getElementById("c1").value,
+    controller1: document.getElementById("n1").value.toUpperCase(),
     score1: parseInt(document.getElementById("s1").value||0,10),
     player2: document.getElementById("p2").value,
     team2: document.getElementById("t2").value,
-    controller2: document.getElementById("c2").value,
+    controller2: document.getElementById("n2").value.toUpperCase(),
     score2: parseInt(document.getElementById("s2").value||0,10),
     player3: document.getElementById("p3")?.value||"",
     team3: document.getElementById("t3")?.value||"",
-    controller3: document.getElementById("c3")?.value||"",
+    controller3: document.getElementById("n3")?.value.toUpperCase()||"",
     score3: parseInt(document.getElementById("s3")?.value||0,10),
     visible3: document.getElementById("v3")?.checked??false,
     player4: document.getElementById("p4")?.value||"",
     team4: document.getElementById("t4")?.value||"",
-    controller4: document.getElementById("c4")?.value||"",
+    controller4: document.getElementById("n4")?.value.toUpperCase()||"",
     score4: parseInt(document.getElementById("s4")?.value||0,10),
     visible4: document.getElementById("v4")?.checked??false
   };
@@ -1615,8 +1586,8 @@ async function updateScoreboard(msg = "Scoreboard updated!") {
 
 function resetScoreboard(){
   // limit reset to scoreboard form inputs only (avoid wiping bracket seeds by accident)
-  const selectors = ['#p1','#t1','#s1','#c1','#p2','#t2','#s2',
-  '#c2','#p3','#t3','#s3','#c3','#p4','#t4','#s4','#c4','#titlecard'];
+  const selectors = ['#p1','#t1','#s1','#n1','#p2','#t2','#s2',
+  '#n2','#p3','#t3','#s3','#n3','#p4','#t4','#s4','#n4','#titlecard'];
   selectors.forEach(sel=>{ 
     const el = document.querySelector(sel); 
     if(el) el.value = (el.type==='number')?0:''; 

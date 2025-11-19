@@ -56,29 +56,29 @@ type Scoreboard struct {
 	Style     string `json:"style"`
 	Titlecard string `json:"titlecard"`
 
-	Player1     string `json:"player1"`
-	Team1       string `json:"team1"`
-	Controller1 string `json:"controller1"`
-	Score1      int    `json:"score1"`
-	Visible1    bool   `json:"visible1"`
+	Player1  string `json:"player1"`
+	Team1    string `json:"team1"`
+	Nation1  string `json:"nation1"`
+	Score1   int    `json:"score1"`
+	Visible1 bool   `json:"visible1"`
 
-	Player2     string `json:"player2"`
-	Team2       string `json:"team2"`
-	Controller2 string `json:"controller2"`
-	Score2      int    `json:"score2"`
-	Visible2    bool   `json:"visible2"`
+	Player2  string `json:"player2"`
+	Team2    string `json:"team2"`
+	Nation2  string `json:"nation2"`
+	Score2   int    `json:"score2"`
+	Visible2 bool   `json:"visible2"`
 
-	Player3     string `json:"player3"`
-	Team3       string `json:"team3"`
-	Controller3 string `json:"controller3"`
-	Score3      int    `json:"score3"`
-	Visible3    bool   `json:"visible3"`
+	Player3  string `json:"player3"`
+	Team3    string `json:"team3"`
+	Nation3  string `json:"nation3"`
+	Score3   int    `json:"score3"`
+	Visible3 bool   `json:"visible3"`
 
-	Player4     string `json:"player4"`
-	Team4       string `json:"team4"`
-	Controller4 string `json:"controller4"`
-	Score4      int    `json:"score4"`
-	Visible4    bool   `json:"visible4"`
+	Player4  string `json:"player4"`
+	Team4    string `json:"team4"`
+	Nation4  string `json:"nation4"`
+	Score4   int    `json:"score4"`
+	Visible4 bool   `json:"visible4"`
 }
 
 func (a *App) GetScoreboard() Scoreboard {
