@@ -18,6 +18,7 @@
         <div class="team"> </div>
       </div>
       <div class="nation-container" id="n1">
+        <span class="nation"></span>
       </div>
     </div>
   </div>
@@ -30,6 +31,7 @@
         <div class="team"> </div>
       </div>
       <div class="nation-container" id="n2"> 
+        <span class="nation"></span>
       </div>
     </div>
   </div>
@@ -42,6 +44,7 @@
         <div class="team"> </div>
       </div>
       <div class="nation-container" id="n3"> 
+        <span class="nation"></span>
       </div>
     </div>
   </div>
@@ -54,6 +57,7 @@
         <div class="team"> </div>
       </div>
       <div class="nation-container" id="n4"> 
+        <span class="nation"></span>
       </div>
     </div>
   </div>
@@ -78,10 +82,10 @@ async function loadScoreboard() {
     if (!resp.ok) throw new Error("Failed to fetch scoreboard.json");
     const data = await resp.json();
 
-    const gameClassMap = { sf: "sf", dbfz: "dbfz", tekken: "tekken", "2xko": "_2XKO" };
+    const gameClassMap = { sf: "sf", dbfz: "dbfz", tekken: "tekken", "2xko": "_2XKO",   gbvsr: "gbvsr",  };
 
     // reset all classes
-    document.body.classList.remove("sf","dbfz","tekken","_2XKO","minimalist","arcade","futuristic","white_outline");
+    document.body.classList.remove("sf","dbfz","tekken","_2XKO","gbvsr","minimalist","arcade","futuristic","white_outline");
 
     // apply game + style
     if (gameClassMap[data.game]) document.body.classList.add(gameClassMap[data.game]);
@@ -93,24 +97,36 @@ async function loadScoreboard() {
 
     // players
     ["p1","p2","p3","p4"].forEach((p,i) => {
-      const card = document.getElementById(`p${i+1}-card`);
-      const visible = (i<2) ? true : !!data[`visible${i+1}`];
+      const idx = i + 1;
+      const card = document.getElementById(`p${idx}-card`);
+      if (!card) return;
+
+      const visible = (i < 2) ? true : !!data[`visible${idx}`];
       card.style.display = visible ? "flex" : "none";
 
-      card.querySelector(".name").textContent = data[`player${i+1}`] || `Player ${i+1}`;
-      card.querySelector(".team").textContent = data[`team${i+1}`] || "";
-      card.querySelector(".score").textContent = data[`score${i+1}`] || 0;
+      const nameEl = card.querySelector(".name");
+      const teamEl = card.querySelector(".team");
+      const scoreEl = card.querySelector(".score");
+      const nationEl = card.querySelector(".nation-container") || document.getElementById(`n${idx}`);
 
-      // controller image logic
-      const controllerType = data[`controller${i+1}`]; // e.g. "leverless"
+      if (nameEl) nameEl.textContent = data[`player${idx}`] || `Player ${idx}`;
+      if (teamEl) teamEl.textContent = data[`team${idx}`] || "";
+      if (scoreEl) scoreEl.textContent = (data[`score${idx}`] ?? 0);
+
+      // set nation / country id (from scoreboard JSON field controller1..4)
+      if (nationEl) nationEl.textContent = (data[`nation${idx}`] || "").toUpperCase();
+
+      // safe controller image block (only if element exists)
       const containerEl = card.querySelector(".controller-container");
-      const controllerEl = containerEl.querySelector(".controller");
-
-      if (controllerType && controllerType !== "none") {
-        containerEl.style.display = "block";
-        controllerEl.src = `img/controller/1x/${controllerType}.png`;
-      } else {
-        containerEl.style.display = "none";
+      if (containerEl) {
+        const controllerEl = containerEl.querySelector(".controller");
+        const controllerType = data[`nation${idx}`];
+        if (controllerType && controllerType !== "none" && controllerEl) {
+          containerEl.style.display = "block";
+          controllerEl.src = `img/controller/1x/${controllerType}.png`;
+        } else {
+          containerEl.style.display = "none";
+        }
       }
     });
 
@@ -159,7 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
     images[current].style.opacity = '1';
   }, 10000); // 10 seconds
 });
-
   setInterval(loadScoreboard, 1000);
   loadScoreboard();
 </script>
