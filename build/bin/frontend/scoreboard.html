@@ -85,7 +85,7 @@ async function loadScoreboard() {
     const gameClassMap = { sf: "sf", dbfz: "dbfz", tekken: "tekken", "2xko": "_2XKO" };
 
     // reset all classes
-    document.body.classList.remove("sf","dbfz","tekken","_2XKO","minimalist","arcade","futuristic");
+    document.body.classList.remove("sf","dbfz","tekken","_2XKO","minimalist","arcade","futuristic","white_outline");
 
     // apply game + style
     if (gameClassMap[data.game]) document.body.classList.add(gameClassMap[data.game]);

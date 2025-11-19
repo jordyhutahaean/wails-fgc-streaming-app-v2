@@ -716,3 +716,47 @@ body {
 .futuristic._2XKO.has-right-duo #p4-card .player-info{
    transform: scale(.7) translateY(-320%) translateX(-10%);
 }
+
+/* White Outline */
+
+.white_outline .name, .white_outline .score{
+  font-family: Segoe UI;
+  color: white;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+.white_outline #titlecard{
+  position: absolute; 
+  
+  padding-top: 16px;
+ 
+  background-image: url("./img/white_out/title.png");
+  font-size: 24px;
+  top: -10px;
+  left: 50%;
+
+  transform:translateX(-50%) ;
+  width: 300px;
+  height: 150px;
+ 
+}
+
+.white_outline #p1-card .score {
+  background-image: url("./img/white_out/p1_score.png");
+}
+.white_outline #p1-card .player-info {
+  background-image: url("./img/white_out/p1_bar.png");
+ 
+}
+.white_outline #p2-card .score {
+  background-image: url("./img/white_out/p2_score.png");
+}
+.white_outline #p2-card .player-info {
+  background-image: url("./img/white_out/p2_bar.png");
+}
+.white_outline #p3-card .player-info {
+  background-image: url("./img/white_out/p1_bar.png");
+}
+.white_outline #p4-card .player-info {
+  background-image: url("./img/white_out/p2_bar.png");
+}
