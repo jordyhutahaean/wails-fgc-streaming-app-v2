@@ -718,13 +718,37 @@ body {
 }
 
 /* White Outline */
-
+@font-face {
+  font-family: 'Stacks Sans';
+  src: url('./fonts/StackSans.ttf') format('truetype');
+  font-weight: 400;
+}
+ 
 .white_outline .name, .white_outline .score{
-  font-family: Segoe UI;
+  font-family: Stacks Sans;
   color: white;
   text-shadow: 2px 2px 4px #000000;
 }
 
+.white_outline .score{
+  font-size: 28px;
+}
+
+.white_outline #p1-card .name, .white_outline #p2-card .name,
+.white_outline #p3-card .name, .white_outline #p4-card .name {
+  font-size: 18px;
+}
+
+.white_outline #p2-card .player-info, .white_outline #p4-card .player-info {
+  text-align: right;
+}
+.white_outline #titlecard{
+  font-family: Stacks Sans;
+  color: white;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+ 
 .white_outline #titlecard{
   position: absolute; 
   
@@ -738,25 +762,102 @@ body {
   transform:translateX(-50%) ;
   width: 300px;
   height: 150px;
- 
 }
 
-.white_outline #p1-card .score {
-  background-image: url("./img/white_out/p1_score.png");
+/* SF */
+.white_outline.sf #p1-card .score {
+  transform:translateX(390px) translateY(4px) scale(1.2) ;
 }
-.white_outline #p1-card .player-info {
-  background-image: url("./img/white_out/p1_bar.png");
  
-}
-.white_outline #p2-card .score {
-  background-image: url("./img/white_out/p2_score.png");
-}
-.white_outline #p2-card .player-info {
-  background-image: url("./img/white_out/p2_bar.png");
-}
-.white_outline #p3-card .player-info {
+.white_outline.sf #p1-card .player-info {
   background-image: url("./img/white_out/p1_bar.png");
+  transform: scale(1.2) translateY(-6px);
 }
-.white_outline #p4-card .player-info {
+
+.white_outline.sf #p2-card .score {
+  transform:translateX(-380px) translateY(4px) scale(1.2) ;
+}
+
+.white_outline.sf #p2-card .player-info {
   background-image: url("./img/white_out/p2_bar.png");
+  transform: scale(1.2) translateY(-6px);
+}
+
+/* DBFZ */
+
+.white_outline.dbfz #p1-card .score {
+  transform:translateX(460px) translateY(-4px) scale(1.2) ;
+}
+ 
+.white_outline.dbfz #p1-card .player-info {
+  background-image: url("./img/white_out/p1_bar.png");
+  transform: scale(1.2) translateY(-11px) translateX(60px);
+}
+
+.white_outline.dbfz #p2-card .score {
+  transform:translateX(-460px) translateY(-4px) scale(1.2) ;
+}
+
+.white_outline.dbfz #p2-card .player-info {
+  background-image: url("./img/white_out/p2_bar.png");
+  transform: scale(1.2) translateY(-11px) translateX(-60px);
+}
+
+/* Tekken */
+.white_outline.tekken #p1-card .score {
+  transform:translateX(300px) translateY(12px) scale(1.2) ;
+}
+ 
+.white_outline.tekken #p1-card .player-info {
+  background-image: url("./img/white_out/p1_bar.png");
+  transform: scale(1.2) translateY(2px) translateX(-70px);
+}
+
+.white_outline.tekken #p2-card .score {
+  transform:translateX(-300px) translateY(12px) scale(1.2) ;
+}
+
+.white_outline.tekken #p2-card .player-info {
+  background-image: url("./img/white_out/p2_bar.png");
+  transform: scale(1.2) translateY(2px) translateX(70px);
+}
+
+/* 2XKO */
+.white_outline._2XKO #p3-card .player-info {
+  background-image: url("./img/white_out/p3_bar.png");
+}
+
+.white_outline._2XKO #p4-card .player-info {
+  background-image: url("./img/white_out/p4_bar.png");
+}
+
+.white_outline._2XKO #p1-card .player-info{
+  background-image: url("./img/white_out/p3_bar.png");
+  transform: scale(1) translateX(-14px) translateY(-10px);
+}
+.white_outline._2XKO.has-left-duo #p1-card .player-info{
+   transform: scale(.7) translateY(20%);
+}
+.white_outline._2XKO.has-left-duo #p3-card .player-info{
+   transform: scale(.7) translateY(-328%) translateX(10%);
+}
+.white_outline._2XKO #p1-card .score{
+  transform:translateX(26px) translateY(-4px) scale(.8) ;
+  background-image:url("./img/white_out/p1_score.png") ;
+}
+
+
+.white_outline._2XKO #p2-card .player-info{
+  transform: scale(1) translateX(2px) translateY(-10px);
+  background-image: url(./img/white_out/p4_bar.png);
+}
+.white_outline._2XKO.has-right-duo #p2-card .player-info{
+   transform: scale(.7) translateY(20%);
+}
+.white_outline._2XKO.has-right-duo #p4-card .player-info{
+   transform: scale(.7) translateY(-328%) translateX(-10%);
+}
+.white_outline._2XKO #p2-card .score{
+  transform:translateX(-26px) translateY(-4px) scale(.8) ;
+  background-image: url("img/white_out/p2_score.png");
 }
