@@ -5,7 +5,6 @@
       <label> Game
       <div class="custom-select" id="gameDropdown">
         <div class="selected">
-
           <span id="selectedGameName">Street Fighter</span>
         </div>
         <div class="options">
@@ -15,6 +14,9 @@
           <div data-value="dbfz" data-icon="./img/game_ico/DBFZ_Logo.png">
             <img src="./img/game_ico/DBFZ_Logo.png"alt=""> Dragon Ball FighterZ
           </div>
+          <div data-value="gbvsr" data-icon="./img/game_ico/GBVSR_Logo.png">
+                <img src="./img/game_ico/GBVSR_Logo.png" alt=""> Granblue Fantasy Versus Rising
+            </div>
           <div data-value="tekken" data-icon="./img/game_ico/Tekken_8_Logo.png">
             <img src="./img/game_ico/Tekken_8_Logo.png" alt=""> Tekken
           </div>
@@ -149,7 +151,8 @@
       'sf': 'Street Fighter',
       'dbfz': 'Dragon Ball FighterZ',
       'tekken': 'Tekken',
-      '2xko': '2XKO'
+      '2xko': '2XKO',
+      'gbvsr': 'Granblue Fantasy Versus Rising',
     };
 
   
@@ -234,6 +237,32 @@
     updateScoreboard("Scoreboard reset!");
   }
 
+  // Auto-clean extra players when switching game
+  document.addEventListener("DOMContentLoaded", () => {
+    const titleInput = document.getElementById("game");
+    if (titleInput) {
+      titleInput.addEventListener("change", (e) => {
+        const game = e.target.value.toLowerCase();
+
+        // If not 2XKO, reset player 3 & 4
+        if (game !== "2xko") {
+          const v3 = document.getElementById("v3"),
+                v4 = document.getElementById("v4");
+          if(v3) v3.checked = false;
+          if(v4) v4.checked = false;
+
+          // Clear values for P3 & P4
+          ["#p3","#t3","#s3","#c3","#p4","#t4","#s4","#c4"].forEach(sel => {
+            const el = document.querySelector(sel);
+            if(el) el.value = (el.type==='number') ? 0 : '';
+          });
+
+          updateScoreboard("Switched game → extra players cleared!");
+        }
+      });
+    }
+  });
+
   function showStreamNotif(msg, color = "green") {
     const notif = document.createElement("div");
     notif.textContent = msg;
@@ -269,17 +298,43 @@
     });
 
     options.querySelectorAll("div").forEach(opt => {
-      opt.addEventListener("click", () => {
-        const val = opt.getAttribute("data-value");
-        const icon = opt.getAttribute("data-icon");
-        const text = opt.textContent.trim();
+      
+    //   opt.addEventListener("click", () => {
+    //     const val = opt.getAttribute("data-value");
+    //     const icon = opt.getAttribute("data-icon");
+    //     const text = opt.textContent.trim();
 
-        hiddenInput.value = val;
-        updateDropdownVisual(val);
-        options.classList.remove("active");
+    //     hiddenInput.value = val;
+    //     updateDropdownVisual(val);
+    //     options.classList.remove("active");
         
-        toggleGameMode();
-        updateScoreboard("Game switched!");
+    //     toggleGameMode();
+    //     updateScoreboard("Game switched!");
+    //   });
+
+      opt.addEventListener("click", () => {
+          const val = opt.getAttribute("data-value");
+          hiddenInput.value = val;
+          updateDropdownVisual(val);
+
+          // AUTO-CLEAN EXTRA PLAYERS
+          if (val !== "2xko") {
+              const v3 = document.getElementById("v3"),
+                    v4 = document.getElementById("v4");
+              if(v3) v3.checked = false;
+              if(v4) v4.checked = false;
+
+              ["#p3","#t3","#s3","#p4","#t4","#s4"].forEach(sel => {
+                  const el = document.querySelector(sel);
+                  if(el) el.value = (el.type==='number') ? 0 : '';
+              });
+          }
+
+          toggleGameMode();
+          updateScoreboard("Game switched!");
+
+          // ✅ Close dropdown after selecting
+          options.classList.remove("active");
       });
     });
 

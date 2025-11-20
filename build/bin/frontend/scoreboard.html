@@ -180,6 +180,38 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <script>
+function autoFitName(element, baseSize, minSize) {
+  const parentWidth = element.parentElement.offsetWidth;
+
+  element.style.fontSize = baseSize + "px";
+
+  while (element.scrollWidth > parentWidth && baseSize > minSize) {
+    baseSize--;
+    element.style.fontSize = baseSize + "px";
+  }
+}
+
+function applyNameAutoFit() {
+  document.querySelectorAll(".name").forEach(name => {
+    const style = window.getComputedStyle(name);
+    const baseSize = parseInt(style.fontSize) || 22;
+
+    // different themes can change min font size
+    const minSize =
+      document.body.classList.contains("minimalist")
+        ? 16
+      : document.body.classList.contains("white_outline")
+        ? 14
+      : 18; // default fallback
+
+    autoFitName(name, baseSize, minSize);
+  });
+}
+
+setInterval(applyNameAutoFit, 300);
+</script>
+
+<script>
 
 async function loadSponsors() {
   try {
