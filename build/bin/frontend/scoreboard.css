@@ -1085,3 +1085,12 @@ body {
   background-image: url("./img/white_out/p2_bar.png");
   transform: scale(1.2) translateY(-4px) translateX(30px);
 }
+
+/* GranblueVersus Style */
+
+.gb_versus{
+  width: 1920px;
+  height: 1080px;
+  position: absolute;
+  font-family: Bahnscrift;
+}
