@@ -7,7 +7,8 @@
 </head>
 <body>
 
-  <div id="titlecard" class="titlecard">
+  <div class="titlecard">
+    <span id="titlecard"></span>
   </div>
 
   <div id="p1-card" class="player">
@@ -225,9 +226,44 @@ function applyNameAutoFit() {
     autoFitName(name, baseSize, minSize);
   });
 }
+
+function applyTitleAutoFit() {
+  const titleEl = document.getElementById("titlecard");
+  if (!titleEl) return;
+  // container that has the background/visual width
+  const container = titleEl.closest(".titlecard") || titleEl.parentElement;
+  if (!container) return;
+
+  // Reset to CSS default so measurement starts from known state
+  titleEl.style.whiteSpace = "normal";
+  titleEl.style.display = "inline-block";
+  titleEl.style.width = "auto";
+
+  const computed = window.getComputedStyle(titleEl);
+  let fontSize = parseFloat(computed.fontSize) || 24;
+  const minSize = 12; // do not shrink below this
+
+  // available width inside the container (account for container padding)
+  const containerPaddingX = parseFloat(window.getComputedStyle(container).paddingLeft || 0) +
+                            parseFloat(window.getComputedStyle(container).paddingRight || 0);
+  const availableWidth = Math.max(10, container.clientWidth - containerPaddingX - 4);
+
+  // shrink loop (safe guard)
+  let iterations = 0;
+  while (titleEl.scrollWidth > availableWidth && fontSize > minSize && iterations < 50) {
+    fontSize = Math.max(minSize, fontSize - 1);
+    titleEl.style.fontSize = fontSize + "px";
+    iterations++;
+  }
+
+  // if text is still wider after min size, allow wrapping (already set) and clamp overflow
+  if (titleEl.scrollWidth > availableWidth) {
+    titleEl.style.whiteSpace = "normal";
+    titleEl.style.wordBreak = "break-word";
+  }
+}
+
  
- 
-setInterval(applyNameAutoFit, 300);
 </script>
 
  

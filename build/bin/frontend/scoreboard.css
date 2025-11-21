@@ -13,14 +13,30 @@ body {
   position: relative;
 }
 
-
 #titlecard {
+  overflow: visible; /* Allow scrollWidth detection */
+  word-wrap: break-word;
+  white-space: normal; /* Allow wrapping if needed */
+  word-break: break-word;
+  overflow-wrap:break-word;
+  text-align: center;
+  line-height: 1.05;
+  width: auto;
+ 
+ 
+}
+
+.titlecard {
+ 
   position: absolute;
   background-size: contain;
+  background-position: center center;
+ 
   background-repeat: no-repeat;
   text-align: center;
-  font-weight: bold;
  
+  overflow: visible;
+  height: auto;
 }
 
 #sponsor-container {
@@ -373,25 +389,26 @@ body {
 
 .minimalist #titlecard, .minimalist .name, .minimalist .score  {
   font-family: Niramit-bold;
-    color: white;
+  color: white;
 }
 .minimalist .team{
   color: #aaa;
   font-family: Niramit-bold;
   font-size: 14px;
 }
-  .minimalist #titlecard {
+
+.minimalist #titlecard {
+  font-size: 20px;
+}
+
+.minimalist .titlecard {
   background-image: url("./img/tuko/1x/Asset\ 28.png");
   top: -10px;
-  font-size: 24px;
-  
- 
   left: 50vw;
-
   transform:translateX(-50%) ;
   width: 300px;
   height: 40px;
-  padding-top: 14px;
+  padding-top: 18px;
 }
 
 .minimalist .score{
@@ -544,30 +561,28 @@ body {
     color: rgb(0, 0, 0);
 }
 
-.arcade #titlecard{
-  font-family: Bahnscrift;
-  color: white;
-}
-
 .arcade .team{
   font-family: Bahnscrift;
   color: #7c7c7c;
   font-size: 18px;
 }
-.arcade #titlecard {
-  position: absolute; 
-  
-  padding-top: 16px;
- 
-  background-image: url("./img/tokon/1x/mid.png");
-  font-size: 24px;
-  top: -10px;
-  left: 50%;
 
-  transform:translateX(-50%) ;
-  width: 300px;
-  height: 150px;
+.arcade #titlecard{
+  font-family: Bahnscrift;
+  color: white;
+  font-size: 14px;
+  top: 50%;
  
+}
+.arcade .titlecard {
+  position: absolute; 
+  padding-top: 8px;
+  padding-bottom: 6px;
+  background-image: url("./img/tokon/1x/mid.png");
+  left: 50%;
+  transform:translateX(-50%)scale(1.4) ;
+  width: 300px;
+  height: auto;
 }
 
 .arcade .score-text{
@@ -764,29 +779,33 @@ body {
   font-family: Segoe UI;
   color: black;
 }
-.futuristic #titlecard{
-  font-family: Segoe UI;
-  color: white;
-}
 
 .futuristic .team{
   font-family: Segoe UI;
   color: #ffffff;
   font-size: 24px;
 }
+
 .futuristic #titlecard{
+  font-family: Segoe UI;
+  color: white;
+  font-size: 18px;
+
+}
+
+.futuristic .titlecard{
   position: absolute; 
  
   padding-top: 16px;
- 
+  padding-bottom: 4px;
   background-image: url("./img/halftones/1x/mid.png");
-  font-size: 34px;
-  top: -10px;
+
+  top: -12px;
   left: 50%;
 
-  transform:translateX(-50%) ;
+  transform:translateX(-50%) scale(1.2) ;
   width: 300px;
-  height: 150px;
+  height: auto;
  
 }
 
@@ -1011,25 +1030,26 @@ body {
   text-align: right;
 }
 .white_outline #titlecard{
+  font-size: 12px;
   font-family: Stacks Sans;
   color: white;
   text-shadow: 2px 2px 4px #000000;
 }
 
  
-.white_outline #titlecard{
+.white_outline .titlecard{
   position: absolute; 
   
   padding-top: 16px;
- 
+  padding-bottom: 4px;
   background-image: url("./img/white_out/title.png");
-  font-size: 24px;
+
   top: -10px;
   left: 50%;
 
-  transform:translateX(-50%) ;
+  transform:translateX(-50%)scale(1.5) ;
   width: 300px;
-  height: 150px;
+  height: auto;
 }
 
 .white_outline #p1-card .player-info .score-text {
@@ -1243,25 +1263,26 @@ body {
   text-align: right;
 }
 .gb_versus #titlecard{
+  font-size: 8px;
   font-family: CormorantG;
   color: white;
   text-shadow: 2px 2px 4px #000000;
 }
 
  
-.gb_versus #titlecard{
+.gb_versus .titlecard{
   position: absolute; 
-  
-  padding-top: 16px;
- 
   background-image: url("./img/gbversus/info.png");
-  font-size: 24px;
+  background-position: center center;
+  background-size: contain;
+ 
   top: 0px;
-  left: 50%;
+  left: 36%;
 
-  transform:translateX(-50%) ;
-  width: 300px;
-  height: 150px;
+  width: 500px;
+  transform:scale(3);
+ 
+  height: auto;
 }
 
 .gb_versus #p1-card .player-info .score-text {
@@ -1410,23 +1431,27 @@ body {
  
 /* GBVSR */
 .gb_versus.gbvsr #p1-card .score {
-  transform:translateX(430px) translateY(4px) scale(1.2) ;
+  transform:translateX(322px) translateY(4px) scale(1.2) ;
 }
  
 .gb_versus.gbvsr #p1-card .player-info {
   background-image: url("./img/gbversus/p1_bar.png");
-  transform: scale(1.2) translateY(-4px) translateX(50px);
+  transform: scale(1.2) translateY(-4px) translateX(-40px);
 }
 
 .gb_versus.gbvsr #p2-card .score {
-  transform:translateX(-420px) translateY(4px) scale(1.2) ;
+  transform:translateX(-324px) translateY(4px) scale(1.2) ;
 }
 
 .gb_versus.gbvsr #p2-card .player-info {
   background-image: url("./img/gbversus/p2_bar.png");
-  transform: scale(1.2) translateY(-4px) translateX(-30px);
+  transform: scale(1.2) translateY(-4px) translateX(50px);
 }
 
-.gb_versus.gbvsr #titlecard {
-top: -5px;
+.gb_versus.gbvsr .titlecard {
+ 
+   
+  /* transform: scale(.8) translateX(-62%) translateY(-12%); */
+  /* transform: scale(.9) translateX(-55%) translateY(-6%)  ; */
 }
+ 
