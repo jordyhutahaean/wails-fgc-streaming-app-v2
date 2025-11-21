@@ -16,7 +16,6 @@ body {
 
 #titlecard {
   position: absolute;
-  
   background-size: contain;
   background-repeat: no-repeat;
   text-align: center;
@@ -379,7 +378,7 @@ body {
 .minimalist .team{
   color: #aaa;
   font-family: Niramit-bold;
-  font-size: 24px;
+  font-size: 14px;
 }
   .minimalist #titlecard {
   background-image: url("./img/tuko/1x/Asset\ 28.png");
@@ -396,7 +395,7 @@ body {
 }
 
 .minimalist .score{
-  font-size: 38px;
+  font-size: 32px;
 }
 
 .minimalist #p1-card .score {
@@ -446,7 +445,6 @@ body {
   transform:  translateY(-10px) translateX(10px);
 }
 
-
 .minimalist.sf #p2-card .player-info{
   transform:  translateY(-10px) translateX(-10px);
 }
@@ -457,6 +455,24 @@ body {
 .minimalist.dbfz #p2-card .player-info{
   transform: translateY(-10px);
 }
+
+.minimalist #p1-card .player-info .score-text .name{
+   width: 240px; 
+}
+
+.minimalist #p2-card .player-info .score-text .name{
+   width: 240px; 
+}
+
+.minimalist #p3-card .player-info .score-text .name{
+   width: 240px; 
+}
+
+.minimalist #p4-card .player-info .score-text .name{
+   width: 240px; 
+}
+
+
 
 .minimalist.tekken #p1-card {
   transform: translateX(-100px);
@@ -472,14 +488,23 @@ body {
   transform: translateY(18px) translateX(-70px);
 }
 
- 
+
+/* 2xko */
+
+.minimalist._2XKO #p1-card .player-info{
+  transform: scale(1) translateX(-40px);
+}
+
+.minimalist._2XKO #p2-card .player-info{
+  transform: scale(1) translateX(0);
+}
 
 .minimalist._2XKO.has-left-duo #p1-card .player-info{
-  transform: scale(.7) translateY(-50%) translateX(10%);
+  transform: scale(.7) translateY(-50%) translateX(-2%);
 }
 
 .minimalist._2XKO.has-right-duo #p2-card .player-info{
-  transform: scale(.7) translateY(-50%) translateX(-10%);
+  transform: scale(.7) translateY(-50%) translateX(-14%);
 }
 
 .minimalist._2XKO.has-left-duo #p3-card .player-info{
@@ -527,7 +552,7 @@ body {
 .arcade .team{
   font-family: Bahnscrift;
   color: #7c7c7c;
-  font-size: 24px;
+  font-size: 18px;
 }
 .arcade #titlecard {
   position: absolute; 
@@ -562,15 +587,23 @@ body {
 .arcade #p1-card .player-info {
   background-image: url("./img/tokon/1x/player_left.png");
 }
+ 
+ 
+.arcade #p1-card .player-info .score-text{
+   margin-left: 22px; 
+    .name{
+      width: 180px;  
+  }
+}
 
-.arcade #p1-card .player-info .score-text {
-  width: auto; 
-  margin-left: 42px;
+.arcade #p2-card .player-info .score-text{
+   margin-right: 22px;
+    .name{
+      width: 180px;  
+  }
 }
-.arcade #p2-card .player-info .score-text {
-  width: auto; 
-  margin-right: 42px;
-}
+ 
+ 
  
 
 .arcade #p1-card .player-info .nation-container{
@@ -644,9 +677,38 @@ body {
  .arcade.tekken #p2-card .score{
   transform: translateY(10px)  ;
  }
- 
+
+ /* 2xko */
+ .arcade._2XKO #p1-card .player-info .score-text{
+    margin-left: 22px;
+      .name{
+        width: 180px;  
+    }
+  }
+
+  .arcade._2XKO #p2-card .player-info .score-text{
+    margin-right: 22px;
+      .name{
+        width: 180px;  
+    }
+  }
+
+   .arcade._2XKO._2XKO.has-left-duo #p3-card .player-info .score-text{
+    margin-left: 22px;
+      .name{
+        width: 180px;  
+    }
+  }
+
+  .arcade._2XKO._2XKO.has-right-duo #p4-card .player-info .score-text{
+    margin-right: 22px;
+      .name{
+        width: 180px;  
+    }
+  }
+
 .arcade._2XKO #p1-card .player-info{
-  transform: scale(1) translateX(10px);
+  transform: scale(1) translateX(-14px);
 }
 .arcade._2XKO.has-left-duo #p1-card .player-info{
    transform: scale(.8) translateY(10%) translateX(10%);
@@ -656,7 +718,7 @@ body {
    z-index: -111;
 }
 .arcade._2XKO #p2-card .player-info{
-  transform: scale(1) translateX(-20px);
+  transform: scale(1) translateX(-22px);
 }
 .arcade._2XKO.has-right-duo #p2-card .player-info{
    transform: scale(.8) translateY(10%) translateX(-10%);
@@ -714,11 +776,11 @@ body {
 }
 .futuristic #titlecard{
   position: absolute; 
-  
+ 
   padding-top: 16px;
  
   background-image: url("./img/halftones/1x/mid.png");
-  font-size: 24px;
+  font-size: 34px;
   top: -10px;
   left: 50%;
 
@@ -764,6 +826,26 @@ body {
   background-image: url("./img/halftones/1x/p_right.png");
 }
 
+ 
+.futuristic #p1-card .player-info .score-text{
+  margin-left:  0px;
+    .name{
+      width: 200px;  
+  } .team{
+      width: auto;
+  }
+}
+
+.futuristic #p2-card .player-info .score-text{
+  margin-right: 0px;
+    .name{
+      width: 200px;  
+  } .team{
+      width: auto;
+  }
+}
+
+/* Street Fighter */
 .futuristic.sf #p1-card .score-text{
   width: auto; 
   margin-right: 32px;
@@ -836,27 +918,40 @@ body {
   transform: translateY(10px) translateX(50px);
 }
 
-.futuristic._2XKO #p1-card .score-text{
-  width: auto; 
-  margin-right: 32px;
+/* 2xko */
+
+.futuristic #p1-card .player-info .score-text{
+  margin-left:  0px;
+    .name{
+      width: 200px;  
+  }
 }
 
-.futuristic._2XKO #p2-card .score-text{
-  width: auto; 
-  margin-left: 32px;
-}
-.futuristic._2XKO #p3-card .score-text{
-  width: auto; 
-  margin-right: 32px;
+.futuristic #p2-card .player-info .score-text{
+  margin-right: 0px;
+    .name{
+      width: 200px;  
+  }
 }
 
-.futuristic._2XKO #p4-card .score-text{
-  width: auto; 
-  margin-left: 32px;
+.futuristic._2XKO.has-left-duo #p3-card .player-info .score-text{
+  margin-left:  0px;
+    .name{
+      width: 200px;  
+  }
 }
+
+.futuristic._2XKO.has-right-duo #p4-card .player-info .score-text{
+  margin-right: 0px;
+    .name{
+      width: 200px;  
+  }
+}
+
+ 
 
 .futuristic._2XKO #p1-card .player-info{
-  transform: scale(1) translateX(10px);
+  transform: scale(1) translateX(-50px);
 }
 .futuristic._2XKO.has-left-duo #p1-card .player-info{
    transform: scale(.7) translateY(20%);
@@ -865,7 +960,7 @@ body {
    transform: scale(.7) translateY(-320%) translateX(10%);
 }
 .futuristic._2XKO #p2-card .player-info{
-  transform: scale(1) translateX(-20px);
+  transform: scale(1) translateX(10px);
 }
 .futuristic._2XKO.has-right-duo #p2-card .player-info{
    transform: scale(.7) translateY(20%);
@@ -883,6 +978,8 @@ body {
 
 
 /* White Outline */
+ 
+
 @font-face {
   font-family: 'Stacks Sans';
   src: url('./fonts/StackSans.ttf') format('truetype');
@@ -892,16 +989,22 @@ body {
 .white_outline .name, .white_outline .score{
   font-family: Stacks Sans;
   color: white;
-  text-shadow: 2px 2px 4px #000000;
+  
 }
 
 .white_outline .score{
   font-size: 28px;
+  color: black;
 }
 
 .white_outline #p1-card .name, .white_outline #p2-card .name,
 .white_outline #p3-card .name, .white_outline #p4-card .name {
   font-size: 18px;
+}
+
+.white_outline #p1-card .team, .white_outline #p2-card .team,
+.white_outline #p3-card .team, .white_outline #p4-card .team {
+  color: #e6e6e6;
 }
 
 .white_outline #p2-card .player-info, .white_outline #p4-card .player-info {
@@ -1012,14 +1115,24 @@ body {
 }
 
 /* 2XKO */
+.white_outline._2XKO .score{
+  color: white;
+}
+
 .white_outline._2XKO #p1-card .player-info .score-text {
- width: auto; 
- margin-left: 40px;
+  margin-left:  60px;
+  width: 300px;
+    .name{
+      width: auto;  
+  }
 }
 
 .white_outline._2XKO #p2-card .player-info .score-text {
- width: auto; 
- margin-right: 40px;
+  margin-right:  60px;
+  width: 300px;
+    .name{
+      width: auto;  
+  }
 }
 .white_outline._2XKO #p3-card .player-info {
   background-image: url("./img/white_out/p3_bar.png");
@@ -1035,6 +1148,21 @@ body {
   transform:  translateX( 180px) scale(1);
 }
 
+.white_outline._2XKO.has-left-duo #p3-card .player-info .score-text {
+  margin-left:  60px;
+  width: 300px;
+    .name{
+      width: auto;  
+  }
+}
+
+.white_outline._2XKO.has-right-duo #p4-card .player-info .score-text {
+  margin-right:  60px;
+  width: 300px;
+    .name{
+      width: auto;  
+  }
+}
 .white_outline._2XKO #p1-card .player-info{
   background-image: url("./img/white_out/p3_bar.png");
   transform: scale(1) translateX(-14px) translateY(-10px);
@@ -1052,11 +1180,11 @@ body {
 
 
 .white_outline._2XKO #p2-card .player-info{
-  transform: scale(1) translateX(2px) translateY(-10px);
+  transform: scale(1) translateX(-24px) translateY(-10px);
   background-image: url(./img/white_out/p4_bar.png);
 }
 .white_outline._2XKO.has-right-duo #p2-card .player-info{
-   transform: scale(.7) translateY(20%);
+   transform: scale(.7) translateY(20%) translateX(-40px);
 }
 .white_outline._2XKO.has-right-duo #p4-card .player-info{
    transform: scale(.7) translateY(-328%) translateX(-10%);
@@ -1088,9 +1216,217 @@ body {
 
 /* GranblueVersus Style */
 
-.gb_versus{
-  width: 1920px;
-  height: 1080px;
-  position: absolute;
-  font-family: Bahnscrift;
+@font-face {
+  font-family: 'CormorantG';
+  src: url('./fonts/CormorantGaramond-V.ttf') format('truetype');
+  font-weight: 500;
+}
+ 
+.gb_versus .name, .gb_versus .score, .gb_versus .team{
+  font-family: CormorantG;
+  color: black;
+}
+ 
+
+.gb_versus .score{
+  color: #0f0f0f;
+  font-size: 38px;
+  font-weight: 800;
+}
+
+.gb_versus #p1-card .name, .gb_versus #p2-card .name,
+.gb_versus #p3-card .name, .gb_versus #p4-card .name {
+  font-size: 18px;
+}
+
+.gb_versus #p2-card .player-info, .white_outline #p4-card .player-info {
+  text-align: right;
+}
+.gb_versus #titlecard{
+  font-family: CormorantG;
+  color: white;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+ 
+.gb_versus #titlecard{
+  position: absolute; 
+  
+  padding-top: 16px;
+ 
+  background-image: url("./img/gbversus/info.png");
+  font-size: 24px;
+  top: 0px;
+  left: 50%;
+
+  transform:translateX(-50%) ;
+  width: 300px;
+  height: 150px;
+}
+
+.gb_versus #p1-card .player-info .score-text {
+ width: 250px; 
+ transform: translateY(2px);
+}
+.gb_versus #p1-card .player-info .score-text .team{
+  overflow: visible;
+}
+.gb_versus #p1-card .player-info .nation-container{
+  transform:  translateX(-160px) translateY(4px) scale(1);
+}
+
+.gb_versus #p2-card .player-info .score-text {
+ width: 250px; 
+ transform: translateY(2px);
+}
+.gb_versus #p2-card .player-info .score-text .team{
+  overflow: visible;
+}
+.gb_versus #p2-card .player-info .nation-container{
+  transform:translateX(160px) translateY(4px) scale(1);
+}
+.gb_versus #p2-card .player-info{
+  right: 10px;
+}
+/* SF */
+.gb_versus.sf #p1-card .score {
+  transform:translateX(370px) translateY(4px) scale(1.2) ;
+}
+ 
+.gb_versus.sf #p1-card .player-info {
+  background-image: url("./img/gbversus/p1_bar.png");
+  transform: scale(1.2) translateY(-6px);
+}
+
+.gb_versus.sf #p2-card .score {
+  transform:translateX(-384px) translateY(4px) scale(1.2) ;
+}
+
+.gb_versus.sf #p2-card .player-info {
+  background-image: url("./img/gbversus/p2_bar.png");
+  transform: scale(1.2) translateY(-6px);
+}
+
+/* DBFZ */
+
+.gb_versus.dbfz #p1-card .score {
+  transform:translateX(442px) translateY(-4px) scale(1.2) ;
+}
+.gb_versus.dbfz #p1-card .player-info {
+  background-image: url("./img/gbversus/p1_bar.png");
+  transform: scale(1.2) translateY(-11px) translateX(60px);
+}
+
+.gb_versus.dbfz #p2-card .score {
+  transform:translateX(-456px) translateY(-4px) scale(1.2) ;
+}
+
+.gb_versus.dbfz #p2-card .player-info {
+  background-image: url("./img/gbversus/p2_bar.png");
+  transform: scale(1.2) translateY(-11px) translateX(-60px);
+}
+
+/* Tekken */
+.gb_versus.tekken #p1-card .score {
+  transform:translateX(286px) translateY(12px) scale(1.2) ;
+}
+ 
+.gb_versus.tekken #p1-card .player-info {
+  background-image: url("./img/gbversus/p1_bar.png");
+  transform: scale(1.2) translateY(2px) translateX(-70px);
+}
+
+.gb_versus.tekken #p2-card .score {
+  transform:translateX(-300px) translateY(12px) scale(1.2) ;
+}
+
+.gb_versus.tekken #p2-card .player-info {
+  background-image: url("./img/gbversus/p2_bar.png");
+  transform: scale(1.2) translateY(2px) translateX(70px);
+}
+
+/* 2XKO */
+.gb_versus._2XKO #p1-card .player-info .score-text {
+ width: 220px; 
+}
+
+.gb_versus._2XKO #p2-card .player-info .score-text {
+ width: 220px; 
+}
+
+.gb_versus._2XKO #p3-card .player-info {
+  background-image: url("./img/gbversus/p3_duo_bar.png");
+}
+.gb_versus #p3-card .player-info .nation-container{
+  transform:  translateX(-160px) translateY(0px) scale(1);
+}
+
+.gb_versus._2XKO #p4-card .player-info {
+  background-image: url("./img/gbversus/p4_duo_bar.png");
+}
+.gb_versus #p4-card .player-info .nation-container{
+  transform:  translateX(168px) translateY(0px) scale(1);
+}
+
+.gb_versus._2XKO #p1-card .player-info{
+  background-image: url("./img/gbversus/p1_duo_bar.png");
+  transform: scale(1) translateX(10px) translateY(-16px);
+}
+.gb_versus._2XKO.has-left-duo #p1-card .player-info{
+   transform: scale(.8) translateY(-51%) translateX(16%);
+}
+.gb_versus._2XKO.has-left-duo #p3-card .player-info{
+   transform: scale(.8) translateY(-220%) translateX(72.3%);
+}
+.gb_versus._2XKO #p1-card .score{
+  transform:translateX(-14px) translateY(-3px) scale(.6) ;
+  background-image:url("./img/gbversus/tukoscore1.png") ;
+  font-size: 82px;
+  padding-left: 28px;
+  padding-bottom:12px ;
+  
+   
+}
+
+
+.gb_versus._2XKO #p2-card .player-info{
+  transform: scale(1) translateX(-50px) translateY(-16px);
+  background-image: url("./img/gbversus/p2_duo_bar.png");
+}
+.gb_versus._2XKO.has-right-duo #p2-card .player-info{
+   transform: scale(.8) translateY(-56%) translateX(-23%);
+}
+.gb_versus._2XKO.has-right-duo #p4-card .player-info{
+   transform: scale(.8) translateY(-218%) translateX(-67.3%);
+}
+.gb_versus._2XKO #p2-card .score{
+  transform:translateX(14px) translateY(-3px) scale(.6) ;
+  background-image: url("img/gbversus/tukoscore2.png");
+  font-size: 82px;
+  padding-right: 28px;
+  padding-bottom:12px ;
+}
+
+ 
+/* GBVSR */
+.gb_versus.gbvsr #p1-card .score {
+  transform:translateX(430px) translateY(4px) scale(1.2) ;
+}
+ 
+.gb_versus.gbvsr #p1-card .player-info {
+  background-image: url("./img/gbversus/p1_bar.png");
+  transform: scale(1.2) translateY(-4px) translateX(50px);
+}
+
+.gb_versus.gbvsr #p2-card .score {
+  transform:translateX(-420px) translateY(4px) scale(1.2) ;
+}
+
+.gb_versus.gbvsr #p2-card .player-info {
+  background-image: url("./img/gbversus/p2_bar.png");
+  transform: scale(1.2) translateY(-4px) translateX(-30px);
+}
+
+.gb_versus.gbvsr #titlecard {
+top: -5px;
 }

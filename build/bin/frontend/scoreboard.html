@@ -149,34 +149,26 @@ async function loadScoreboard() {
       document.body.classList.add("has-right-duo");
     }
 
+    // ✅ Call auto-fit AFTER data loads
+    applyNameAutoFit();
+    applyTeamAutoFit();
+    applyTitleAutoFit();
+
   } catch (err) {
     console.error("Error loading scoreboard.json:", err);
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const images = Array.from(document.querySelectorAll('#sponsor-container .sponsor-logo'));
-  if (images.length === 0) return;
-  if (images.length === 1) {
-    images[0].style.opacity = '1';
-    images[0].style.transition = 'none';
-    return;
-  }
+// Remove the separate setInterval calls or keep them as backup:
+setInterval(() => {
+  applyTeamAutoFit();
+  applyNameAutoFit();
+  applyTitleAutoFit();
+}, 1000); // Match the loadScoreboard interval
 
-  let current = 0;
-  images.forEach((img, i) => {
-    img.style.opacity = i === 0 ? '1' : '0';
-    img.style.transition = 'opacity 1s';
-  });
-
-  setInterval(() => {
-    images[current].style.opacity = '0';
-    current = (current + 1) % images.length;
-    images[current].style.opacity = '1';
-  }, 10000); // 10 seconds
-});
-  setInterval(loadScoreboard, 1000);
-  loadScoreboard();
+// Main load
+setInterval(loadScoreboard, 1000);
+loadScoreboard();
 </script>
 
 <script>
@@ -191,25 +183,54 @@ function autoFitName(element, baseSize, minSize) {
   }
 }
 
+// function applyNameAutoFit() {
+//   document.querySelectorAll(".name").forEach(name => {
+//     const style = window.getComputedStyle(name);
+//     const baseSize = parseInt(style.fontSize) || 22;
+
+//     // different themes can change min font size
+//     const minSize =
+//       document.body.classList.contains("minimalist")
+//         ? 16
+//       : document.body.classList.contains("white_outline")
+//         ? 14
+//       : 18; // default fallback
+
+//     autoFitName(name, baseSize, minSize);
+//   });
+// }
+
 function applyNameAutoFit() {
   document.querySelectorAll(".name").forEach(name => {
     const style = window.getComputedStyle(name);
     const baseSize = parseInt(style.fontSize) || 22;
 
-    // different themes can change min font size
-    const minSize =
-      document.body.classList.contains("minimalist")
-        ? 16
-      : document.body.classList.contains("white_outline")
-        ? 14
-      : 18; // default fallback
+    const nameFontRules = {
+      minimalist: 16,
+      arcade: 18,
+      futuristic: 18,
+      white_outline: 14,
+      gb_versus:18
+    };
+
+    let minSize = nameFontRules.default;
+
+    for (const key in nameFontRules) {
+      if (document.body.classList.contains(key)) {
+        minSize = nameFontRules[key];
+        break;
+      }
+    }
 
     autoFitName(name, baseSize, minSize);
   });
 }
-
+ 
+ 
 setInterval(applyNameAutoFit, 300);
 </script>
+
+ 
 
 <script>
 
