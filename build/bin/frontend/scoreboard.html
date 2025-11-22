@@ -184,48 +184,54 @@ function autoFitName(element, baseSize, minSize) {
   }
 }
 
-// function applyNameAutoFit() {
-//   document.querySelectorAll(".name").forEach(name => {
-//     const style = window.getComputedStyle(name);
-//     const baseSize = parseInt(style.fontSize) || 22;
-
-//     // different themes can change min font size
-//     const minSize =
-//       document.body.classList.contains("minimalist")
-//         ? 16
-//       : document.body.classList.contains("white_outline")
-//         ? 14
-//       : 18; // default fallback
-
-//     autoFitName(name, baseSize, minSize);
-//   });
-// }
-
 function applyNameAutoFit() {
   document.querySelectorAll(".name").forEach(name => {
     const style = window.getComputedStyle(name);
     const baseSize = parseInt(style.fontSize) || 22;
 
-    const nameFontRules = {
-      minimalist: 16,
-      arcade: 18,
-      futuristic: 18,
-      white_outline: 14,
-      gb_versus:18
-    };
-
-    let minSize = nameFontRules.default;
-
-    for (const key in nameFontRules) {
-      if (document.body.classList.contains(key)) {
-        minSize = nameFontRules[key];
-        break;
-      }
-    }
+    // different themes can change min font size
+    const minSize =
+      document.body.classList.contains("minimalist")
+        ? 16
+      : document.body.classList.contains("white_outline")
+        ? 14
+      : document.body.classList.contains("arcade")
+        ? 18
+      : document.body.classList.contains("futuristic")
+        ? 18
+      : document.body.classList.contains("gb_versus")
+        ? 14
+      : 16; // default fallback
 
     autoFitName(name, baseSize, minSize);
   });
 }
+
+// function applyNameAutoFit() {
+//   document.querySelectorAll(".name").forEach(name => {
+//     const style = window.getComputedStyle(name);
+//     const baseSize = parseInt(style.fontSize) || 22;
+
+//     const nameFontRules = {
+//       minimalist: 16,
+//       arcade: 18,
+//       futuristic: 18,
+//       white_outline: 14,
+//       gb_versus:14
+//     };
+
+//     let minSize = nameFontRules.default;
+
+//     for (const key in nameFontRules) {
+//       if (document.body.classList.contains(key)) {
+//         minSize = nameFontRules[key];
+//         break;
+//       }
+//     }
+
+//     autoFitName(name, baseSize, minSize);
+//   });
+// }
 
 function applyTitleAutoFit() {
   const titleEl = document.getElementById("titlecard");

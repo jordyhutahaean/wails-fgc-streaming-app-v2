@@ -1246,7 +1246,7 @@ body {
   font-family: CormorantG;
   color: black;
 }
- 
+
 
 .gb_versus .score{
   color: #0f0f0f;
@@ -1256,7 +1256,14 @@ body {
 
 .gb_versus #p1-card .name, .gb_versus #p2-card .name,
 .gb_versus #p3-card .name, .gb_versus #p4-card .name {
-  font-size: 18px;
+  font-size: 24px;
+  
+}
+
+.gb_versus .team{
+  font-size: 14px;
+  color: #555555;
+  font-weight: 700;
 }
 
 .gb_versus #p2-card .player-info, .white_outline #p4-card .player-info {
@@ -1266,7 +1273,7 @@ body {
   font-size: 8px;
   font-family: CormorantG;
   color: white;
-  text-shadow: 2px 2px 4px #000000;
+   
 }
 
  
