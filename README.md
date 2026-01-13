@@ -6,8 +6,11 @@ https://drive.google.com/drive/folders/1fg2BLdyyFPhFgZ8oYdBHFWeM1Is8eOso?usp=sha
 Fighting Game Scoreboard Control
 
 A desktop app built with Wails
- for managing fighting game tournaments.
+for managing fighting game tournaments.
 Easily control scoreboards, commentators, brackets, and sponsor logos, and use them directly in OBS through local overlays.
+
+## Platform
+Windows
 
 ## Changelog 
 
