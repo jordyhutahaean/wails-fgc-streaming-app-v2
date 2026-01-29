@@ -1,0 +1,3442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Scoreboard Control</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<script src="https://cdn.jsdelivr.net/npm/mousetrap@1.6.5/mousetrap.min.js"></script>
+<link rel="stylesheet" href="/node_modules/animate.css/animate.min.css" />
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+/>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+  :root{
+    --bg:#f5f7fa;
+    --card-bg:#fff;
+    --panel:#ffffff;
+    --border:#dcdfe3;
+    --accent:#0077ff;
+    --muted:#666;
+    --text:#222;
+    --win:#5a5a5a;
+    --lose:#fff5f5;
+        --sumtext:#222;
+        --dot-color: rgba(0, 0, 0, 0.1);
+        --buttonbg: #dcdfe3;
+        --graybg:#f3f3f3;
+  }
+
+  /* 🌙 Dark mode variables override */
+[data-theme='dark'] {
+  --bg: #121212;
+  --text: #eee;
+  --card-bg: #1e1e1e;
+  --panel: #1a1a1a;
+  --border: #333;
+  --accent: #1ea7ff;
+  --muted: #aaa;
+  --win: #333;
+  --lose: #442222;
+      --sumtext:#222;
+      --dot-color: rgba(255, 255, 255, 0.08);
+      --buttonbg : #dcdfe3;
+      --graybg:#292929;
+}
+
+/* googoo */
+
+
+/* gaagaa */
+  html,body{height:100%;margin:0;padding:0;background:var(--bg);font-family:Space Grotesk, sans-serif;color:var(--text)}
+  .container{padding:20px;max-width:1200px;margin:0 auto;padding-top: 30px;position: relative;z-index: 20;}
+  h1{margin:0 0 18px;font-size:20px;color:var(--accent)}
+
+  body, .player-block, .sponsor-section {
+  transition: background 0.3s ease, color 0.3s ease;}
+  /* Top tabs */
+  .tab{display:flex;gap:10px;border-bottom:2px solid var(--border);margin-bottom:18px}
+  .tab button{background:none;border:0;padding:10px 14px;cursor:pointer;font-weight:700;border-radius:6px;color:var(--text)}
+  .tab button.active{background:var(--accent);color:#fff}
+  .tabcontent{display:none}
+  .tabcontent.active{display:block}
+
+  /* Halftone bG */
+  
+/* Halftone overlay */
+.halftone-bg {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* Create dot grid overlay */
+.halftone-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+  background-size: 6px 6px;
+  opacity: 1;
+  z-index: 0;
+
+  /* Optional subtle animation */
+  animation: drift 10s linear infinite;
+}
+
+@keyframes drift {
+  0% { background-position: 0 0; }
+  100% { background-position: 6px 6px; }
+}
+
+/* Ensure your content sits above */
+.halftone-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+.halftone-gradual{
+  overflow: hidden;
+
+}
+.halftone-gradual::before,
+.halftone-gradual::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.halftone-gradual::before {
+  background-image: radial-gradient(var(--dot-color) 0.8px, transparent 0.8px);
+  background-size: 5px 5px;
+  mask-image: linear-gradient(to right, black 0%, transparent 50%);
+  -webkit-mask-image: linear-gradient(to right, black 0%, transparent 50%);
+}
+
+.halftone-gradual::after {
+  background-image: radial-gradient(var(--dot-color) 2px, transparent 2px);
+  background-size: 8px 8px;
+  mask-image: linear-gradient(to right, transparent 50%, black 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 50%, black 100%);
+}
+
+
+  /* Try UI */
+
+  .channel-bar {
+    position: fixed;
+    top: -50px; /* hide most of it */
+    left: 0;
+    right: 0;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 10px 10px 0 10px;
+    background: #ffffff1c;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    border-bottom: 2px solid #ccc;
+    border-radius: 0 0 120px 120px;
+    transition: top 0.3s ease;
+    z-index: 1000;
+  }
+
+  /* little tab hanging down */
+  .channel-bar::after {
+    content: "↓"; /* could be an icon or arrow */
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1ea7ff;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 0 0 80px 80px;
+    font-size: 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+
+  /* hover effect → slide down */
+  .channel-bar:hover {
+    top: 0;
+  }
+
+  .channel {
+    background: #eee;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    padding: 0 16px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    height: 6vh;
+
+    color: var(--sumtext);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .channel:hover {
+    background: #1ea7ff;
+    color: white;
+    border-color: #1ea7ff;
+  }
+
+  .channel.active {
+    background: #3B4FFF;
+    color: white;
+    border-color: #3B4FFF;
+    box-shadow: 3px 3px 1px #0e3d73;
+  }
+  /* toolbar & controls */
+  .toolbar{display:flex;gap:10px;margin-bottom:18px}
+  button{
+    background:var(--accent);
+    color:#fff;border:0;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size: 12px;
+    box-shadow: 2px 2px 1px #0e3d73;
+  }
+
+  button:active{
+    transform:scale(.98);
+  }
+  button:hover
+  {
+    filter:brightness(.9)
+  }
+
+  /* Toggle */
+  .toggle {
+  display: none;
+}
+
+.toggle + label {
+  display: inline-block;
+  width: 4em;
+  height: 2em;
+  background: #ebebeb;
+  color: #fff;
+  font-weight: bold;
+  text-align: center;
+  line-height: 2em;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  transform: skew(-10deg);
+  position: relative;
+  overflow: hidden;
+}
+.toggle + label span {
+  display: block;
+  transform: skew(10deg);
+}
+
+
+#v3:checked + label {
+  background: #86d993; /* green */
+}
+#v4:checked + label {
+  background: #ffd986; /* yellow */
+}
+
+.toggle + label:before,
+.toggle + label:after {
+  content: attr(data-tg-off);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform: skew(10deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.toggle + label:after {
+  content: attr(data-tg-on);
+  left: 100%;
+}
+
+.toggle:checked + label {
+  background: #86d993;
+}
+
+.toggle:checked + label:before {
+  left: -100%;
+}
+
+.toggle:checked + label:after {
+  left: 0;
+}
+.toggle + label:before,
+.toggle + label:after {
+  content: attr(data-tg-off);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform: skew(10deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.toggle + label:after {
+  content: attr(data-tg-on);
+  left: 100%;
+}
+
+.toggle:checked + label {
+  background: #86d993;
+}
+
+.toggle:checked + label:before {
+  left: -100%;
+}
+
+.toggle:checked + label:after {
+  left: 0;
+}
+
+
+  .settings{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:18px}
+  .settings label{display:flex;flex-direction:column;font-weight:700;font-size:13px}
+  input[type="text"], input[type="number"], select{margin-top:6px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;}
+
+  .scoreboard-panel{padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:10px}
+  .playerflex{display:flex;gap:12px;flex-wrap:nowrap;flex-direction: row;}
+  .player-block{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;flex-direction: column;width: 19%;flex: 1;}
+  .player-block label{font-weight:700;font-size:13px;min-width:150px ; display: flex; flex-direction: column; width:-webkit-fill-available;}
+
+    .player-block#p1block{background: #e6f1f5; border:1px solid #0e3d73;}
+    .player-block#p2block{background: #fbf2f2; border:1px solid #991b1b; }
+    .player-block#p3block{background: #e7ffe7; border:1px solid #166534; }
+    .player-block#p4block{background: #fff7e7; border:1px solid #ffaa00;}
+
+    .player-block#p1block label{color: #0077ff; }
+    .player-block#p2block label{color: #ff0000; }
+    .player-block#p3block label{color: #00aa00; }
+    .player-block#p4block label{color: #ffaa00; } 
+  /* commentary */
+  .commentary-panel{padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:10px}
+  .commentator-block{margin-top: 15px; display:flex;gap:24px;flex-wrap:nowrap;margin-bottom:8px}
+
+  .commentator-block label {
+    font-size: 12px;
+    display: flex;
+    gap: 4px;
+    flex-direction: column;
+  }
+  .commentary-toolbar{display:flex;gap:8px;margin-top:25px}
+
+  /* Bracket Panel layout (horizontal tournament tree) */
+  .bracket-panel{padding:16px;background:var(--panel);border:1px solid var(--border);border-radius:10px}
+
+  .inner-tabs #singleTabBtn, .inner-tabs #doubleTabBtn{font-weight: 1000;font-size:12px ; color: var(--text); display: flex; align-items: center; gap: 8px;}
+  #singleTabBtn.active {
+  background: linear-gradient(135deg, #0077FF, #005BCC);
+  }
+  #doubleTabBtn.active {
+    background: linear-gradient(135deg, #7A5FFF, #5939FF);
+  }
+
+
+  .inner-tabs{display:flex;gap:0px;margin-bottom:14px;justify-content: center;}
+  .inner-tabs button{background:var(--buttonbg);border:1px solid var(--border);padding:8px 10px;border-radius:8px;cursor:pointer}
+  .inner-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+  .round{display:flex;flex-direction:column;gap:18px;min-width:220px}
+  .round .round-title{text-align:center;font-weight:800;color:var(--muted);margin-bottom:6px}
+  
+  .match{width: 240px;display: table; background:#f8fbff;border:1px solid var(--border);border-radius:8px;padding:8px 10px;position:relative;box-shadow:0 4px 10px rgba(0,0,0,0.03)}
+  .match .player-line{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px;border-radius:6px}
+  .match .player-line.name{font-weight:700}
+  .match .player-line .score{min-width:44px;text-align:center;border-radius:6px;padding:6px;border:1px solid #e6eefb;background:#fff}
+  .match .player-line.win{background:var(--win)}
+ 
+  .match .controls{display:flex;gap:8px;margin-top:8px;justify-content:flex-end}
+
+      .bracket {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+    }
+
+    .round {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      gap: 40px;
+      position: relative;
+    }
+
+    .match {
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 6px;
+      padding: 6px 10px;
+      width: 200px;
+      font-size: 12px;
+    }
+
+    .player-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 3px 0;
+    }
+
+    .player-line input {
+      width: 20%;
+      font-size: 12px;
+      text-align: center;
+      background: #000;
+      color: #fff;
+      border: 1px solid #555;
+      border-radius: 3px;
+      padding: 1px;
+    }
+ 
+  /* responsive */
+  @media (max-width:900px){
+    .bracket-tree{gap:45}
+    .round{min-width:180px}
+  }
+
+  /* small helper */
+  .small{font-size:12px;color:var(--muted);margin-top:8px}
+  hr{border:0;border-top:1px dashed #eee;margin:14px 0}
+
+/* === ADDED: make bracket text white === */
+.bracket-tree .match,
+.bracket-tree .player-line span,
+.bracket-tree .player-line input {
+  color: #fff;
+}
+
+.custom-select {
+  position: relative;
+  width: 220px;
+  font-family: sans-serif;
+  cursor: pointer;
+}
+ 
+
+.custom-select .selected {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+ 
+  border: 1px solid #444;
+  padding: 6px 10px;
+  border-radius: 6px;
+  height: 40%;
+}
+
+.custom-select .selected img {
+  width: 50px;
+  height: 30px;
+}
+
+.custom-select .selected img#gbvsr {
+  width: 150px;
+  height: 30px;
+}
+ 
+.custom-select .options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: #ececec;
+  border: 1px solid #444;
+  border-radius: 6px;
+  margin-top: 4px;
+  display: none;
+  z-index: 10;
+
+}
+
+.custom-select .options div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  color: var(--sumtext);
+}
+
+.custom-select .options div:hover {
+  background: #333;
+}
+
+.custom-select .options img {
+  width: 30px;
+  height: 20px;
+}
+
+#gameIcon{
+  position: absolute;
+  top: 10%;
+  right: 2%;
+  max-width:15%;
+  max-height: 10%;
+}
+
+.bracket-top8 label{
+  font-size: 12px;
+}
+
+.commentary-top{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.iframe-commentator {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+ 
+  justify-content: center;
+  align-items: center;
+}
+
+.iframe-commentator {
+  width: 100%;
+  display: flex;
+  overflow: visible; /* don’t cut off the bottom */
+  justify-content: center;
+  align-items: center;
+
+}
+
+.iframe-wrapper {
+  transform: scale(0.4);
+  transform-origin: top left;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.iframe-wrapper iframe {
+  width: 250%;
+  border: none;
+}
+
+ /* sponsor UI */
+  .sponsor-section {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 20px 0;
+  }
+  .upload-container {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    text-align: center;
+    background: var(--card-bg);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .upload-container.dragover {
+    border-color: var(--accent);
+    background: #f0f9ff;
+    transform: scale(1.01);
+  }
+  .upload-icon { font-size: 28px; margin-bottom:8px }
+  .upload-button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  #statusContainer { margin-top:10px; min-height:24px }
+  .status-message { padding:8px 10px; border-radius:6px; margin-bottom:8px; font-weight:600; }
+  .status-success { background:#f0fdf4; color:#166534; border:1px solid #bbf7d0; }
+  .status-error { background:#fef2f2; color:#991b1b; border:1px solid #fecaca; }
+
+  .preview-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.preview-card {
+    width: 120px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #ddd;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-card img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.preview-name {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: 12px;
+    padding: 4px;
+    text-align: center;
+}
+
+.delete-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+.obs-scoreboard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  gap: 10px;
+  padding: 10px 16px;
+  width: 100%;
+  max-width: 420px;
+
+  background: var(--panel);
+  border: 3px solid var(--border);
+  box-shadow: 4px 4px 0 var(--border);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+
+  width: auto;
+  /* subtle halftone texture */
+  isolation: isolate;
+}
+.obs-scoreboard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(0,0,0,0.1) 1px, transparent 1px);
+  background-size: 6px 6px;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.obs-scoreboard h1 {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+/* URL Chip */
+.copy-scoreboard {
+  background: #fffce2;
+  border: 2px solid var(--border);
+  box-shadow: 2px 2px 0 var(--border);
+  border-radius: 6px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copy-scoreboard p {
+  margin: 0;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.copy-scoreboard:hover {
+  background: var(--accent);
+  color: #000;
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--border);
+}
+
+/* Hide panel animation */
+#settingsPanel {
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+#settingsPanel.hidden {
+  transform: translateX(-120%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/*-------- Button ------------- */
+.toggle-btn {
+  align-self: flex-start;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 6px 10px;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn:hover {
+  background: #005bcc;
+  transform: scale(1.05);
+}
+
+#togglePanelBtn {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  top: 10%;
+  right: 4%;
+  z-index: 100;
+}
+
+#togglePanelBtn:active{
+  background: white;
+  color: var(--accent);
+}
+
+#notifMsg {
+  position: fixed;         /* stays in viewport even if page scrolls */
+  top: 20px;               /* pixel position is more predictable */
+  right: 20px;             /* no negative offset */
+  padding: 8px 12px;
+  background: #e0ffe0;
+  border: 1px solid #b6ffb6;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #155724;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  z-index: 9999;           /* ensure it’s above other elements */
+
+  width: 200px;
+}
+
+  /* keep rest of UI minimal for brevity */
+  .small{font-size:12px;color:var(--muted);margin-top:8px}
+
+.halftone-btn {
+  position: relative;
+  padding: 12px 28px;
+  font-weight: 700;
+  font-family: "Arial Black", sans-serif;
+  text-transform: uppercase;
+  color: #222;
+  background: #ffeb3b;              /* bright base color */
+  border: 3px solid #222;
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 4px 4px 0 #222;
+}
+
+/* dotted halftone overlay */
+.halftone-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(#000 1px, transparent 1px);
+  background-size: 4px 4px;          /* density of dots */
+  opacity: 0.15;                     /* subtle effect */
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* slight lift on hover */
+.halftone-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 #222;
+}
+
+/* animate dots to “shake” */
+@keyframes halftone-move {
+  0%, 100% { background-position: 0 0; }
+  50% { background-position: 2px 2px; }
+}
+
+/* start animation on hover */
+.halftone-btn:hover::before {
+  animation: halftone-move 0.4s steps(2, jump-none) infinite;
+  opacity: 0.25;
+}
+
+/* pressed effect */
+.halftone-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #222;
+}
+
+:root {
+  --btn-bg: #3B4FFF;
+  --btn-text: #fff;
+  --dot-color: rgba(255,255,255,0.5);
+}
+
+[data-theme='dark'] {
+  --btn-bg: #1e1e1e;
+  --btn-text: #eee;
+  --dot-color: rgba(255,255,255,0.2);
+}
+
+.corner-halftone-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  border: 3px solid #000;
+  border-radius: 8px;
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  overflow: hidden;
+  letter-spacing: 0.5px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 4px 4px 0 #000;
+  
+}
+
+/* Gentle scaling animation */
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+.corner-halftone-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 6px 6px 0 #000;
+}
+
+/* Top-left halftone dots */
+.corner-halftone-btn::before {
+  content: "";
+  position: absolute;
+  top: 0cm;
+  left: 0px;
+  width: 24px;
+  height: 24px;
+  background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+  background-size: 4px 4px;
+  opacity: 0.8;
+  transform-origin: top left;
+  animation: dotscale 4s ease-in-out infinite;
+}
+
+/* Bottom-right halftone dots */
+.corner-halftone-btn::after {
+  content: "";
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 24px;
+  height: 24px;
+  background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+  background-size: 4px 4px;
+  opacity: 0.8;
+  transform-origin: bottom right;
+  animation: dotscale 4s ease-in-out infinite reverse;
+}
+
+/* Optional pulsing dots */
+@keyframes dotscale {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 0.5; }
+}
+
+/* Pressed state */
+.corner-halftone-btn:active {
+  transform: scale(0.97);
+  box-shadow: 2px 2px 0 #000;
+}
+
+/* === Inner Tab Buttons (Single / Double Elimination) === */
+.inner-tab-btn {
+  --bg: #fdfdf5;
+  --text: #222;
+  --dot: rgba(0, 0, 0, 0.08);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  border: 2px solid #333;
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  font-weight: 600;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  clip-path: polygon(6px 0%, calc(100% - 6px) 0%, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0% calc(100% - 6px), 0% 6px);
+}
+
+.inner-tab-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+  background-size: 5px 5px;
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.inner-tab-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0 #000;
+}
+
+.inner-tab-btn.active {
+  background: linear-gradient(135deg, #0077ff, #005bcc);
+  color: #fff;
+  border-color: #002266;
+  box-shadow: 4px 4px 0 #002266;
+}
+
+.inner-tab-btn.active::before {
+  background-image: radial-gradient(rgba(255,255,255,0.4) 1px, transparent 1px);
+}
+
+/* Dark mode */
+[data-theme='dark'] .inner-tab-btn {
+  border-color: var(--border-dark);
+  background: linear-gradient(145deg, #2a2a2a, var(--buttonbg));
+  color: var(---dark);
+  box-shadow: 2px 2px 0 #000;
+}
+
+[data-theme='dark'] .inner-tab-btn::before,
+[data-theme='dark'] .inner-tab-btn::after {
+  background-image: radial-gradient(var(--dot-dark) 1px, transparent 1px);
+}
+
+[data-theme='dark'] .inner-tab-btn:hover {
+  box-shadow: 3px 3px 0 #000;
+  background: linear-gradient(145deg, #2e2e2e, #252525);
+}
+
+[data-theme='dark'] .inner-tab-btn.active {
+  background: linear-gradient(145deg, #0077ff, #005bcc);
+  border-color: #0044bb;
+  color: #fff;
+  box-shadow: 3px 3px 0 #002266;
+}
+
+ 
+/* === Unique Toggle Panel Button === */
+#togglePanelBtn {
+  --bg-light: #f7f8fa;
+  --bg-dark: #1f1f1f;
+  --border-light: #ccc;
+  --border-dark: #444;
+  --text-light: #222;
+  --text-dark: #eee;
+  --dot-light: rgba(0, 0, 0, 0.12);
+  --dot-dark: rgba(255, 255, 255, 0.1);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 6px 14px;
+  border-radius: 10px;
+  border: 2px solid var(--border-light);
+  background: linear-gradient(145deg, #ffffff, var(--bg-light));
+  color: var(--text-light);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  position: absolute;
+  overflow: hidden;
+
+  box-shadow: 2px 2px 0 #888;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+
+  animation: toggle-breathe 5s ease-in-out infinite;
+}
+
+/* Icon */
+#togglePanelBtn span {
+  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Light halftone corners */
+#togglePanelBtn::before,
+#togglePanelBtn::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-image: radial-gradient(var(--dot-light) 1px, transparent 1px);
+  background-size: 3px 3px;
+  pointer-events: none;
+  transition: background-size 0.3s ease;
+}
+
+#togglePanelBtn::before {
+  top: 4px;
+  left: 4px;
+}
+
+#togglePanelBtn::after {
+  bottom: 4px;
+  right: 4px;
+}
+
+/* Hover = subtle lift */
+#togglePanelBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 3px 3px 0 #555;
+  background: linear-gradient(145deg, #fafafa, #e8ebf0);
+}
+
+#togglePanelBtn:hover::before,
+#togglePanelBtn:hover::after {
+  background-size: 2.5px 2.5px;
+  opacity: 0.8;
+}
+
+/* Pressed = tactile push */
+#togglePanelBtn:active {
+  transform: scale(0.96);
+  box-shadow: 1px 1px 0 #666;
+}
+
+/* Subtle breathing */
+@keyframes toggle-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* === Dark Mode === */
+[data-theme='dark'] #togglePanelBtn {
+  border-color: var(--border-dark);
+  background: linear-gradient(145deg, #2a2a2a, var(--bg-dark));
+  color: var(--text-dark);
+  box-shadow: 2px 2px 0 #000;
+}
+
+[data-theme='dark'] #togglePanelBtn::before,
+[data-theme='dark'] #togglePanelBtn::after {
+  background-image: radial-gradient(var(--dot-dark) 1px, transparent 1px);
+}
+
+[data-theme='dark'] #togglePanelBtn:hover {
+  background: linear-gradient(145deg, #2e2e2e, #252525);
+  box-shadow: 3px 3px 0 #000;
+}
+
+
+
+.toggleNight{
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+/* Tabler */
+.tabler--tournament {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M2 4a2 2 0 1 0 4 0a2 2 0 1 0-4 0m16 6a2 2 0 1 0 4 0a2 2 0 1 0-4 0M2 12a2 2 0 1 0 4 0a2 2 0 1 0-4 0m0 8a2 2 0 1 0 4 0a2 2 0 1 0-4 0m4-8h3a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H6'/%3E%3Cpath d='M6 4h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-2m3-6h4'/%3E%3C/g%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.mdi--bracket {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M2 2v2h5v4H2v2h5c1.11 0 2-.89 2-2V7h5v10H9v-1c0-1.11-.89-2-2-2H2v2h5v4H2v2h5c1.11 0 2-.89 2-2v-1h5c1.11 0 2-.89 2-2v-4h6v-2h-6V7c0-1.11-.89-2-2-2H9V4c0-1.11-.89-2-2-2z'/%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.material-symbols--hide-source-outline {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M19.775 22.625L17.5 20.35q-1.225.8-2.612 1.225T12 22q-2.075 0-3.9-.788t-3.175-2.137T2.788 15.9T2 12q0-1.5.425-2.887T3.65 6.5L1.375 4.225L2.8 2.8l18.4 18.4zM12 20q1.075 0 2.088-.275t1.962-.825L5.1 7.95q-.55.95-.825 1.962T4 12q0 3.325 2.338 5.663T12 20m8.35-2.5l-1.45-1.45q.55-.95.825-1.963T20 12q0-3.325-2.337-5.663T12 4q-1.075 0-2.087.275T7.95 5.1L6.5 3.65q1.225-.8 2.613-1.225T12 2q2.075 0 3.9.788t3.175 2.137T21.213 8.1T22 12q0 1.5-.425 2.888T20.35 17.5m-9.775-4.075'/%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.bi--save-fill {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%23000' d='M8.5 1.5A1.5 1.5 0 0 1 10 0h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h6c-.314.418-.5.937-.5 1.5v7.793L4.854 6.646a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l3.5-3.5a.5.5 0 0 0-.708-.708L8.5 9.293z'/%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  transform: rotate(180deg);
+}
+
+.ic--outline-reset-tv {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M22 8V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4v2h8v-2h4c1.1 0 1.99-.9 1.99-2v-5H22c0-1.1-.9-2-2-2h-7.17l1.83-1.83l-1.41-1.41C9.69 10.31 10.88 9.12 9 11l4.24 4.24l1.41-1.41L12.83 12H20v5H4V5h16v3z'/%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.line-md--play-filled {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 6l10 6l-10 6Z'/%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.material-symbols--stop-rounded {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  --svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M6 16V8q0-.825.588-1.412T8 6h8q.825 0 1.413.588T18 8v8q0 .825-.587 1.413T16 18H8q-.825 0-1.412-.587T6 16'/%3E%3C/svg%3E");
+  background-color: currentColor;
+  -webkit-mask-image: var(--svg);
+  mask-image: var(--svg);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.creator-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 9999;
+}
+
+.creator-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.creator-card {
+  background: var(--card-bg, #fff);
+  color: var(--text, #222);
+  padding: 24px 32px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  text-align: center;
+  max-width: 320px;
+  width: 90%;
+  animation: fadeInUp 0.4s ease;
+}
+
+.creator-card h2 {
+  margin-top: 0;
+}
+
+.creator-card button {
+  margin-top: 16px;
+  background: var(--accent, #0077ff);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.creator-card button:hover {
+  background: #005bcc;
+}
+
+@keyframes fadeInUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+</style>
+</head>
+<body>
+<div class="halftone-gradual"></div>
+  <button class="halftone-btn toggleNight" onclick="toggleTheme()">🌙</button>
+
+
+  <div class="channel-bar">
+    <button class="channel active halftone-btn" onclick="openTab(event,'scoreboard')">🏆 Scoreboard</button>
+    <button class="channel halftone-btn" onclick="openTab(event,'commentary')">🎙 Commentary</button>
+    <button class="channel halftone-btn" onclick="openTab(event,'brackets')">🔀 Brackets</button>
+  </div>
+  <div class="container">
+      <div id="notifMsg" style="display: none; color: green;">
+        Copied to clipboard!
+      </div>
+    <!-- SCOREBOARD -->
+    <div id="scoreboard" class="tabcontent active">
+      <div class="scoreboard-panel">
+        <div class="toolbar">
+          <button class="btn corner-halftone-btn" title="Ctrl + s for shortcut" onclick="updateScoreboard('Scoreboard updated!')"><span class="bi--save-fill"></span> Save Scoreboard</button>
+          <button class="btn corner-halftone-btn" title="Ctrl + r for shortcut" onclick="resetScoreboard()"><span class="ic--outline-reset-tv"></span> Reset </button>
+          <div class="obs-scoreboard">
+            <h1> Copy this to your obs</h1>
+            <div class="copy-scoreboard" id="scoreboard-url" onclick="copyCardContent('scoreboard-url')">
+              <p> localhost:34115/scoreboard.html </p>
+            </div>
+          </div>
+
+          <button class="corner-halftone-btn" id="toggleStreamBtn" onclick="openStreamMode()">
+             Stream Mode
+          </button>
+
+        </div>
+        <div class="settings">
+          <input type="hidden" id="game" value="sf">
+          <label> Game
+          <div class="custom-select" id="gameDropdown">
+            <div class="selected">
+              <img id="selectedGameIcon" src="./img/game_ico/SF6_Logo.png" alt="">
+              <span id="selectedGameName">Street Fighter</span>
+            </div>
+            <div class="options">
+              <div data-value="sf" data-icon="./img/game_ico/SF6_Logo.png">
+                <img src="./img/game_ico/SF6_Logo.png" alt=""> Street Fighter
+              </div>
+              <div data-value="dbfz" data-icon="./img/game_ico/DBFZ_Logo.png">
+                <img src="./img/game_ico/DBFZ_Logo.png" alt=""> Dragon Ball FighterZ
+              </div>
+              <div data-value="gbvsr" data-icon="./img/game_ico/GBVSR_Logo.png">
+                <img src="./img/game_ico/GBVSR_Logo.png" alt=""> Granblue Fantasy Versus Rising
+              </div>
+              <div data-value="tekken" data-icon="./img/game_ico/Tekken_8_Logo.png">
+                <img src="./img/game_ico/Tekken_8_Logo.png" alt=""> Tekken
+              </div>
+              <div data-value="2xko" data-icon="./img/game_ico/2XKO_Logo.png">
+                <img src="./img/game_ico/2XKO_Logo.png" alt=""> 2XKO
+              </div>
+            </div>
+          </div>
+          </label>
+          <label>Style
+            <select id="style" style="padding: 8px; width: 100%;">
+              <option value="minimalist">Minimalist</option>
+              <option value="arcade">Arcade</option>
+              <option value="futuristic">Futuristic</option>
+              <option value="white_outline">White Outline</option>
+              <option value="gb_versus">GranblueVersus Style</option>
+              <option value="popu">Popu Style</option>
+            </select>
+          </label>
+          <label>Titlecard
+            <input style="padding: 9px; width: 100%;" id="titlecard" type="text" placeholder="Top 8 / Grand Finals / etc.">
+          </label>
+  
+          <img id="gameIcon" src="./img/game_ico/SF6_Logo.png " alt="Game Icon" >
+        </div>
+      <div class="playerflex">
+        <!-- Player 1 -->
+          <div class="player-block" id="p1block">
+            <label>Name: <input id="p1" type="text" placeholder="Player 1"></label>
+            <label>Team: <input id="t1" type="text" placeholder="Team 1"></label>
+            <label>Nation:
+              <input id="n1" type="text" maxlength="2" placeholder="ID">
+            </label>
+            <label>Score: <input id="s1" type="number" value="0"></label>
+          </div>
+      
+          <!-- Player 2 -->
+          <div class="player-block" id="p2block">
+            <label>Name: <input id="p2" type="text" placeholder="Player 2"></label>
+            <label>Team: <input id="t2" type="text" placeholder="Team 2"></label>
+            <label>Nation:
+              <input id="n2" type="text" maxlength="2" placeholder="ID">
+            </label>
+            <label>Score: <input id="s2" type="number" value="0"></label>
+          </div>
+      
+          <!-- Player 3 (2XKO only) -->
+          <div class="player-block" id="p3block" style="display:none;">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="v3" class="toggle toggle-green">
+              <label for="v3" data-tg-on="ON" data-tg-off="OFF"></label>
+            </div>
+
+            <label>Name: <input id="p3" type="text" placeholder="Player 3"></label>
+            <label>Team: <input id="t3" type="text" placeholder="Team 3"></label>
+            <label>Nation:
+              <input id="n3" type="text" maxlength="2" placeholder="ID">
+            </label>
+            <label>Score: <input id="s3" type="number" value="0"></label>
+          </div>
+
+          <!-- Player 4 (2XKO only) -->
+          <div class="player-block" id="p4block" style="display:none;">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="v4" class="toggle toggle-yellow">
+              <label for="v4" data-tg-on="ON" data-tg-off="OFF"> </label>
+            </div>
+
+            <label>Name: <input id="p4" type="text" placeholder="Player 4"></label>
+            <label>Team: <input id="t4" type="text" placeholder="Team 4"></label>
+            <label>Nation:
+              <input id="n4" type="text" maxlength="2" placeholder="ID">
+            </label>
+            <label>Score: <input id="s4" type="number" value="0"></label>
+          </div>
+
+      </div>
+      <div class="small">* Player 3 and Player 4 are only used in 2XKO mode.</div>
+      <div class="container" style="padding-top: 20px;">
+        <!-- sponsor section -->
+          <div class="sponsor-section">
+            <h3>🎯Sponsor</h3>
+            
+            <div id="uploadContainer" class="upload-container">
+              <div class="upload-icon">📁</div>
+              <div><strong>Drag & drop images here</strong></div>
+              <div class="small">Supports: JPG, PNG, GIF, SVG</div>
+              <input id="fileInput" type="file" accept="image/*" multiple style="display:none;">
+            </div>
+  
+            <div id="statusContainer"></div>
+            <!-- This is where previews will show -->
+            <div id="previewGrid" class="preview-grid"></div>
+          </div>
+  
+  
+      </div>
+      </div>
+
+  </div> <!-- end scoreboard tab -->
+
+    <!-- COMMENTARY -->
+    <div id="commentary" class="tabcontent">
+      <div class="commentary-top">
+        <div class="commentary-panel">
+          <div class="commentary-toolbar" style="margin-bottom: 16px;">
+            <button class="btn corner-halftone-btn" title="Ctrl + s for shortcut" onclick="updateCommentary()"><span class="bi--save-fill"></span> Save Commentary</button>
+            <button class="btn corner-halftone-btn" title="Ctrl + r for shortcut" onclick="resetCommentary()"><span class="ic--outline-reset-tv"></span> Reset </button>
+            <button class="btn corner-halftone-btn" onclick="toggleCommentary(true)"><span class="line-md--play-filled"></span> Show</button>
+            <button class="btn corner-halftone-btn" onclick="toggleCommentary(false)"><span class="material-symbols--stop-rounded"></span> Hide</button>
+          </div>
+            <div class="obs-scoreboard" style="width: 400px;">
+              <h1> Copy this to your obs</h1>
+              <div class="copy-scoreboard" id="commentary-url" onclick="copyCardContent('commentary-url')">
+                <p> localhost:34115/commentary.html </p>
+            </div>
+          </div> 
+          <div class="commentator-block">
+            <label>Commentator 1 - Name<input id="com1_name" type="text" placeholder="Commentator 1"></label>
+            <label>Commentator 1 - Description<input id="com1_desc" type="text" placeholder="FGC Expert"></label>
+          </div>
+          <div class="commentator-block">
+            <label>Commentator 2 - Name<input id="com2_name" type="text" placeholder="Commentator 2"></label>
+            <label>Commentator 2 - Description<input id="com2_desc" type="text" placeholder="Studio Host"></label>
+          </div>
+        </div>
+        <div class="iframe-commentator">
+          <div class="iframe-wrapper">
+            <iframe 
+              src="http://localhost:34115/commentary.html"
+              frameborder="0"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BRACKETS -->
+    <div id="brackets" class="tabcontent">
+      <div class="bracket-panel">
+        <!-- <h2 style="margin-top:0">Brackets — Single Elimination (Top 8)</h2> -->
+        <div class="inner-tabs" style="margin-bottom:14px">
+          <button id="singleTabBtn" class="active inner-tab-btn" onclick="openInnerTab('single')"><span class="mdi--bracket"></span>Single Elimination</button>
+          <button id="doubleTabBtn" class="inner-tab-btn" onclick="openInnerTab('double')"><span class="tabler--tournament"></span> Double Elimination</button>
+
+        </div>
+
+        <!-- Single elimination UI (will be loaded from bracket_single.html) -->
+        <div id="single" class="inner-tabcontent" style="display:block"></div>
+
+        <!-- Double elimination UI (will be loaded from bracket_double.html) -->
+        <div id="double" class="inner-tabcontent" style="display:none"></div>
+  </div>
+  </div>
+
+  
+<div id="creatorOverlay" class="creator-overlay">
+  <div class="creator-card">
+    <p></p>
+    <h2>👋 It's Mahvel Baybeh </h2>
+    <p>This app was created by <strong>giogio555</strong></p>
+    <p>Version 1.0.3 — © 2025</p>
+ <p>
+  Consider visiting 
+  <a href="#" onclick="openExternal('https://github.com/jordyhutahaean')">Github</a> 
+  or 
+  <a href="#" onclick="openExternal('https://www.youtube.com/@LunallytheMedan')">Youtube</a>
+</p>
+    <p>If you found bugs and stuff, let me know by reaching <a href="mailto:aklasia404@gmail.com">This mail</a></p>
+    <button onclick="document.getElementById('creatorOverlay').classList.remove('visible')">Close</button>
+  </div>
+</div>
+
+<!-- Test -->
+
+
+<script>
+/* ---------------------
+   Utility + tabs
+   --------------------- */
+
+function openInnerTab(name){
+  document.querySelectorAll(".inner-tabcontent").forEach(el=>el.style.display="none");
+  document.querySelectorAll(".inner-tabs button").forEach(b=>b.classList.remove("active"));
+  document.getElementById(name).style.display="block";
+  document.getElementById(name + "TabBtn") && document.getElementById(name + "TabBtn").classList.add("active");
+}
+
+/* ---------------------
+   Scoreboard logic (unchanged)
+   --------------------- */
+function toggleGameMode(){
+  const game = document.getElementById("game").value;
+  const p3 = document.getElementById("p3block");
+  const p4 = document.getElementById("p4block");
+
+  if(p3) p3.style.display = (game==="2xko") ? "flex" : "none";
+  if(p4) p4.style.display = (game==="2xko") ? "flex" : "none";
+}
+
+// Custom dropdown logic
+document.addEventListener("DOMContentLoaded", () => {
+  window.focus();
+  document.body.focus();
+  const dropdown = document.getElementById("gameDropdown");
+  const selected = dropdown.querySelector(".selected");
+  const options = dropdown.querySelector(".options");
+  const hiddenInput = document.getElementById("game");
+  
+  hiddenInput.type = "hidden";
+  hiddenInput.id = "game";
+  hiddenInput.value = "sf"; // default game
+  document.body.appendChild(hiddenInput);
+
+  selected.addEventListener("click", () => {
+    options.style.display = options.style.display === "block" ? "none" : "block";
+  });
+
+  options.querySelectorAll("div").forEach(opt => {
+    opt.addEventListener("click", () => {
+      const val = opt.getAttribute("data-value");
+      const icon = opt.getAttribute("data-icon");
+      const text = opt.innerText;
+
+      hiddenInput.value = val;
+      selected.querySelector("img").src = icon;
+      selected.querySelector("span").textContent = text;
+
+      // update selected block (img + span)
+      document.getElementById("selectedGameIcon").src = icon;
+      document.getElementById("selectedGameName").textContent = text;
+      document.getElementById("gameIcon").src = icon;
+
+      // close dropdown
+      gameDropdown.classList.remove("open");
+
+      options.style.display = "none";
+
+      //Call existing Logic
+      toggleGameMode();
+      handleGameSwitch(val);   // ✅ reset when switching game
+    });
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if(!dropdown.contains(e.target)) options.style.display = "none";
+  });
+});
+
+
+async function updateScoreboard(msg = "Scoreboard updated!") {
+  const data = {
+    game: document.getElementById("game").value,
+    style: document.getElementById("style").value,
+    titlecard: document.getElementById("titlecard").value,
+    player1: document.getElementById("p1").value,
+    team1: document.getElementById("t1").value,
+    nation1: document.getElementById("n1").value.toUpperCase(),
+    score1: parseInt(document.getElementById("s1").value||0,10),
+    player2: document.getElementById("p2").value,
+    team2: document.getElementById("t2").value,
+    nation2: document.getElementById("n2").value.toUpperCase(),
+    score2: parseInt(document.getElementById("s2").value||0,10),
+    player3: document.getElementById("p3")?.value||"",
+    team3: document.getElementById("t3")?.value||"",
+    nation3: document.getElementById("n3")?.value.toUpperCase()||"",
+    score3: parseInt(document.getElementById("s3")?.value||0,10),
+    visible3: document.getElementById("v3")?.checked??false,
+    player4: document.getElementById("p4")?.value||"",
+    team4: document.getElementById("t4")?.value||"",
+    nation4: document.getElementById("n4")?.value.toUpperCase()||"",
+    score4: parseInt(document.getElementById("s4")?.value||0,10),
+    visible4: document.getElementById("v4")?.checked??false
+  };
+
+  try {
+    await window.go.main.App.SaveScoreboardJSON(data);
+
+    // ✅ Also save player names to CSV
+    const players = [
+      { name: data.player1, team: data.team1 },
+      { name: data.player2, team: data.team2 },
+      { name: data.player3, team: data.team3 },
+      { name: data.player4, team: data.team4 },
+    ].filter(p => p.name);
+
+    await window.go.main.App.SavePlayersCSV(players);
+    console.log("✅ Saved player list to CSV");
+  
+    // 🔁 Refresh suggestions right away
+    await loadPlayerSuggestions();
+    await loadPlayersCSV(); 
+    
+    // ✅ Show notification again
+    copyCardContent(null, msg);
+  } catch (err) {
+    console.error("SaveScoreboardJSON failed:", err);
+  }
+  copyCardContent(null, msg);
+  loadPlayersCSV(); // Refresh suggestions after update
+}
+
+
+function resetScoreboard(){
+  // limit reset to scoreboard form inputs only (avoid wiping bracket seeds by accident)
+  const selectors = ['#p1','#t1','#s1','#n1','#p2','#t2','#s2',
+  '#n2','#p3','#t3','#s3','#n3','#p4','#t4','#s4','#n4','#titlecard'];
+  selectors.forEach(sel=>{ 
+    const el = document.querySelector(sel); 
+    if(el) el.value = (el.type==='number')?0:''; 
+  });
+  
+  const v3 = document.getElementById("v3"), 
+        v4 = document.getElementById("v4");
+  if(v3) v3.checked=false; 
+  if(v4) v4.checked=false;
+  updateScoreboard("Scoreboard reset!");
+}
+
+// Auto-clean extra players when switching game
+document.addEventListener("DOMContentLoaded", () => {
+  const titleInput = document.getElementById("titlecard");
+  if (titleInput) {
+    titleInput.addEventListener("change", (e) => {
+      const game = e.target.value.toLowerCase();
+
+      // If not 2XKO, reset player 3 & 4
+      if (game !== "2xko") {
+        const v3 = document.getElementById("v3"),
+              v4 = document.getElementById("v4");
+        if(v3) v3.checked = false;
+        if(v4) v4.checked = false;
+
+        // Clear values for P3 & P4
+        ["#p3","#t3","#s3","#c3","#p4","#t4","#s4","#c4"].forEach(sel => {
+          const el = document.querySelector(sel);
+          if(el) el.value = (el.type==='number') ? 0 : '';
+        });
+
+        updateScoreboard("Switched game → extra players cleared!");
+      }
+    });
+  }
+});
+
+function handleGameSwitch(val) {
+  if (val !== "2xko") {
+    const v3 = document.getElementById("v3"),
+          v4 = document.getElementById("v4");
+    if (v3) v3.checked = false;
+    if (v4) v4.checked = false;
+
+    // Clear values for P3 & P4
+    ["#p3","#t3","#s3","#c3","#p4","#t4","#s4","#c4"].forEach(sel => {
+      const el = document.querySelector(sel);
+      if (el) el.value = (el.type === "number") ? 0 : "";
+    });
+
+    updateScoreboard("Switched game → extra players cleared!");
+  }
+}
+
+/* ---------------------
+   Commentary logic (unchanged behavior)
+   --------------------- */
+let commentaryVisible = false;
+
+async function updateCommentary(msg="Commentary updated!"){
+  const data = {
+    commentator1: document.getElementById("com1_name").value || "",
+    description1: document.getElementById("com1_desc").value || "",
+    commentator2: document.getElementById("com2_name").value || "",
+    description2: document.getElementById("com2_desc").value || "",
+    visible: commentaryVisible
+  };
+  try {
+    if (window.go?.main?.App?.SaveCommentaryJSON) {
+      await window.go.main.App.SaveCommentaryJSON(data);
+      copyCardContent(null, msg);
+    }
+  } catch (e) {
+    alert("Failed to save commentary: " + e);
+    copyCardContent(null, "Error saving commentary");
+  }
+}
+
+function resetCommentary(){
+  document.getElementById("com1_name").value="";
+  document.getElementById("com1_desc").value="";
+  document.getElementById("com2_name").value="";
+  document.getElementById("com2_desc").value="";
+  updateCommentary("Commentary reset!");
+}
+
+async function toggleCommentary(show) {
+  commentaryVisible = show;
+  const card = document.getElementById("commentary-card");
+
+  if (card) {
+    if (show) {
+      card.classList.remove("hide");
+      card.classList.add("show");
+    } else {
+      card.classList.remove("show");
+      card.classList.add("hide");
+    }
+  }
+
+  const data = {
+    commentator1: document.getElementById("com1_name").value||"",
+    description1: document.getElementById("com1_desc").value||"",
+    commentator2: document.getElementById("com2_name").value||"",
+    description2: document.getElementById("com2_desc").value||"",
+    visible: show
+  };
+  try{
+    await window.go.main.App.SaveCommentaryJSON(data);
+  }catch(err){
+    console.error("SaveCommentaryJSON failed:",err);
+  }
+}
+
+/* ---------------------
+   Bracket data & functions (keeps previous IDs/logic)
+   --------------------- */
+
+let bracketData = null;
+
+function ensureBracket(){
+  if(!bracketData){
+    bracketData = { single: { players: Array(8).fill(""), scores: {}, winners: {} }, double: { players: Array(8).fill(""), scores: {}, winners:{}, meta:{} } };
+  }
+}
+
+/* Progression */
+function updateDoubleBracket(){
+  ensureBracket();
+  bracketData.double.eliminated = [];
+  bracketData.double.losers = {};
+
+  // --- Winners Semis → Winners Final, losers → Losers QF slots ---
+  [['wb_sf1','wb_final_p1'],['wb_sf2','wb_final_p2']].forEach(([mid, winTarget])=>{
+    const a = val(mid+'_s1'), b = val(mid+'_s2');
+    bracketData.double.scores[mid] = [a,b];
+
+    if(a !== null && b !== null && a !== b){
+      const winner = a > b ? text(mid+'_p1') : text(mid+'_p2');
+      const loser  = a > b ? text(mid+'_p2') : text(mid+'_p1');
+      setText(winTarget, winner);
+
+      bracketData.double.winners[mid] = winner;
+      bracketData.double.losers[mid]  = loser;
+    } else {
+      setText(winTarget, 'Winner '+mid.toUpperCase());
+      delete bracketData.double.winners[mid];
+      delete bracketData.double.losers[mid];
+    }
+  });
+
+  // --- Losers R1 → Losers QF ---
+  [['lb_r1_m1','lb_qf_m1_p1'],['lb_r1_m2','lb_qf_m2_p1']].forEach(([mid, winTarget])=>{
+    const a = val(mid+'_s1'), b = val(mid+'_s2');
+    bracketData.double.scores[mid] = [a,b];
+
+    if(a !== null && b !== null && a !== b){
+      const winner = a > b ? text(mid+'_p1') : text(mid+'_p2');
+      const loser  = a > b ? text(mid+'_p2') : text(mid+'_p1');
+      setText(winTarget, winner);
+
+      bracketData.double.winners[mid] = winner;
+      bracketData.double.eliminated.push(loser);
+      if(a > b) setEliminated(mid+'_p2',true); else setEliminated(mid+'_p1',true);
+    } else {
+      setText(winTarget,'Winner '+mid.toUpperCase());
+      setEliminated(mid+'_p1',false); setEliminated(mid+'_p2',false);
+      delete bracketData.double.winners[mid];
+    }
+  });
+
+  // --- Drop WB SF losers into Losers QF ---
+  if(bracketData.double.losers){
+    if(bracketData.double.losers['wb_sf1'])
+      setText('lb_qf_m2_p2', bracketData.double.losers['wb_sf1']);
+    if(bracketData.double.losers['wb_sf2'])
+      setText('lb_qf_m1_p2', bracketData.double.losers['wb_sf2']);
+  }
+
+  // --- Losers QF → Losers Semi ---
+  [['lb_qf_m1','lb_semi_p1'],['lb_qf_m2','lb_semi_p2']].forEach(([mid,winTarget])=>{
+    const a = val(mid+'_s1'), b = val(mid+'_s2');
+    bracketData.double.scores[mid] = [a,b];
+
+    if(a !== null && b !== null && a !== b){
+      const winner = a > b ? text(mid+'_p1') : text(mid+'_p2');
+      const loser  = a > b ? text(mid+'_p2') : text(mid+'_p1');
+      setText(winTarget, winner);
+
+      bracketData.double.winners[mid] = winner;
+      bracketData.double.eliminated.push(loser);
+      if(a > b) setEliminated(mid+'_p2',true); else setEliminated(mid+'_p1',true);
+    } else {
+      setText(winTarget,'Winner '+mid.toUpperCase());
+      setEliminated(mid+'_p1',false); setEliminated(mid+'_p2',false);
+      delete bracketData.double.winners[mid];
+    }
+  });
+
+  // --- Losers Semi → Losers Final ---
+  const lsa = val('lb_semi_s1'), lsb = val('lb_semi_s2');
+  bracketData.double.scores['lb_semi'] = [lsa, lsb];
+  if(lsa !== null && lsb !== null && lsa !== lsb){
+    const winner = lsa > lsb ? text('lb_semi_p1') : text('lb_semi_p2');
+    const loser  = lsa > lsb ? text('lb_semi_p2') : text('lb_semi_p1');
+    setText('lb_final_p1', winner);
+
+    bracketData.double.winners['lb_semi'] = winner;
+    bracketData.double.eliminated.push(loser);
+    if(lsa > lsb) setEliminated('lb_semi_p2',true); else setEliminated('lb_semi_p1',true);
+  } else {
+    setText('lb_final_p1','Winner LB_SEMI');
+    setEliminated('lb_semi_p1',false); setEliminated('lb_semi_p2',false);
+    delete bracketData.double.winners['lb_semi'];
+  }
+
+  // --- Losers Final → Grand Final LB slot ---
+  const lfa = val('lb_final_s1'), lfb = val('lb_final_s2');
+  bracketData.double.scores['lb_final'] = [lfa, lfb];
+  if(lfa !== null && lfb !== null && lfa !== lfb){
+    const winner = lfa > lfb ? text('lb_final_p1') : text('lb_final_p2');
+    const loser  = lfa > lfb ? text('lb_final_p2') : text('lb_final_p1');
+    setText('gf_lb', winner);
+
+    bracketData.double.winners['lb_final'] = winner;
+    bracketData.double.eliminated.push(loser);
+    if(lfa > lfb) setEliminated('lb_final_p2',true); else setEliminated('lb_final_p1',true);
+  } else {
+    setText('gf_lb','LB Winner');
+    setEliminated('lb_final_p1',false); setEliminated('lb_final_p2',false);
+    delete bracketData.double.winners['lb_final'];
+  }
+
+// Combined Winners Final logic (both Losers Final and Grand Final slots)
+const wfa = val('wb_final_s1'), wfb = val('wb_final_s2');
+bracketData.double.scores['wb_final'] = [wfa, wfb];
+
+if(wfa !== null && wfb !== null && wfa !== wfb){
+    // Determine winner and loser
+    const winner = wfa > wfb ? text('wb_final_p1') : text('wb_final_p2');
+    const loser = wfa > wfb ? text('wb_final_p2') : text('wb_final_p1');
+    
+    // Update both slots
+    setText('gf_wb', winner);
+    setText('lb_final_p2', loser);
+    
+    // Store in bracket data
+    bracketData.double.winners['wb_final'] = winner;
+    bracketData.double.losers['wb_final'] = loser;
+} else {
+    // Reset both slots if no valid result
+    setText('gf_wb', 'WB Winner');
+    setText('lb_final_p2', 'Loser WB Final');
+    delete bracketData.double.winners['wb_final'];
+    delete bracketData.double.losers['wb_final'];
+}
+
+  // --- Grand Final (Champion or Reset) ---
+  const gfa = val('gf_wb_s'), gfb = val('gf_lb_s');
+  bracketData.double.scores['grand_final'] = [gfa, gfb];
+  if(gfa !== null && gfb !== null && gfa !== gfb){
+    if(gfa > gfb){
+      alert('🏆 Champion: '+text('gf_wb'));
+      setEliminated('gf_lb', true);
+      document.getElementById('gf_reset').style.display = 'none';
+    } else {
+      document.getElementById('gf_reset').style.display = 'block';
+      setText('gf_reset_p1', text('gf_wb'));
+      setText('gf_reset_p2', text('gf_lb'));
+    }
+  } else {
+    document.getElementById('gf_reset').style.display = 'none';
+  }
+
+  // ✅ Save progress to JSON
+  highlightDoubleWinners();
+  try {
+    if(window.go?.main?.App)
+      window.go.main.App.SaveBracketJSON(bracketData);
+  } catch(e) {}
+}
+
+
+async function loadBracket(){
+  ensureBracket();
+  try{
+    const resp = await fetch("bracket.json?_=" + Date.now());
+    if(!resp.ok) throw new Error("no bracket.json");
+    const data = await resp.json();
+    bracketData = data;
+  }catch(err){
+    console.warn("No bracket.json found – using blank bracket");
+  }
+  renderSingleFromData();
+  renderDoubleFromData();
+}
+document.querySelectorAll('#doubleVisual input[type="number"]').forEach(inp => {
+  inp.addEventListener('input', updateDoubleBracket);
+});
+
+
+/* ---------- replaced: renderSingleFromData, updateBracket, attachBracketListeners ---------- */
+
+/* small helpers used by bracket logic */
+function getNum(id){
+  const el = document.getElementById(id);
+  if(!el) return null;
+  const v = el.value;
+  return (v === '' || v === undefined) ? null : Number(v);
+}
+function setText(id, txt){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.textContent = txt;
+}
+function setInputVal(id, v){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.value = (v === null || v === undefined) ? '' : v;
+}
+
+/* compute winner from stored scores if available, else null */
+function computeWinnerFromScores(scoresObj, matchId, p1Id, p2Id){
+  const sc = (scoresObj && scoresObj[matchId]) ? scoresObj[matchId] : [null, null];
+  if(!Array.isArray(sc) || sc.length < 2) return null;
+  const [a,b] = sc;
+  if(a === null || b === null || a === b) return null;
+  return a > b ? (document.getElementById(p1Id)?.textContent || '') : (document.getElementById(p2Id)?.textContent || '');
+}
+
+/* render single-elim data into the UI (seeds, scores, derived winners) */
+function renderSingleFromData(){
+  ensureBracket();
+  const s = bracketData && bracketData.single ? bracketData.single : { players: Array(8).fill(""), scores:{}, winners:{} };
+  const players = s.players || Array(8).fill("");
+
+  // seeding -> QF mapping (keep your original mapping)
+  const qfPairs = {
+    qf1: [players[0]||"", players[7]||""], // 1 vs 8
+    qf2: [players[3]||"", players[4]||""], // 4 vs 5
+    qf3: [players[2]||"", players[5]||""], // 3 vs 6
+    qf4: [players[1]||"", players[6]||""]  // 2 vs 7
+  };
+
+  // fill QF names and scores
+  Object.keys(qfPairs).forEach(k=>{
+    const [aName,bName] = qfPairs[k];
+    setText(k + 'p1', aName || '—');
+    setText(k + 'p2', bName || '—');
+    const sc = (s.scores && s.scores[k]) ? s.scores[k] : [null,null];
+    setInputVal(k + 's1', sc[0] ?? '');
+    setInputVal(k + 's2', sc[1] ?? '');
+  });
+
+  // derive QF winners (try saved winners first, otherwise compute from scores)
+  ['qf1','qf2','qf3','qf4'].forEach((qf, idx) => {
+    const saved = s.winners && s.winners[qf];
+    const derived = saved || computeWinnerFromScores(s.scores, qf, qf + 'p1', qf + 'p2');
+    // place into SF slots (mapping preserved from original logic)
+    const sfTarget = (qf === 'qf1') ? 'sf1p1' : (qf === 'qf2') ? 'sf1p2' : (qf === 'qf3') ? 'sf2p1' : 'sf2p2';
+    setText(sfTarget, derived || ('Winner ' + qf.toUpperCase()));
+    if(derived) bracketData.single.winners = bracketData.single.winners || {}, bracketData.single.winners[qf] = derived;
+    else if(bracketData.single && bracketData.single.winners) delete bracketData.single.winners[qf];
+  });
+
+  // populate SF scores
+  setInputVal('sf1s1', s.scores?.sf1 ? s.scores.sf1[0] ?? '' : '');
+  setInputVal('sf1s2', s.scores?.sf1 ? s.scores.sf1[1] ?? '' : '');
+  setInputVal('sf2s1', s.scores?.sf2 ? s.scores.sf2[0] ?? '' : '');
+  setInputVal('sf2s2', s.scores?.sf2 ? s.scores.sf2[1] ?? '' : '');
+
+  // derive SF winners -> final participants
+  ['sf1','sf2'].forEach(sf=>{
+    const saved = s.winners && s.winners[sf];
+    const derived = saved || computeWinnerFromScores(s.scores, sf, sf + 'p1', sf + 'p2');
+    const fTarget = (sf === 'sf1') ? 'f1p1' : 'f1p2';
+    setText(fTarget, derived || ('Winner ' + sf.toUpperCase()));
+    if(derived) bracketData.single.winners = bracketData.single.winners || {}, bracketData.single.winners[sf] = derived;
+    else if(bracketData.single && bracketData.single.winners) delete bracketData.single.winners[sf];
+  });
+
+  // final scores
+  setInputVal('f1s1', s.scores?.f1 ? s.scores.f1[0] ?? '' : '');
+  setInputVal('f1s2', s.scores?.f1 ? s.scores.f1[1] ?? '' : '');
+
+  // visual highlight
+  highlightWinners(bracketData.single);
+}
+
+/* unified match processor for live UI changes -> updates bracketData and downstream slots */
+function processAndAdvance(){
+  ensureBracket();
+  bracketData.single.scores = bracketData.single.scores || {};
+
+  // helper to update a match's scores into bracketData
+  function storeScores(mid){
+    const a = getNum(mid + 's1'), b = getNum(mid + 's2');
+    bracketData.single.scores[mid] = [a,b];
+    return [a,b];
+  }
+
+  // process QFs -> SF slots
+  [['qf1','sf1p1'], ['qf2','sf1p2'], ['qf3','sf2p1'], ['qf4','sf2p2']].forEach(([mid, sfTarget])=>{
+    const [a,b] = storeScores(mid);
+    if(a !== null && b !== null && a !== b){
+      const winner = a > b ? document.getElementById(mid + 'p1').textContent : document.getElementById(mid + 'p2').textContent;
+      setText(sfTarget, winner);
+      bracketData.single.winners = bracketData.single.winners || {};
+      bracketData.single.winners[mid] = winner;
+    } else {
+      setText(sfTarget, 'Winner ' + mid.toUpperCase());
+      if(bracketData.single && bracketData.single.winners) delete bracketData.single.winners[mid];
+    }
+  });
+
+  // process SFs -> Final slots
+  [['sf1','f1p1'], ['sf2','f1p2']].forEach(([mid, fTarget])=>{
+    const [a,b] = storeScores(mid);
+    if(a !== null && b !== null && a !== b){
+      const winner = a > b ? document.getElementById(mid + 'p1').textContent : document.getElementById(mid + 'p2').textContent;
+      setText(fTarget, winner);
+      bracketData.single.winners = bracketData.single.winners || {};
+      bracketData.single.winners[mid] = winner;
+    } else {
+      setText(fTarget, 'Winner ' + mid.toUpperCase());
+      if(bracketData.single && bracketData.single.winners) delete bracketData.single.winners[mid];
+    }
+  });
+
+  // final scores stored
+  storeScores('f1');
+
+  // update visual highlights
+  highlightWinners(bracketData.single);
+
+  // optionally persist (non-blocking)
+  try{ if(window.go?.main?.App) window.go.main.App.SaveBracketJSON(bracketData); }catch(e){}
+}
+
+/* attach listeners to inputs inside the visual bracket only */
+function attachBracketListeners(){
+  const container = document.getElementById('visualBracket') || document;
+  const inputs = container.querySelectorAll('input[type=number]');
+  inputs.forEach(inp=>{
+    inp.removeEventListener('input', processAndAdvance);
+    inp.addEventListener('input', processAndAdvance);
+  });
+}
+
+/* ---------- end replacements ---------- */
+
+function renderOverlay() {
+  const d = bracketData?.double || {};
+  
+  // Set the title
+  document.getElementById("game-title-dbracket").textContent = d.title || "Untitled";
+
+  // Set player names
+  if (Array.isArray(d.players)) {
+    // Winners bracket
+    setText("wb_sf1_p1", d.players[0] || "Seed 1");
+    setText("wb_sf1_p2", d.players[1] || "Seed 2");
+    setText("wb_sf2_p1", d.players[2] || "Seed 3");
+    setText("wb_sf2_p2", d.players[3] || "Seed 4");
+
+    // Losers bracket
+    setText("lb_r1_m1_p1", d.players[4] || "Seed 5");
+    setText("lb_r1_m1_p2", d.players[5] || "Seed 6");
+    setText("lb_r1_m2_p1", d.players[6] || "Seed 7");
+    setText("lb_r1_m2_p2", d.players[7] || "Seed 8");
+  }
+
+  // Set winners progression
+  setText("wb_final_p1", d.winners?.wb_sf1 || "Winner SF1");
+  setText("wb_final_p2", d.winners?.wb_sf2 || "Winner SF2");
+
+  // Set losers progression
+  setText("lb_qf_m1_p1", d.winners?.lb_r1_m1 || "Winner R1M1");
+  setText("lb_qf_m1_p2", d.losers?.wb_sf1 || "Loser SF1");
+  setText("lb_qf_m2_p1", d.winners?.lb_r1_m2 || "Winner R1M2");
+  setText("lb_qf_m2_p2", d.losers?.wb_sf2 || "Loser SF2");
+  setText("lb_semi_p1", d.winners?.lb_qf_m1 || "Winner QF1");
+  setText("lb_semi_p2", d.winners?.lb_qf_m2 || "Winner QF2");
+  setText("lb_final_p1", d.winners?.lb_semi || "Winner LB Semi");
+  setText("lb_final_p2", d.losers?.wb_final || "Loser WB Final");
+
+  // Set grand finals
+  setText("gf_wb", d.winners?.wb_final || "WB Winner");
+  setText("gf_lb", d.winners?.lb_final || "LB Winner");
+
+  // Set scores
+  if (d.scores) {
+    Object.entries(d.scores).forEach(([matchId, scores]) => {
+      if (Array.isArray(scores) && scores.length === 2) {
+        const [s1, s2] = scores;
+        const s1Input = document.getElementById(`${matchId}_s1`);
+        const s2Input = document.getElementById(`${matchId}_s2`);
+        if (s1Input) s1Input.value = s1 ?? "";
+        if (s2Input) s2Input.value = s2 ?? "";
+      }
+    });
+  }
+
+  // Handle reset visibility
+  const resetSection = document.getElementById("gf_reset_section");
+  if (resetSection) {
+    const showReset = d.scores?.grand_final?.[1] > d.scores?.grand_final?.[0];
+    resetSection.style.display = showReset ? "block" : "none";
+  }
+}
+
+// Helper function
+function setText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text || "";
+}
+
+function renderDoubleFromData(){
+  ensureBracket();
+  const d = bracketData.double || { players: Array(8).fill("") };
+  for(let i=1;i<=8;i++){
+    const el = document.getElementById("dp"+i);
+    if(el) el.value = (d.players && d.players[i-1]) ? d.players[i-1] : "";
+  }
+}
+
+async function saveDoublePlayers(){
+  ensureBracket();
+
+  // read seed inputs dp1..dp8
+  const arr = [
+    document.getElementById("dp1")?.value || "",
+    document.getElementById("dp2")?.value || "",
+    document.getElementById("dp3")?.value || "",
+    document.getElementById("dp4")?.value || "",
+    document.getElementById("dp5")?.value || "",
+    document.getElementById("dp6")?.value || "",
+    document.getElementById("dp7")?.value || "",
+    document.getElementById("dp8")?.value || ""
+  ];
+
+  // persist player seeds in bracketData.double
+  bracketData.double = bracketData.double || {};
+  bracketData.double.players = arr;
+  bracketData.double.scores = bracketData.double.scores || {};
+  bracketData.double.winners = bracketData.double.winners || {};
+
+  try{
+    await saveBracket(); // uses existing saveBracket() which saves bracketData
+  }catch(err){
+    console.warn("saveBracket failed:", err);
+  }
+
+  // mapping as requested:
+  // dp1 -> wb_sf1_p1, dp2 -> wb_sf1_p2, dp3 -> wb_sf2_p1, dp4 -> wb_sf2_p2
+  // dp5 -> lb_r1_m1_p1, dp6 -> lb_r1_m1_p2, dp7 -> lb_r1_m2_p1, dp8 -> lb_r1_m2_p2
+  const set = (id, value) => {
+    const el = document.getElementById(id);
+    if(el){
+      // prefer textContent for spans, if input exist set value
+      if(el.tagName === 'INPUT') el.value = value;
+      else el.textContent = value || '';
+    }
+  };
+
+  set('wb_sf1_p1', arr[0] || 'Seed 1');
+  set('wb_sf1_p2', arr[1] || 'Seed 2');
+  set('wb_sf2_p1', arr[2] || 'Seed 3');
+  set('wb_sf2_p2', arr[3] || 'Seed 4');
+
+  set('lb_r1_m1_p1', arr[4] || 'Loser 1');
+  set('lb_r1_m1_p2', arr[5] || 'Loser 2');
+  set('lb_r1_m2_p1', arr[6] || 'Loser 3');
+  set('lb_r1_m2_p2', arr[7] || 'Loser 4');
+
+  // clear numeric inputs inside the double visual so new progression is clean
+  document.querySelectorAll('#doubleVisual input[type="number"]').forEach(i=>i.value='');
+
+  // reset downstream placeholders
+  const placeholders = {
+    'wb_final_p1': 'Winner SF1', 'wb_final_p2':'Winner SF2',
+    'lb_r2_m1_p1':'Winner R1M1','lb_r2_m1_p2':'Loser SF1',
+    'lb_r2_m2_p1':'Winner R1M2','lb_r2_m2_p2':'Loser SF2',
+    'lb_final_p1':'Winner R2M1','lb_final_p2':'Winner R2M2',
+    'gf_wb':'WB Winner','gf_lb':'LB Winner'
+  };
+  Object.entries(placeholders).forEach(([id,val])=> set(id, val));
+
+  // hide gf reset area
+  const gfReset = document.getElementById('gf_reset');
+  if(gfReset) gfReset.style.display = 'none';
+
+  // run progression
+  if(typeof updateDoubleBracket === 'function') updateDoubleBracket();
+}
+
+
+function resetDouble(){
+  // clear seed inputs dp1..dp8
+  for(let i=1;i<=8;i++){
+    const el = document.getElementById('dp'+i);
+    if(el) el.value = '';
+  }
+
+  // clear bracketData.double and persist
+  bracketData.double = { players: Array(8).fill(""), scores: {}, winners: {} };
+  try{ saveBracket(); }catch(e){ console.warn('saveBracket failed', e); }
+
+  // reset visual placeholders and clear numeric inputs
+  const resetPlace = (id, val) => {
+    const el = document.getElementById(id);
+    if(el){
+      if(el.tagName === 'INPUT') el.value = '';
+      else el.textContent = val || '';
+    }
+  };
+
+  resetPlace('wb_sf1_p1','Winner QF1'); resetPlace('wb_sf1_p2','Winner QF2');
+  resetPlace('wb_sf2_p1','Winner QF3'); resetPlace('wb_sf2_p2','Winner QF4');
+
+  resetPlace('lb_r1_m1_p1','Loser QF1'); resetPlace('lb_r1_m1_p2','Loser QF2');
+  resetPlace('lb_r1_m2_p1','Loser QF3'); resetPlace('lb_r1_m2_p2','Loser QF4');
+
+  resetPlace('wb_final_p1','Winner SF1'); resetPlace('wb_final_p2','Winner SF2');
+  resetPlace('lb_r2_m1_p1','Winner R1M1'); resetPlace('lb_r2_m1_p2','Loser SF1');
+  resetPlace('lb_r2_m2_p1','Winner R1M2'); resetPlace('lb_r2_m2_p2','Loser SF2');
+  resetPlace('lb_final_p1','Winner R2M1'); resetPlace('lb_final_p2','Winner R2M2');
+  resetPlace('gf_wb','WB Winner'); resetPlace('gf_lb','LB Winner');
+
+  document.querySelectorAll('#doubleVisual input[type="number"]').forEach(i=>i.value='');
+
+  // hide reset UI
+  const gfReset = document.getElementById('gf_reset'); if(gfReset) gfReset.style.display='none';
+
+  // re-run progression to clear state
+  if(typeof updateDoubleBracket === 'function') updateDoubleBracket();
+}
+/* ---------------------
+   Initialization
+   --------------------- */
+ensureBracket();
+loadBracket();
+</script>
+
+<script>
+function seedPlayers(){
+  document.getElementById("wb_sf1p1").textContent=document.getElementById("sp1").value;
+  document.getElementById("wb_sf1p2").textContent=document.getElementById("sp8").value;
+  document.getElementById("wb_sf2p1").textContent=document.getElementById("sp4").value;
+  document.getElementById("wb_sf2p2").textContent=document.getElementById("sp5").value;
+  document.getElementById("wb_sf3p1").textContent=document.getElementById("sp3").value;
+  document.getElementById("wb_sf3p2").textContent=document.getElementById("sp6").value;
+  document.getElementById("wb_sf4p1").textContent=document.getElementById("sp2").value;
+  document.getElementById("wb_sf4p2").textContent=document.getElementById("sp7").value;
+}
+
+function setMatch(matchId, nextWinId, nextLoseId){
+  let p1=document.getElementById(matchId+"p1").textContent;
+  let p2=document.getElementById(matchId+"p2").textContent;
+  let s1=parseInt(document.getElementById(matchId+"s1").value)||0;
+  let s2=parseInt(document.getElementById(matchId+"s2").value)||0;
+  let winner=s1>s2?p1:p2;
+  let loser=s1>s2?p2:p1;
+
+  if(nextWinId){
+    let slot=document.querySelector("#"+nextWinId+" span:empty, #"+nextWinId+" span:contains('Winner')");
+    if(slot) slot.textContent=winner;
+  }
+  if(nextLoseId){
+    let slot=document.querySelector("#"+nextLoseId+" span:empty, #"+nextLoseId+" span:contains('L ')");
+    if(slot) slot.textContent=loser;
+  }
+}
+
+function setGrandFinal(){
+  let p1=document.getElementById("gfp1").textContent;
+  let p2=document.getElementById("gfp2").textContent;
+  let s1=parseInt(document.getElementById("gfs1").value)||0;
+  let s2=parseInt(document.getElementById("gfs2").value)||0;
+  if(s1>s2){
+    alert("🏆 Champion: "+p1);
+  } else if(s2>s1){
+    // LB Champ won, trigger reset
+    document.getElementById("gf_reset").style.display="block";
+    document.getElementById("gf_resetp1").textContent=p1;
+    document.getElementById("gf_resetp2").textContent=p2;
+  }
+}
+
+function finalizeChampion(){
+  let p1=document.getElementById("gf_resetp1").textContent;
+  let p2=document.getElementById("gf_resetp2").textContent;
+  let s1=parseInt(document.getElementById("gf_resets1").value)||0;
+  let s2=parseInt(document.getElementById("gf_resets2").value)||0;
+  let champ=s1>s2?p1:p2;
+  alert("🏆 Champion: "+champ);
+}
+</script>
+
+
+<script>
+  // loadPartial: fetch HTML partial and inject into container
+  async function loadPartial(containerId, filePath){
+    try{
+      const res = await fetch(filePath + '?_=' + Date.now());
+      if(!res.ok) throw new Error('Failed to load ' + filePath);
+      const html = await res.text();
+      const container = document.getElementById(containerId);
+      if(container) container.innerHTML = html;
+
+      // re-attach bracket listeners if visual was injected
+      attachBracketListeners();
+
+      // call init hooks if present in the injected partial
+      if(containerId === 'single' && typeof initSingle === 'function') initSingle();
+      if(containerId === 'double' && typeof initDouble === 'function') initDouble();
+    }catch(err){
+      console.warn('loadPartial error:', filePath, err);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    // load partials using new filenames to avoid conflicts with your existing single.html / double.html
+    loadPartial('single','bracket_single.html');
+    loadPartial('double','bracket_double.html');
+
+    // existing init
+    attachBracketListeners();
+  });
+</script>
+
+<!-- index.html (only showing bottom part where scripts are) -->
+
+<script>
+/* ----------------- SINGLE BRACKET LOGIC (unchanged) ----------------- */
+ function getSingleSeedInputs() {
+  return [
+    document.getElementById("sp1")?.value || "",
+    document.getElementById("sp8")?.value || "",
+    document.getElementById("sp4")?.value || "",
+    document.getElementById("sp5")?.value || "",
+    document.getElementById("sp3")?.value || "",
+    document.getElementById("sp6")?.value || "",
+    document.getElementById("sp2")?.value || "",
+    document.getElementById("sp7")?.value || ""
+  ];
+}
+
+function setSingleSeedInputs(arr) {
+  if (!arr) return;
+  document.getElementById("sp1").value = arr[0] || "";
+  document.getElementById("sp8").value = arr[1] || "";
+  document.getElementById("sp4").value = arr[2] || "";
+  document.getElementById("sp5").value = arr[3] || "";
+  document.getElementById("sp3").value = arr[4] || "";
+  document.getElementById("sp6").value = arr[5] || "";
+  document.getElementById("sp2").value = arr[6] || "";
+  document.getElementById("sp7").value = arr[7] || "";
+}
+
+// --- Save/Reset Single Players ---
+async function saveSinglePlayers(msg = "Single-elimination players saved ") {
+  ensureBracket();
+  const arr = getSingleSeedInputs();
+  bracketData.single.players = arr;
+  bracketData.single.scores = bracketData.single.scores || {};
+  bracketData.single.winners = bracketData.single.winners || {};
+
+    // ✅ also save title
+  bracketData.single.title = document.getElementById("game-title-sbracket").value || "";
+
+  try {
+    if (typeof saveBracket === "function") await saveBracket();
+    else if (window.go?.main?.App) 
+    await window.go.main.App.SaveBracketJSON(bracketData);
+    copyCardContent(null, msg);
+  } catch (e) {
+    console.warn("saveBracket failed", e);
+    copyCardContent(null, "Failed to save players");
+  }
+  seedSingleVisualBracket();
+}
+
+function resetSingle(msg = "Single-elimination bracket reset") {
+  setSingleSeedInputs(Array(8).fill(""));
+  bracketData.single = { players: Array(8).fill(""), scores: {}, winners: {} };
+  seedSingleVisualBracket();
+  try {
+    if (typeof saveBracket === "function") saveBracket();
+    else if (window.go?.main?.App) window.go.main.App.SaveBracketJSON(bracketData);
+    copyCardContent(null, msg);
+  } catch (e) {
+    console.warn("saveBracket failed", e);
+    copyCardContent(null, "Failed to reset players");
+  }
+}
+
+// --- Seeding and Progression ---
+function seedSingleVisualBracket() {
+  const seeds = getSingleSeedInputs();
+  // QF mapping: qf1: 1 vs 8, qf2: 4 vs 5, qf3: 3 vs 6, qf4: 2 vs 7
+  setText("qf1p1", seeds[0] || "Seed 1");
+  setText("qf1p2", seeds[1] || "Seed 8");
+  setText("qf2p1", seeds[2] || "Seed 4");
+  setText("qf2p2", seeds[3] || "Seed 5");
+  setText("qf3p1", seeds[4] || "Seed 3");
+  setText("qf3p2", seeds[5] || "Seed 6");
+  setText("qf4p1", seeds[6] || "Seed 2");
+  setText("qf4p2", seeds[7] || "Seed 7");
+
+  // Reset downstream
+  setText("sf1p1", "Winner QF1");
+  setText("sf1p2", "Winner QF2");
+  setText("sf2p1", "Winner QF3");
+  setText("sf2p2", "Winner QF4");
+  setText("f1p1", "Winner SF1");
+  setText("f1p2", "Winner SF2");
+
+  // Clear all score inputs
+  document.querySelectorAll('#visualBracket input[type=number]').forEach(i => i.value = '');
+
+  // Run progression
+  renderSingleFromData();
+}
+
+// --- Render/Progression Logic ---
+function renderSingleFromData() {
+  ensureBracket();
+  const s = bracketData.single || { players: Array(8).fill(""), scores: {}, winners: {} };
+  const players = s.players || Array(8).fill("");
+
+  // QF mapping
+  const qfPairs = {
+    qf1: [players[0] || "", players[1] || ""],
+    qf2: [players[2] || "", players[3] || ""],
+    qf3: [players[4] || "", players[5] || ""],
+    qf4: [players[6] || "", players[7] || ""]
+  };
+
+  Object.keys(qfPairs).forEach(k => {
+    const [aName, bName] = qfPairs[k];
+    setText(k + "p1", aName || "—");
+    setText(k + "p2", bName || "—");
+    const sc = (s.scores && s.scores[k]) ? s.scores[k] : [null, null];
+    setInputVal(k + "s1", sc[0] != null ? sc[0] : "");
+    setInputVal(k + "s2", sc[1] != null ? sc[1] : "");
+  });
+
+  // QF winners
+  const qfWinners = {};
+  ["qf1", "qf2", "qf3", "qf4"].forEach(qf => {
+    const sc = s.scores?.[qf];
+    if (Array.isArray(sc) && sc.length >= 2 && sc[0] !== null && sc[1] !== null && sc[0] !== sc[1]) {
+      const winner = sc[0] > sc[1] ? document.getElementById(qf + "p1").textContent : document.getElementById(qf + "p2").textContent;
+      qfWinners[qf] = winner;
+    }
+  });
+
+  setText("sf1p1", qfWinners.qf1 || "Winner QF1");
+  setText("sf1p2", qfWinners.qf2 || "Winner QF2");
+  setText("sf2p1", qfWinners.qf3 || "Winner QF3");
+  setText("sf2p2", qfWinners.qf4 || "Winner QF4");
+
+  // SF scores
+  setInputVal("sf1s1", s.scores?.sf1 ? s.scores.sf1[0] ?? "" : "");
+  setInputVal("sf1s2", s.scores?.sf1 ? s.scores.sf1[1] ?? "" : "");
+  setInputVal("sf2s1", s.scores?.sf2 ? s.scores.sf2[0] ?? "" : "");
+  setInputVal("sf2s2", s.scores?.sf2 ? s.scores.sf2[1] ?? "" : "");
+
+  // SF winners
+  const sfWinners = {};
+  ["sf1", "sf2"].forEach(sf => {
+    const sc = s.scores?.[sf];
+    if (Array.isArray(sc) && sc.length >= 2 && sc[0] !== null && sc[1] !== null && sc[0] !== sc[1]) {
+      const winner = sc[0] > sc[1] ? document.getElementById(sf + "p1").textContent : document.getElementById(sf + "p2").textContent;
+      sfWinners[sf] = winner;
+    }
+  });
+
+  setText("f1p1", sfWinners.sf1 || "Winner SF1");
+  setText("f1p2", sfWinners.sf2 || "Winner SF2");
+
+  // Final scores
+  setInputVal("f1s1", s.scores?.f1 ? s.scores.f1[0] ?? "" : "");
+  setInputVal("f1s2", s.scores?.f1 ? s.scores.f1[1] ?? "" : "");
+}
+
+// --- Helpers ---
+function setText(id, txt) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = txt;
+}
+function setInputVal(id, v) {
+  const el = document.getElementById(id);
+  if (el) el.value = (v === null || v === undefined) ? "" : v;
+}
+
+// --- Attach listeners (call after loading partial) ---
+function attachSingleBracketListeners() {
+  const container = document.getElementById('visualBracket') || document;
+  const inputs = container.querySelectorAll('input[type=number]');
+  inputs.forEach(inp => {
+    inp.removeEventListener('input', processSingleBracket);
+    inp.addEventListener('input', processSingleBracket);
+  });
+}
+
+// --- Live progression ---
+function processSingleBracket() {
+  ensureBracket();
+  bracketData.single.scores = bracketData.single.scores || {};
+
+  // Store scores
+  function storeScores(mid) {
+    const a = parseInt(document.getElementById(mid + "s1").value) || 0;
+    const b = parseInt(document.getElementById(mid + "s2").value) || 0;
+    bracketData.single.scores[mid] = [a, b];
+    return [a, b];
+  }
+
+  // QFs -> SFs
+  [["qf1", "sf1p1"], ["qf2", "sf1p2"], ["qf3", "sf2p1"], ["qf4", "sf2p2"]].forEach(([mid, sfTarget]) => {
+    const [a, b] = storeScores(mid);
+    if (a !== null && b !== null && a !== b) {
+      const winner = a > b ? document.getElementById(mid + "p1").textContent : document.getElementById(mid + "p2").textContent;
+      setText(sfTarget, winner);
+      bracketData.single.winners = bracketData.single.winners || {};
+      bracketData.single.winners[mid] = winner;
+    } else {
+      setText(sfTarget, "Winner " + mid.toUpperCase());
+      if (bracketData.single && bracketData.single.winners) delete bracketData.single.winners[mid];
+    }
+  });
+
+  // SFs -> Final
+  [["sf1", "f1p1"], ["sf2", "f1p2"]].forEach(([mid, fTarget]) => {
+    const [a, b] = storeScores(mid);
+    if (a !== null && b !== null && a !== b) {
+      const winner = a > b ? document.getElementById(mid + "p1").textContent : document.getElementById(mid + "p2").textContent;
+      setText(fTarget, winner);
+      bracketData.single.winners = bracketData.single.winners || {};
+      bracketData.single.winners[mid] = winner;
+    } else {
+      setText(fTarget, "Winner " + mid.toUpperCase());
+      if (bracketData.single && bracketData.single.winners) delete bracketData.single.winners[mid];
+    }
+  });
+
+  // Final scores
+  storeScores("f1");
+
+  // Optionally persist
+  try {
+    if (window.go?.main?.App) window.go.main.App.SaveBracketJSON(bracketData);
+  } catch (e) {}
+}
+
+// --- Initialization (call after loading partial) ---
+function initSingle() {
+  attachSingleBracketListeners();
+  setTimeout(() => { renderSingleFromData(); }, 30);
+}
+
+
+/* ----------------- DOUBLE BRACKET LOGIC ----------------- */
+
+if (typeof bracketData === 'undefined') window.bracketData = {};
+function ensureBracket(){
+  if(!bracketData.double){
+    bracketData.double = { players: Array(8).fill(""), scores:{}, winners:{}, eliminated:[] };
+  }
+}
+
+/* Called when bracket_double.html is loaded */
+function initDouble(){
+  const container = document.getElementById('doubleVisual') || document;
+
+  // Attach score input listeners
+  const numberInputs = container.querySelectorAll('input[type=number]');
+  numberInputs.forEach(i=>{
+    i.removeEventListener('input', updateDoubleBracket);
+    i.addEventListener('input', updateDoubleBracket);
+  });
+
+  // Attach seed listeners
+  for(let i=1;i<=8;i++){
+    const dp = document.getElementById('dp'+i);
+    if(!dp) continue;
+    dp.removeEventListener('input', seedDoubleVisualBracket);
+    dp.addEventListener('input', seedDoubleVisualBracket);
+  }
+
+  setTimeout(populateDoubleFromData, 20);
+  setTimeout(()=>{
+    seedDoubleVisualBracket();
+    updateDoubleBracket();
+  }, 40);
+}
+
+
+function val(id){ 
+  const el=document.getElementById(id); 
+  if(!el) return null; 
+  const v=parseInt(el.value); 
+  return isNaN(v)?null:v; 
+}
+function text(id){ return document.getElementById(id)?.textContent || ''; }
+function setText(id,val){ const el=document.getElementById(id); if(el) el.textContent=val; }
+function setEliminated(id,flag){ /* optional styling */ }
+
+/* Highlight winners/losers */
+function highlightDoubleWinners(){
+  const matchIds=['wb_sf1','wb_sf2','wb_final','lb_r1_m1','lb_r1_m2','lb_qf_m1','lb_qf_m2','lb_final','grand_final'];
+  matchIds.forEach(mid=>{
+    const matchEl=document.getElementById(mid);
+    if(!matchEl) return;
+    const lines=matchEl.querySelectorAll('.player-line');
+    lines.forEach(l=>{ l.classList.remove('win','lose'); });
+    const scores=bracketData.double.scores[mid];
+    if(!scores||scores.length<2) return;
+    const [a,b]=scores;
+    if(a===null||b===null||a===b) return;
+    const winner=a>b?text(mid+'_p1'):text(mid+'_p2');
+    lines.forEach(l=>{
+      const span=l.querySelector('span');
+      if(!span) return;
+      if(span.textContent.trim()===winner) l.classList.add('win'); else l.classList.add('lose');
+    });
+  });
+}
+
+/* Progression */
+
+  /* Seeding */
+function seedDoubleVisualBracket(){
+  const seeds=[];
+  for(let i=1;i<=8;i++) seeds.push(document.getElementById('dp'+i)?.value||'');
+
+  setText('wb_sf1_p1',seeds[0]||'Seed 1');
+  setText('wb_sf1_p2',seeds[1]||'Seed 2');
+  setText('wb_sf2_p1',seeds[2]||'Seed 3');
+  setText('wb_sf2_p2',seeds[3]||'Seed 4');
+
+  setText('lb_r1_m1_p1',seeds[4]||'Seed 5');
+  setText('lb_r1_m1_p2',seeds[5]||'Seed 6');
+  setText('lb_r1_m2_p1',seeds[6]||'Seed 7');
+  setText('lb_r1_m2_p2',seeds[7]||'Seed 8');
+
+  document.querySelectorAll('#doubleVisual input[type=number]').forEach(i=>i.value='');
+  updateDoubleBracket();
+}
+
+/* Restore */
+function populateDoubleFromData(){
+  ensureBracket();
+  const d=bracketData.double||{players:Array(8).fill("")};
+  if(d.players?.length>=8){
+    for(let i=0;i<8;i++){
+      const el=document.getElementById('dp'+(i+1));
+      if(el) el.value=d.players[i]||'';
+    }
+    seedDoubleVisualBracket();
+  }
+  const scores=d.scores||{};
+  Object.keys(scores).forEach(mid=>{
+    const arr=scores[mid];
+    if(!arr||arr.length!==2) return;
+    if(mid==='grand_final'){
+      document.getElementById('gf_wb_s').value=arr[0]??'';
+      document.getElementById('gf_lb_s').value=arr[1]??'';
+    } else if(mid==='gf_reset'){
+      document.getElementById('gf_reset_s1').value=arr[0]??'';
+      document.getElementById('gf_reset_s2').value=arr[1]??'';
+    } else {
+      const s1=document.getElementById(mid+'_s1'), s2=document.getElementById(mid+'_s2');
+      if(s1) s1.value=arr[0]??''; if(s2) s2.value=arr[1]??'';
+    }
+  });
+  updateDoubleBracket();
+}
+
+/* Save / Reset */
+async function saveDoublePlayers(msg = 'Double-elimination players saved') {
+  ensureBracket();
+
+  // 1. Get the double bracket title
+  const title = document.getElementById("game-title-dckecket")?.value || "";
+
+  // 2. Get all player names
+  const players = [];
+  for (let i = 1; i <= 8; i++) {
+    const input = document.getElementById(`dp${i}`);
+    players.push(input?.value || "");
+  }
+
+  // 3. Build the bracket data structure
+  bracketData.double = {
+    ...bracketData.double,  // preserve existing scores/winners/losers
+    title: title,
+    players: players,
+    scores: bracketData.double?.scores || {},
+    winners: bracketData.double?.winners || {},
+    losers: bracketData.double?.losers || {},
+    meta: bracketData.double?.meta || {}
+  };
+
+  // 4. Save to backend
+  try {
+    if (typeof saveBracket === 'function') {
+      await saveBracket();
+    } else if (window.go?.main?.App) {
+      await window.go.main.App.SaveBracketJSON(bracketData);
+    }
+    
+    // 5. Update visual bracket
+    seedDoubleVisualBracket();
+    updateDoubleBracket();
+    
+    // 6. Show success notification
+    showNotif(msg);
+  } catch (err) {
+    console.error('Failed to save double bracket:', err);
+    showNotif('Failed to save bracket', 'red');
+  }
+}
+
+function resetDouble(msg='Double-elimination bracket reset'){
+  for(let i=1;i<=8;i++){ const el=document.getElementById('dp'+i); if(el) el.value=''; }
+  bracketData.double={players:Array(8).fill(""),scores:{},winners:{},eliminated:[]};
+  seedDoubleVisualBracket();
+  try{ if(typeof saveBracket==='function') saveBracket();
+    copyCardContent(null, msg);
+   }catch(e){
+    console.warn('saveBracket failed', e);
+    copyCardContent(null, 'Failed to reset players');    
+  }
+}
+
+/* GF Reset */
+function finalizeChampion(){
+  const p1=text('gf_reset_p1'), p2=text('gf_reset_p2');
+  const s1=val('gf_reset_s1'), s2=val('gf_reset_s2');
+  if(s1!==null&&s2!==null&&s1!==s2){
+    const champ=s1>s2?p1:p2;
+    alert('🏆 Champion: '+champ);
+    bracketData.double.scores.gf_reset=[s1,s2];
+    bracketData.double.winners.gf_reset=champ;
+    try{ if(window.go?.main?.App) window.go.main.App.SaveBracketJSON(bracketData); }catch(e){}
+    document.getElementById('gf_reset').style.display='none';
+  }
+}
+ 
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const uploadContainer = document.getElementById("uploadContainer");
+  const fileInput = document.getElementById("fileInput");
+  const previewGrid = document.getElementById("previewGrid");
+  const statusContainer = document.getElementById("statusContainer");
+
+  // Drag & Drop handlers
+  uploadContainer.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      uploadContainer.classList.add("dragover");
+  });
+
+  uploadContainer.addEventListener("dragleave", () => {
+      uploadContainer.classList.remove("dragover");
+  });
+
+  uploadContainer.addEventListener("drop", async (e) => {
+      e.preventDefault();
+      uploadContainer.classList.remove("dragover");
+      handleFiles(e.dataTransfer.files);
+  });
+
+  // File input handler
+  fileInput.addEventListener("change", (e) => {
+      handleFiles(e.target.files);
+      fileInput.value = ''; // Reset input
+  });
+
+  async function handleFiles(files) {
+      if (!files?.length) return;
+
+      for (const file of files) {
+          try {
+              const arrayBuffer = await file.arrayBuffer();
+              const bytes = new Uint8Array(arrayBuffer);
+              await window.go.main.App.SaveSponsor(file.name, Array.from(bytes));
+              showStatus(`Uploaded ${file.name}`);
+          } catch (err) {
+              console.error("Upload failed:", err);
+              showStatus(`Failed to upload ${file.name}`, true);
+          }
+      }
+      loadSponsors(); // Refresh grid after upload
+  }
+
+  function showStatus(message, isError = false) {
+      const status = document.createElement("div");
+      status.className = `status-message status-${isError ? 'error' : 'success'}`;
+      status.textContent = message;
+      statusContainer.innerHTML = '';
+      statusContainer.appendChild(status);
+      setTimeout(() => status.remove(), 3000);
+  }
+
+  async function loadSponsors() {
+      try {
+          const sponsors = await window.go.main.App.GetSponsors();
+          previewGrid.innerHTML = '';
+          
+          sponsors.forEach(path => {
+              const filename = path.split('/').pop();
+              const card = document.createElement("div");
+              card.className = "preview-card";
+              card.innerHTML = `
+                  <img src="${path}?_=${Date.now()}" alt="${filename}">
+                  <button class="delete-btn" title="Delete">×</button>
+                  <div class="preview-name">${filename}</div>
+              `;
+              
+              // Add delete handler
+              card.querySelector('.delete-btn').onclick = async () => {
+                  if (!confirm(`Delete ${filename}?`)) return;
+                  try {
+                      await window.go.main.App.DeleteSponsor(filename);
+                      showStatus(`Deleted ${filename}`);
+                      loadSponsors();
+                  } catch (err) {
+                      showStatus(`Failed to delete ${filename}`, true);
+                  }
+              };
+              
+              previewGrid.appendChild(card);
+          });
+      } catch (err) {
+          console.error("Failed to load sponsors:", err);
+          previewGrid.innerHTML = '<div class="small">No sponsors found</div>';
+      }
+  }
+
+  // Initial load
+  loadSponsors();
+});
+</script>
+
+<script>
+async function loadSponsorsOverlay(){
+  try{
+    // Get list from backend (returns array like ["sponsors/a.png", ...])
+    const sponsors = await window.go.main.App.GetSponsors();
+    const cont = document.getElementById("sponsor-container");
+    cont.innerHTML = "";
+
+    if(!sponsors || sponsors.length === 0) return;
+
+    // Add images
+    sponsors.forEach((src, idx) => {
+      const img = document.createElement("img");
+      img.className = "sponsor-logo";
+      img.src = src;
+      img.style.opacity = idx === 0 ? "1" : "0";
+      cont.appendChild(img);
+    });
+
+    startRotation();
+  }catch(err){
+    console.error("Failed to load sponsors for overlay:", err);
+  }
+}
+
+let sponsorInterval = null;
+function startRotation(){
+  const images = Array.from(document.querySelectorAll('#sponsor-container .sponsor-logo'));
+  if(images.length <= 1){
+    // make sure single is visible
+    if(images[0]) images[0].style.opacity = "1";
+    if(sponsorInterval) { clearInterval(sponsorInterval); sponsorInterval = null; }
+    return;
+  }
+  // clear existing interval if any
+  if(sponsorInterval) clearInterval(sponsorInterval);
+  let current = 0;
+  images.forEach((img,i) => img.style.opacity = i===0 ? "1" : "0");
+  sponsorInterval = setInterval(() => {
+    images[current].style.opacity = "0";
+    current = (current + 1) % images.length;
+    images[current].style.opacity = "1";
+  }, 10000); // 10 seconds per your requirement
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadSponsorsOverlay();
+
+  // Optionally refresh list every 5 seconds to pick up new uploads/deletes
+  setInterval(() => {
+    loadSponsorsOverlay();
+  }, 5000);
+});
+</script>
+
+<script>
+// =============== Sponsor Upload Logic ===============
+
+// initialize sponsor section on DOM ready
+document.addEventListener("DOMContentLoaded", () => {
+  const uploadContainer = document.getElementById("uploadContainer");
+  const fileInput = document.getElementById("fileInput");
+  const previewGrid = document.getElementById("previewGrid");
+  const statusContainer = document.getElementById("statusContainer");
+
+  // helper to show status
+  function showStatus(msg, isError = false) {
+    const el = document.createElement("div");
+    el.className = `status-message ${isError ? "status-error" : "status-success"}`;
+    el.textContent = msg;
+    statusContainer.innerHTML = "";
+    statusContainer.appendChild(el);
+  }
+
+  // load sponsor.json and render previews
+  async function loadSponsors() {
+    try {
+      const res = await fetch("sponsors.json?_=" + Date.now());
+      if (!res.ok) throw new Error("no sponsors.json");
+      const data = await res.json();
+      previewGrid.innerHTML = "";
+      if (Array.isArray(data) && data.length > 0) {
+        data.forEach(name => {
+          const card = document.createElement("div");
+          card.className = "preview-card";
+
+          const img = document.createElement("img");
+          img.src = "./sponsors/" + name;
+          card.appendChild(img);
+
+          const del = document.createElement("button");
+          del.className = "delete-btn";
+          del.textContent = "×";
+          del.onclick = () => deleteSponsor(name);
+          card.appendChild(del);
+
+          const lbl = document.createElement("div");
+          lbl.className = "preview-name";
+          lbl.textContent = name;
+          card.appendChild(lbl);
+
+          previewGrid.appendChild(card);
+        });
+      }
+    } catch (e) {
+      console.warn("loadSponsors failed:", e);
+      previewGrid.innerHTML = "<div class='small'>No sponsors found</div>";
+    }
+  }
+
+  // upload logic
+  async function uploadFiles(files) {
+    if (!files || files.length === 0) return;
+    for (let file of files) {
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const bytes = Array.from(new Uint8Array(arrayBuffer));
+        await window.go.main.App.UploadSponsor(file.name, bytes);
+        showStatus(`✅ Uploaded: ${file.name}`);
+      } catch (e) {
+        console.error("Upload failed:", e);
+        showStatus(`❌ Failed: ${file.name}`, true);
+      }
+    }
+    await loadSponsors();
+  }
+
+  // delete sponsor
+  async function deleteSponsor(name) {
+    try {
+      await window.go.main.App.DeleteSponsor(name);
+      showStatus(`🗑 Deleted: ${name}`);
+      await loadSponsors();
+    } catch (e) {
+      console.error("Delete failed:", e);
+      showStatus(`❌ Failed to delete ${name}`, true);
+    }
+  }
+
+  // handle clicks
+  selectBtn.addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", e => uploadFiles(e.target.files));
+
+  // drag-drop
+  uploadContainer.addEventListener("dragover", e => {
+    e.preventDefault();
+    uploadContainer.classList.add("dragover");
+  });
+  uploadContainer.addEventListener("dragleave", e => {
+    uploadContainer.classList.remove("dragover");
+  });
+  uploadContainer.addEventListener("drop", e => {
+    e.preventDefault();
+    uploadContainer.classList.remove("dragover");
+    uploadFiles(e.dataTransfer.files);
+  });
+
+  // iit
+  loadSponsors();
+});
+</script>
+
+<script>
+let notifTimeout; // global reference for current timer
+
+function showNotif(message, color = "green") {
+  const msg = document.getElementById("notifMsg");
+  if (!msg) return;
+
+  // If another notif is already showing, reset animation + timer
+  clearTimeout(notifTimeout);
+
+  // Set text + color
+  msg.textContent = message;
+  msg.style.color = color;
+  msg.style.display = "block";
+
+  // Reset animation classes (important)
+  msg.classList.remove("animate__slideInRight", "animate__slideOutRight");
+  void msg.offsetWidth; // 🔄 Force reflow to restart animation cleanly
+
+  // Start new slide-in
+  msg.classList.add("animate__animated", "animate__slideInRight", "animate__faster");
+
+  // Schedule hide
+  notifTimeout = setTimeout(() => {
+    msg.classList.remove("animate__slideInRight");
+    msg.classList.add("animate__slideOutRight", "animate__faster");
+    setTimeout(() => { msg.style.display = "none"; }, 500);
+  }, 2500);
+}
+
+
+async function copyCardContent(id, customMsg = "Copied to clipboard!") {
+  try {
+    if (id) {
+      const card = document.getElementById(id);
+      const textToCopy = card.innerText.trim();
+      await navigator.clipboard.writeText(textToCopy);
+    }
+    showNotif(customMsg, "green");
+  } catch (err) {
+    console.error("Failed to copy card content: ", err);
+    showNotif("Failed to copy!", "red");
+  }
+}
+
+</script>
+ 
+<script>
+// Globals to represent the active view
+let currentTab = "scoreboard";
+let currentSubtab = ""; // e.g. "single" or "double" when currentTab === "brackets"
+
+// Replace / enhance your existing openTab
+function openTab(evt, tabName) {
+  // Hide all tab content
+  document.querySelectorAll(".tabcontent").forEach(el => {
+    el.style.display = "none";   // hide content
+    el.classList.remove("active");
+  });
+
+  // Remove "active" from all tab buttons
+  document.querySelectorAll(".channel").forEach(el => {
+    el.classList.remove("active");
+  });
+
+  // Show the chosen tab
+  const container = document.getElementById(tabName);
+  if (container) {
+    container.style.display = "block";
+    container.classList.add("active");
+  }
+
+  // Mark the clicked button active
+  if (evt && evt.currentTarget) {
+    evt.currentTarget.classList.add("active");
+  }
+
+  // Update state
+  currentTab = tabName;
+  if (tabName !== "brackets") currentSubtab = "";
+
+  console.log("openTab ->", currentTab, currentSubtab);
+}
+ 
+// Replace / enhance your existing openInnerTab
+function openInnerTab(name){
+  document.querySelectorAll(".inner-tabcontent").forEach(el=>el.style.display = "none");
+  document.querySelectorAll(".inner-tabs button").forEach(b=>b.classList.remove("active"));
+  const container = document.getElementById(name);
+  if (container) container.style.display = "block";
+  const btn = document.getElementById(name + "TabBtn");
+  if (btn) btn.classList.add("active");
+
+  // update state: inner tabs belong to the 'brackets' top tab
+  currentTab = "brackets";
+  currentSubtab = name;
+
+  console.log("openInnerTab ->", currentTab, currentSubtab);
+}
+
+// Global keyboard handler (works inside inputs/textareas too)
+document.addEventListener("keydown", function(e) {
+  const key = (e.key || "").toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && key === "s") {
+    e.preventDefault();
+
+    const view = currentSubtab ? `${currentTab}:${currentSubtab}` : currentTab;
+    console.log("Shortcut: Ctrl/Cmd+S ->", view);
+
+    switch (view) {
+      case "scoreboard":
+        if (typeof updateScoreboard === "function") updateScoreboard();
+        break;
+      case "commentary":
+        if (typeof updateCommentary === "function") updateCommentary();
+        break;
+      case "brackets:single":
+        if (typeof saveSinglePlayers === "function") saveSinglePlayers();
+        break;
+      case "brackets:double":
+        if (typeof saveDoublePlayers === "function") saveDoublePlayers();
+        break;
+      default:
+        console.warn("No save action for view:", view);
+    }
+  }
+});
+
+document.addEventListener("keydown", function(e) {
+  const key = (e.key || "").toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && key === "r") {
+    e.preventDefault();
+
+    const view = currentSubtab ? `${currentTab}:${currentSubtab}` : currentTab;
+    console.log("Shortcut: Ctrl/Cmd+S ->", view);
+
+    switch (view) {
+      case "scoreboard":
+        if (typeof resetScoreboard === "function") resetScoreboard();
+        break;
+      case "commentary":
+        if (typeof resetCommentary === "function") resetCommentary();
+        break;
+      case "brackets:single":
+        if (typeof resetSingle === "function") resetSingle();
+        break;
+      case "brackets:double":
+        if (typeof resetDouble === "function") resetDouble();
+        break;
+      default:
+        console.warn("No save action for view:", view);
+    }
+  }
+});
+
+document.addEventListener("keydown", function (e) {
+  const key = (e.key || "").toLowerCase();
+
+  // Alt + S → show commentary
+  if (e.altKey && key === "s") {
+    e.preventDefault();
+    if (typeof toggleCommentary === "function") {
+      toggleCommentary(true);
+      showNotif("🎙 Commentary Shown", "green");
+    }
+  }
+
+  // Alt + D → hide commentary
+  if (e.altKey && key === "d") {
+    e.preventDefault();
+    if (typeof toggleCommentary === "function") {
+      toggleCommentary(false);
+      showNotif("🎙 Commentary Hidden", "red");
+    }
+  }
+});
+
+document.addEventListener("keydown", function (e) {
+  const key = (e.key || "").toLowerCase();
+
+  if (e.altKey   && key === "1") {
+    e.preventDefault();
+
+    const view = currentSubtab ? `${currentTab}:${currentSubtab}` : currentTab;
+    console.log("Shortcut: Alt/Opt+1 ->", view);
+
+    openTab(e, 'scoreboard');
+  }
+});
+
+document.addEventListener("keydown", function (e) {
+  const key = (e.key || "").toLowerCase();
+
+  if (e.altKey && key === "2") {
+    e.preventDefault();
+
+    const view = currentSubtab ? `${currentTab}:${currentSubtab}` : currentTab;
+    console.log("Shortcut: Alt/Opt+2 ->", view);
+
+    openTab(e, 'commentary');
+  }
+});
+
+document.addEventListener("keydown", function (e) {
+  const key = (e.key || "").toLowerCase();
+
+  if (e.altKey && key === "3") {
+    e.preventDefault();
+
+    const view = currentSubtab ? `${currentTab}:${currentSubtab}` : currentTab;
+    console.log("Shortcut: Alt/Opt+3 ->", view);
+
+    openTab(e, 'brackets');
+  }
+});
+
+// Konami code sequence
+const KONAMI_CODE = [
+  "arrowup", "arrowup",
+  "arrowdown", "arrowdown",
+  "arrowleft", "arrowright",
+  "arrowleft", "arrowright",
+  "b", "a"
+];
+
+let konamiProgress = 0;
+
+document.addEventListener("keydown", (e) => {
+  const key = e.key.toLowerCase();
+
+  if (key === KONAMI_CODE[konamiProgress]) {
+    konamiProgress++;
+    if (konamiProgress === KONAMI_CODE.length) {
+      konamiProgress = 0;
+      showCreatorOverlay();
+    }
+  } else {
+    konamiProgress = 0; // reset if wrong key
+  }
+});
+
+// Show overlay
+function showCreatorOverlay() {
+  const overlay = document.getElementById("creatorOverlay");
+  if (!overlay) return;
+  overlay.classList.add("visible");
+}
+
+
+function toggleSinglePanel() {
+  const panel = document.getElementById("settingsSinglePanel");
+  const bracket = document.getElementById("singleBracketContainer");
+  const btn = document.getElementById("toggleSinglePanelBtn");
+
+  if (!panel || !bracket) return;
+
+  const isHidden = panel.classList.toggle("hidden");
+
+  if (isHidden) {
+    panel.style.display = "none";
+    bracket.style.flex = "1 1 100%";
+    btn.textContent = "⏪";
+  } else {
+    panel.style.display = "flex";
+    bracket.style.flex = "1 1 auto";
+    btn.textContent = "⏩";
+  }
+}
+
+function toggleDoublePanel() {
+  const panel = document.getElementById("settingsDoublePanel");
+  const bracket = document.getElementById("doubleBracketContainer");
+  const btn = document.getElementById("toggleDoublePanelBtn");
+
+  if (!panel || !bracket) return;
+
+  const isHidden = panel.classList.toggle("hidden");
+
+  if (isHidden) {
+    panel.style.display = "none";
+    bracket.style.flex = "1 1 100%";
+    btn.textContent = "⏪";
+  } else {
+    panel.style.display = "flex";
+    bracket.style.flex = "1 1 auto";
+    btn.textContent = "⏩";
+  }
+}
+
+</script>
+
+<script>
+  
+  // Auto-clean extra players when switching game
+document.addEventListener("DOMContentLoaded", () => {
+  const titleInput = document.getElementById("titlecard");
+  if (titleInput) {
+    titleInput.addEventListener("change", (e) => {
+      const game = e.target.value.toLowerCase();
+
+      // If not 2XKO, reset player 3 & 4
+      if (game !== "2xko") {
+        const v3 = document.getElementById("v3"),
+              v4 = document.getElementById("v4");
+        if(v3) v3.checked = false;
+        if(v4) v4.checked = false;
+
+        // Clear values for P3 & P4
+        ["#p3","#t3","#s3","#c3","#p4","#t4","#s4","#c4"].forEach(sel => {
+          const el = document.querySelector(sel);
+          if(el) el.value = (el.type==='number') ? 0 : '';
+        });
+
+        updateScoreboard("Switched game → extra players cleared!");
+      }
+    });
+  }
+});
+
+</script>
+<script>
+  localStorage.setItem('scoreboard-data', JSON.stringify(data));
+
+const saved = localStorage.getItem('scoreboard-data');
+if (saved) populateScoreboard(JSON.parse(saved));
+
+ localStorage.setItem('commentary-data', JSON.stringify(commentaryData));
+const savedCommentary = localStorage.getItem('commentary-data');
+if (savedCommentary) populateCommentary(JSON.parse(savedCommentary));
+
+  localStorage.setItem('bracket-data', JSON.stringify(bracketData));
+const savedBracket = localStorage.getItem('bracket-data');
+if (savedBracket) {
+  bracketData = JSON.parse(savedBracket);
+  if (bracketData.single) {
+    setSingleSeedInputs(bracketData.single.players || Array(8).fill(''));
+    seedSingleVisualBracket();
+  }
+  if (bracketData.double) {
+    const d = bracketData.double;
+    if (d.players?.length >= 8) {
+      for (let i = 0; i < 8; i++) {
+        const el = document.getElementById('dp' + (i + 1));
+        if (el) el.value = d.players[i] || '';
+      }
+      seedDoubleVisualBracket();
+      populateDoubleFromData();
+    }
+  }
+}
+
+function openExternal(url) {
+  if (window.runtime && window.runtime.BrowserOpenURL) {
+    // Wails v2 way
+    window.runtime.BrowserOpenURL(url);
+  } else if (window.wails && window.wails.Browser) {
+    // Sometimes exposed under window.wails
+    window.wails.Browser.OpenURL(url);
+  } else {
+    // fallback for normal browser
+    window.open(url, '_blank');
+  }
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute("data-theme") === "dark";
+  html.setAttribute("data-theme", isDark ? "light" : "dark");
+}
+
+let history = [];
+function saveState() { history.push(currentData); }
+function undo() { restore(history.pop()); }
+
+window.addEventListener("load", () => {
+  setTimeout(() => document.body.focus(), 100);
+});
+</script>
+
+<script>
+// === Load Player List from CSV ===
+async function loadPlayersCSV() {
+  try {
+    const players = await window.go.main.App.LoadPlayersCSV();
+    window.playerList = players || [];
+    console.log("✅ Loaded players from Go:", window.playerList);
+    setupAutocomplete();
+  } catch (err) {
+    console.warn("⚠ Couldn't load players:", err);
+    window.playerList = [];
+  }
+}
+
+function setupAutocomplete() {
+  const playerInputs = ["p1", "p2", "p3", "p4"].map(id => document.getElementById(id));
+  playerInputs.forEach(input => {
+    if (!input) return;
+    const listId = input.id + "-list";
+    let datalist = document.getElementById(listId);
+    if (!datalist) {
+      datalist = document.createElement("datalist");
+      datalist.id = listId;
+      document.body.appendChild(datalist);
+      input.setAttribute("list", listId);
+    }
+    datalist.innerHTML = "";
+    window.playerList.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = p.name;
+      opt.label = p.team ? `${p.name} (${p.team})` : p.name;
+      datalist.appendChild(opt);
+    });
+    input.addEventListener("change", () => {
+      const found = window.playerList.find(p => p.name.toLowerCase() === input.value.toLowerCase());
+      if (found) {
+        const teamInput = document.getElementById("t" + input.id.slice(1));
+        if (teamInput) teamInput.value = found.team;
+      }
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", loadPlayersCSV);
+
+</script>
+<script>
+  function openStreamMode() {
+  window.open("http://localhost:34115/miniscoreboard.html", "StreamMode",
+              "width=620,height=260,resizable=yes");
+}
+</script>

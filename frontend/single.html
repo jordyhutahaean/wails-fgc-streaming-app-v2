@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Single Bracket Overlay</title>
+<style>
+  body {
+    margin: 0;
+    background: #111;
+    color: #fff;
+    font-family: sans-serif;
+  }
+
+  .bracket-container {
+    width: 100%;
+    height: 100vh;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  .bracket-tree {
+    display: grid;
+    grid-template-columns: repeat(3, 200px);
+    gap: 60px;
+  }
+
+  .round {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .match {
+    background: #222;
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 6px 10px;
+    min-width: 180px;
+  }
+
+  .player {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px;
+  }
+
+  .player span {
+    flex: 1;
+  }
+
+  .score {
+    width: 28px;
+    text-align: center;
+    background: transparent;
+    border: none;
+    color: #fff;
+  }
+</style>
+</head>
+<body>
+  <div class="bracket-container">
+    <div class="bracket-tree" id="visualBracket">
+      <!-- Quarter Finals -->
+      <div class="round">
+        <div class="match">
+          <div class="player"><span id="qf1p1">—</span><input id="qf1s1" class="score" readonly></div>
+          <div class="player"><span id="qf1p2">—</span><input id="qf1s2" class="score" readonly></div>
+        </div>
+        <div class="match">
+          <div class="player"><span id="qf2p1">—</span><input id="qf2s1" class="score" readonly></div>
+          <div class="player"><span id="qf2p2">—</span><input id="qf2s2" class="score" readonly></div>
+        </div>
+        <div class="match">
+          <div class="player"><span id="qf3p1">—</span><input id="qf3s1" class="score" readonly></div>
+          <div class="player"><span id="qf3p2">—</span><input id="qf3s2" class="score" readonly></div>
+        </div>
+        <div class="match">
+          <div class="player"><span id="qf4p1">—</span><input id="qf4s1" class="score" readonly></div>
+          <div class="player"><span id="qf4p2">—</span><input id="qf4s2" class="score" readonly></div>
+        </div>
+      </div>
+
+      <!-- Semi Finals -->
+      <div class="round">
+        <div class="match">
+          <div class="player"><span id="sf1p1">Winner QF1</span><input id="sf1s1" class="score" readonly></div>
+          <div class="player"><span id="sf1p2">Winner QF2</span><input id="sf1s2" class="score" readonly></div>
+        </div>
+        <div class="match">
+          <div class="player"><span id="sf2p1">Winner QF3</span><input id="sf2s1" class="score" readonly></div>
+          <div class="player"><span id="sf2p2">Winner QF4</span><input id="sf2s2" class="score" readonly></div>
+        </div>
+      </div>
+
+      <!-- Final -->
+      <div class="round">
+        <div class="match">
+          <div class="player"><span id="f1p1">Winner SF1</span><input id="f1s1" class="score" readonly></div>
+          <div class="player"><span id="f1p2">Winner SF2</span><input id="f1s2" class="score" readonly></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+let bracketData = null;
+
+function ensureBracket(){
+  if(!bracketData){
+    bracketData = { single: { players: Array(8).fill(""), scores: {}, winners: {} } };
+  }
+}
+
+async function loadBracket(){
+  ensureBracket();
+  try {
+    const resp = await fetch("bracket.json?_=" + Date.now()); // prevent caching
+    if(!resp.ok) throw new Error("no bracket.json");
+    bracketData = await resp.json();
+  } catch (err) {
+    console.warn("No bracket.json found – using blank bracket");
+  }
+  renderSingleFromData();
+}
+
+function renderSingleFromData(){
+  ensureBracket();
+  const s = bracketData.single || { players: Array(8).fill(""), scores:{}, winners:{} };
+  const players = s.players || Array(8).fill("");
+
+  const qfPairs = {
+    qf1: [players[0]||"", players[1]||""],
+    qf2: [players[2]||"", players[3]||""],
+    qf3: [players[4]||"", players[5]||""],
+    qf4: [players[6]||"", players[7]||""]
+  };
+
+  Object.keys(qfPairs).forEach(k=>{
+    const [aName, bName] = qfPairs[k];
+    document.getElementById(k + "p1").textContent = aName || "—";
+    document.getElementById(k + "p2").textContent = bName || "—";
+
+    const sc = (s.scores && s.scores[k]) ? s.scores[k] : [null,null];
+    document.getElementById(k + "s1").value = sc[0] != null ? sc[0] : "";
+    document.getElementById(k + "s2").value = sc[1] != null ? sc[1] : "";
+  });
+
+  // Semis
+  document.getElementById("sf1p1").textContent = (s.winners && s.winners.qf1) || "Winner QF1";
+  document.getElementById("sf1p2").textContent = (s.winners && s.winners.qf2) || "Winner QF2";
+  document.getElementById("sf2p1").textContent = (s.winners && s.winners.qf3) || "Winner QF3";
+  document.getElementById("sf2p2").textContent = (s.winners && s.winners.qf4) || "Winner QF4";
+
+  const sf1sc = s.scores?.sf1 || [null,null];
+  document.getElementById("sf1s1").value = sf1sc[0] ?? "";
+  document.getElementById("sf1s2").value = sf1sc[1] ?? "";
+
+  const sf2sc = s.scores?.sf2 || [null,null];
+  document.getElementById("sf2s1").value = sf2sc[0] ?? "";
+  document.getElementById("sf2s2").value = sf2sc[1] ?? "";
+
+  // Final
+  document.getElementById("f1p1").textContent = (s.winners && s.winners.sf1) || "Winner SF1";
+  document.getElementById("f1p2").textContent = (s.winners && s.winners.sf2) || "Winner SF2";
+
+  const fsc = s.scores?.f1 || [null,null];
+  document.getElementById("f1s1").value = fsc[0] ?? "";
+  document.getElementById("f1s2").value = fsc[1] ?? "";
+}
+
+// Auto load on page open
+window.addEventListener("DOMContentLoaded", () => {
+  loadBracket();
+  // Auto-refresh every second
+  setInterval(loadBracket, 1000);
+});
+</script>
+</body>
+</html>

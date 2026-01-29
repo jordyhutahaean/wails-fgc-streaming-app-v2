@@ -1,0 +1,37 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "J-FGC-Scoreboard",
+  "description": "My Wails App",
+  "icon": "build/appicon.png",
+  "outputfilename": "J's FGC Scoreboard",
+  "static": ["./sponsors"],
+
+  "frontend": {
+    "install": "npm install",
+    "build": "npm run build",
+    "dev": {
+      "watcher": "npm run dev",
+      "serverUrl": "auto"
+    }
+  },
+
+  "assetdir": "frontend/dist",
+
+  "author": {
+    "name": "giogio555",
+    "email": "jordyhutahaean555@gmail.com"
+  },
+
+  "mac": {
+  "package": {
+    "dmg": {
+      "enabled": true
+    },
+    "resources": [
+      "frontend",
+      "sponsors"
+    ]
+  }
+}
+
+}
