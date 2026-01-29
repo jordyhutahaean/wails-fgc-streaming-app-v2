@@ -28,11 +28,7 @@
       </label>
       <label>Style
         <select id="style" style="padding: 8px; width: 100%;">
-          <option value="minimalist">Minimalist</option>
-          <option value="arcade">Arcade</option>
-          <option value="futuristic">Futuristic</option>
-          <option value="white_outline">White Outline</option>
-          <option value="gb_versus">GranblueVersus Style</option>
+          <option value="popu">Popu Style</option>
         </select>
       </label>
       <label>Titlecard
@@ -112,7 +108,7 @@
       
       // Populate form
       document.getElementById("game").value = data.game || "sf";
-      document.getElementById("style").value = data.style || "minimalist";
+      document.getElementById("style").value = data.style || "popu";
       document.getElementById("titlecard").value = data.titlecard || "";
       
       document.getElementById("p1").value = data.player1 || "";
