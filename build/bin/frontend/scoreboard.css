@@ -455,7 +455,7 @@ body {
 
 .popu #p1-card .score {
   top: -62px;
-  padding: 2px;
+  padding: 0px;
   left: 60%;
   transform: translateX(52%);
 }
@@ -467,7 +467,7 @@ body {
 
 .popu #p2-card .score {
   top: -62px;
-  padding: 2px;
+  padding: 0px;
   right: 60%;
   transform: translateX(-56%);
 }
@@ -489,10 +489,37 @@ body {
    width: 240px; 
 }
 
+/* Street Fighter 6 */
+.popu.sf #p1-card {
+  transform: translateX(-100px) translateY(2px);
+}
+.popu.sf #p1-card .score{
+  transform: translateY(22px) translateX(70px);
+}
+.popu.sf #p1-card .player-info .name{
+  transform: translateY(-4px);
+}
+.popu.sf #p1-card .player-info .team{
+  transform: translateY(-2px);
+}
 
+.popu.sf #p2-card {
+  transform: translateX( 100px)translateY(2px);
+}
+.popu.sf #p2-card .score{
+  transform: translateY(22px) translateX(-70px);
+}
+.popu.sf #p2-card .player-info .name{
+  transform: translateY(-4px);
+}
+.popu.sf #p2-card .player-info .team{
+  transform: translateY(-2px);
+}
+ 
 
+/* Tekken */
 .popu.tekken #p1-card {
-  transform: translateX(-100px) translateY(-8px);
+  transform: translateX(-100px) translateY(8px);
 }
 .popu.tekken #p1-card .score{
   transform: translateY(28px) translateX(70px);
@@ -504,8 +531,8 @@ body {
   transform: translateY(-2px);
 }
 
-.popu.popu.tekken #p2-card {
-  transform: translateX( 100px)translateY(-8px);
+.popu.tekken #p2-card {
+  transform: translateX( 100px)translateY(8px);
 }
 .popu.tekken #p2-card .score{
   transform: translateY(28px) translateX(-70px);
