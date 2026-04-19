@@ -1259,6 +1259,7 @@
         <div class="toolbar">
           <button class="btn corner-halftone-btn" title="Ctrl + s for shortcut" onclick="updateScoreboard('Scoreboard updated!')"><span class="bi--save-fill"></span> Save Scoreboard</button>
           <button class="btn corner-halftone-btn" title="Ctrl + r for shortcut" onclick="resetScoreboard()"><span class="ic--outline-reset-tv"></span> Reset </button>
+          <button class="btn corner-halftone-btn" onclick="swapPlayers()">Swap Players</button>
           <div class="obs-scoreboard">
             <h1> Copy this to your obs</h1>
             <div class="copy-scoreboard" id="scoreboard-url" onclick="copyCardContent('scoreboard-url')">
@@ -1577,7 +1578,7 @@ async function updateScoreboard(msg = "Scoreboard updated!") {
     console.log("✅ Saved player list to CSV");
   
     // 🔁 Refresh suggestions right away
-    await loadPlayerSuggestions();
+ 
     await loadPlayersCSV(); 
     
     // ✅ Show notification again
@@ -1604,6 +1605,55 @@ function resetScoreboard(){
   if(v3) v3.checked=false; 
   if(v4) v4.checked=false;
   updateScoreboard("Scoreboard reset!");
+}
+
+function swapPlayers() {
+  // Swap Player 1 and Player 2
+  const p1 = document.getElementById("p1").value;
+  const t1 = document.getElementById("t1").value;
+  const n1 = document.getElementById("n1").value;
+  const s1 = document.getElementById("s1").value;
+
+  const p2 = document.getElementById("p2").value;
+  const t2 = document.getElementById("t2").value;
+  const n2 = document.getElementById("n2").value;
+  const s2 = document.getElementById("s2").value;
+
+  document.getElementById("p1").value = p2;
+  document.getElementById("t1").value = t2;
+  document.getElementById("n1").value = n2;
+  document.getElementById("s1").value = s2;
+
+  document.getElementById("p2").value = p1;
+  document.getElementById("t2").value = t1;
+  document.getElementById("n2").value = n1;
+  document.getElementById("s2").value = s2;
+
+  // If 2XKO game, also swap Player 3 and Player 4
+  const game = document.getElementById("game").value;
+  if (game === "2xko") {
+    const p3 = document.getElementById("p3").value;
+    const t3 = document.getElementById("t3").value;
+    const n3 = document.getElementById("n3").value;
+    const s3 = document.getElementById("s3").value;
+
+    const p4 = document.getElementById("p4").value;
+    const t4 = document.getElementById("t4").value;
+    const n4 = document.getElementById("n4").value;
+    const s4 = document.getElementById("s4").value;
+
+    document.getElementById("p3").value = p4;
+    document.getElementById("t3").value = t4;
+    document.getElementById("n3").value = n4;
+    document.getElementById("s3").value = s4;
+
+    document.getElementById("p4").value = p3;
+    document.getElementById("t4").value = t3;
+    document.getElementById("n4").value = n3;
+    document.getElementById("s4").value = s3;
+  }
+
+  updateScoreboard("Players swapped!");
 }
 
 // Auto-clean extra players when switching game

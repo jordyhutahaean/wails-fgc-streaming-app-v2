@@ -42,6 +42,7 @@
   <div class="toolbar">
       <button class="btn corner-halftone-btn" title="Ctrl + s for shortcut" onclick="updateScoreboard('Scoreboard updated!')"><span class="bi--save-fill"></span> Save Scoreboard</button>
       <button class="btn corner-halftone-btn" title="Ctrl + r for shortcut" onclick="resetScoreboard()"><span class="ic--outline-reset-tv"></span> Reset </button>
+      <button class="btn corner-halftone-btn" onclick="swapPlayers()">Swap Players</button>
 
   </div>
 
@@ -214,12 +215,16 @@
         });
         if (!resp.ok) throw new Error("HTTP save failed");
       }
+      // 🔁 Refresh suggestions right away
+ 
+    await loadPlayersCSV(); 
 
       showStreamNotif(msg);
     } catch (err) {
       console.error("Save failed:", err);
       showStreamNotif("Failed to save: " + err.message, "red");
     }
+      loadPlayersCSV(); // Refresh suggestions after update
   }
 
   function resetScoreboard() {
@@ -236,6 +241,55 @@
     if (v4) v4.checked = false;
 
     updateScoreboard("Scoreboard reset!");
+  }
+
+  function swapPlayers() {
+    // Swap Player 1 and Player 2
+    const p1 = document.getElementById("p1").value;
+    const t1 = document.getElementById("t1").value;
+    const n1 = document.getElementById("n1").value;
+    const s1 = document.getElementById("s1").value;
+
+    const p2 = document.getElementById("p2").value;
+    const t2 = document.getElementById("t2").value;
+    const n2 = document.getElementById("n2").value;
+    const s2 = document.getElementById("s2").value;
+
+    document.getElementById("p1").value = p2;
+    document.getElementById("t1").value = t2;
+    document.getElementById("n1").value = n2;
+    document.getElementById("s1").value = s2;
+
+    document.getElementById("p2").value = p1;
+    document.getElementById("t2").value = t1;
+    document.getElementById("n2").value = n1;
+    document.getElementById("s2").value = s2;
+
+    // If 2XKO game, also swap Player 3 and Player 4
+    const game = document.getElementById("game").value;
+    if (game === "2xko") {
+      const p3 = document.getElementById("p3").value;
+      const t3 = document.getElementById("t3").value;
+      const n3 = document.getElementById("n3").value;
+      const s3 = document.getElementById("s3").value;
+
+      const p4 = document.getElementById("p4").value;
+      const t4 = document.getElementById("t4").value;
+      const n4 = document.getElementById("n4").value;
+      const s4 = document.getElementById("s4").value;
+
+      document.getElementById("p3").value = p4;
+      document.getElementById("t3").value = t4;
+      document.getElementById("n3").value = n4;
+      document.getElementById("s3").value = s4;
+
+      document.getElementById("p4").value = p3;
+      document.getElementById("t4").value = t3;
+      document.getElementById("n4").value = n3;
+      document.getElementById("s4").value = s3;
+    }
+
+    updateScoreboard("Players swapped!");
   }
 
   // Auto-clean extra players when switching game
@@ -371,6 +425,69 @@
     });
   });
   </script>
+
+<script>
+// === Load Player List from CSV ===
+async function loadPlayersCSV() {
+  try {
+    let players;
+    if (window.go?.main?.App?.LoadPlayersCSV) {
+      players = await window.go.main.App.LoadPlayersCSV();
+    } else {
+      const resp = await fetch("http://localhost:34115/data.csv");
+      if (!resp.ok) throw new Error("Could not load data.csv");
+      const text = await resp.text();
+      const rows = text.split(/\r?\n/).filter(line => line.trim().length > 0);
+      players = rows.slice(1).map(line => {
+        const [name, ...rest] = line.split(",");
+        return {
+          name: name?.trim() || "",
+          team: rest.join(",").trim() || ""
+        };
+      }).filter(p => p.name);
+    }
+    window.playerList = players || [];
+    console.log("✅ Loaded players:", window.playerList);
+    setupAutocomplete();
+  } catch (err) {
+    console.warn("⚠ Couldn't load players:", err);
+    window.playerList = [];
+    setupAutocomplete();
+  }
+}
+
+function setupAutocomplete() {
+  const playerInputs = ["p1", "p2", "p3", "p4"].map(id => document.getElementById(id));
+  playerInputs.forEach(input => {
+    if (!input) return;
+    const listId = input.id + "-list";
+    let datalist = document.getElementById(listId);
+    if (!datalist) {
+      datalist = document.createElement("datalist");
+      datalist.id = listId;
+      document.body.appendChild(datalist);
+      input.setAttribute("list", listId);
+    }
+    datalist.innerHTML = "";
+    window.playerList.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = p.name;
+      opt.label = p.team ? `${p.name} (${p.team})` : p.name;
+      datalist.appendChild(opt);
+    });
+    input.addEventListener("change", () => {
+      const found = window.playerList.find(p => p.name.toLowerCase() === input.value.toLowerCase());
+      if (found) {
+        const teamInput = document.getElementById("t" + input.id.slice(1));
+        if (teamInput) teamInput.value = found.team;
+      }
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", loadPlayersCSV);
+
+</script>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap');

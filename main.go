@@ -2,10 +2,12 @@ package main
 
 import (
 	"embed"
+	"encoding/csv"
 	"encoding/json"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -55,6 +57,13 @@ func main() {
 		mux.Handle("/frontend/", http.StripPrefix("/frontend/", fs))
 
 		mux.HandleFunc("/api/save-scoreboard", func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+			if r.Method == "OPTIONS" {
+				w.WriteHeader(http.StatusNoContent)
+				return
+			}
 			if r.Method != "POST" {
 				http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 				return
@@ -76,6 +85,49 @@ func main() {
 
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+		})
+
+		mux.HandleFunc("/api/load-players", func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+			if r.Method == "OPTIONS" {
+				w.WriteHeader(http.StatusNoContent)
+				return
+			}
+			if r.Method != "GET" {
+				http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+				return
+			}
+
+			filePath := filepath.Join(resourcePath("frontend"), "data.csv")
+			f, err := os.Open(filePath)
+			if err != nil {
+				http.Error(w, "File not found", http.StatusNotFound)
+				return
+			}
+			defer f.Close()
+
+			csvReader := csv.NewReader(f)
+			records, err := csvReader.ReadAll()
+			if err != nil || len(records) < 2 {
+				w.Header().Set("Content-Type", "application/json")
+				json.NewEncoder(w).Encode([]map[string]string{})
+				return
+			}
+
+			var players []map[string]string
+			for _, row := range records[1:] {
+				if len(row) >= 2 {
+					players = append(players, map[string]string{
+						"name": strings.TrimSpace(row[0]),
+						"team": strings.TrimSpace(row[1]),
+					})
+				}
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(players)
 		})
 
 		ports := []string{":34115", ":34116", ":34117"}
@@ -146,6 +198,43 @@ func startOverlayServer() {
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+	})
+
+	mux.HandleFunc("/api/load-players", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		filePath := filepath.Join(resourcePath("frontend"), "data.csv")
+
+		f, err := os.Open(filePath)
+		if err != nil {
+			http.Error(w, "File not found", http.StatusNotFound)
+			return
+		}
+		defer f.Close()
+
+		csvReader := csv.NewReader(f)
+		records, err := csvReader.ReadAll()
+		if err != nil || len(records) < 2 {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode([]map[string]string{})
+			return
+		}
+
+		var players []map[string]string
+		for _, row := range records[1:] {
+			if len(row) >= 2 {
+				players = append(players, map[string]string{
+					"name": strings.TrimSpace(row[0]),
+					"team": strings.TrimSpace(row[1]),
+				})
+			}
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(players)
 	})
 
 	ports := []string{":34115", ":34116", ":34117"}
