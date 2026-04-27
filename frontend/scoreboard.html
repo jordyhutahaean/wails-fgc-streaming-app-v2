@@ -18,6 +18,10 @@
         <div class="team"> </div>
       </div>
       <div class="nation-container" id="n1"> 
+        <span class="nation"></span>
+      </div>
+      <div class="controller-container">
+        <img class="controller" src="" />
       </div>
     </div>
   </div>
@@ -30,6 +34,7 @@
         <div class="team"> </div>
       </div>
       <div class="nation-container" id="n2"> 
+        <span class="nation"></span>
       </div>
     </div>
   </div>
@@ -42,6 +47,7 @@
         <div class="team"> </div>
       </div>
       <div class="nation-container" id="n3"> 
+        <span class="nation"></span>
       </div>
     </div>
   </div>
@@ -54,6 +60,7 @@
         <div class="team"> </div>
       </div>
       <div class="nation-container" id="n4"> 
+        <span class="nation"></span>
       </div>
     </div>
   </div>
@@ -87,6 +94,15 @@
   </script>
 
 <script>
+  
+  function getFlagImg(countryCode) {
+    if (!countryCode || countryCode.length !== 2) return '';
+    const special = { EN: 'GB' };
+    countryCode = (special[countryCode.toUpperCase()] || countryCode).toLowerCase();
+    return `<img src="https://flagcdn.com/w40/${countryCode}.png" 
+                alt="${countryCode}" 
+                style="width:32px; height:auto; vertical-align:middle;" />`;
+  }
 async function loadScoreboard() {
   try {
     const resp = await fetch("scoreboard.json?_=" + Date.now());
@@ -115,6 +131,21 @@ async function loadScoreboard() {
       card.querySelector(".name").textContent = data[`player${i+1}`] || `Player ${i+1}`;
       card.querySelector(".team").textContent = data[`team${i+1}`] || `Team ${i+1}`;
       card.querySelector(".score").textContent = data[`score${i+1}`] || 0;
+
+     // nation
+    const nationEl = card.querySelector(".nation");
+    if (nationEl) {
+      const nationCode = (data[`nation${i+1}`] || "").toUpperCase();
+      const special = { EN: 'GB' };
+      const resolvedCode = (special[nationCode] || nationCode).toLowerCase();
+      if (resolvedCode.length === 2) {
+        nationEl.innerHTML = `<img src="https://flagcdn.com/w40/${resolvedCode}.png" 
+                                  alt="${resolvedCode.toUpperCase()}"
+                                  style="width:32px; height:auto; vertical-align:middle;" />`;
+      } else {
+        nationEl.textContent = nationCode;
+      }
+    }
 
       // controller image logic
       const controllerType = data[`controller${i+1}`]; // e.g. "leverless"

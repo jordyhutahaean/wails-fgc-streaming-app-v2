@@ -13,6 +13,10 @@ body {
   position: relative;
 }
 
+.nation {
+  font-family: "Segoe UI Emoji", "Segoe UI Symbol", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+}
+
 
 #titlecard {
   position: absolute;

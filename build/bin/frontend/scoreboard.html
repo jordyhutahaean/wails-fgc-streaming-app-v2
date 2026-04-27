@@ -77,6 +77,15 @@
  
 
 <script>
+function getFlagImg(countryCode) {
+  if (!countryCode || countryCode.length !== 2) return '';
+  const special = { EN: 'GB' };
+  countryCode = (special[countryCode.toUpperCase()] || countryCode).toLowerCase();
+  return `<img src="https://flagcdn.com/w40/${countryCode}.png" 
+               alt="${countryCode}" 
+               style="width:32px; height:auto; vertical-align:middle;" />`;
+}
+
 async function loadScoreboard() {
   try {
     const resp = await fetch("scoreboard.json?_=" + Date.now());
@@ -115,7 +124,12 @@ async function loadScoreboard() {
       if (scoreEl) scoreEl.textContent = (data[`score${idx}`] ?? 0);
 
       // set nation / country id (from scoreboard JSON field controller1..4)
-      if (nationEl) nationEl.textContent = (data[`nation${idx}`] || "").toUpperCase();
+      const nationSpan = nationEl ? nationEl.querySelector(".nation") : null;
+      if (nationSpan) {
+        const nationCode = (data[`nation${idx}`] || "").toUpperCase();
+        const flag = getFlagImg(nationCode);
+        nationSpan.innerHTML = flag || nationCode;
+      }
 
       // safe controller image block (only if element exists)
       const containerEl = card.querySelector(".controller-container");
