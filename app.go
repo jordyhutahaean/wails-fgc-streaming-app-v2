@@ -1,10 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"encoding/csv"
 	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 )
@@ -385,4 +390,271 @@ func (a *App) LoadPlayersCSV() ([]map[string]string, error) {
 		}
 	}
 	return players, nil
+}
+
+func parseStartGGLink(link string) (string, string, error) {
+	link = strings.TrimSpace(link)
+	if link == "" {
+		return "", "", fmt.Errorf("start.gg event link is required")
+	}
+	link = strings.TrimPrefix(link, "https://")
+	link = strings.TrimPrefix(link, "http://")
+	link = strings.TrimPrefix(link, "www.")
+	link = strings.TrimPrefix(link, "start.gg/")
+	link = strings.TrimSuffix(link, "/")
+
+	parts := strings.Split(link, "/")
+	var tournamentSlug, eventSlug string
+	for i, part := range parts {
+		switch part {
+		case "tournament":
+			if i+1 < len(parts) {
+				tournamentSlug = parts[i+1]
+			}
+		case "event":
+			if i+1 < len(parts) {
+				eventSlug = parts[i+1]
+			}
+		}
+	}
+	if tournamentSlug == "" && len(parts) >= 2 && parts[0] != "tournament" {
+		tournamentSlug = parts[0]
+		eventSlug = parts[1]
+	}
+	if tournamentSlug == "" || eventSlug == "" {
+		return "", "", fmt.Errorf("could not parse tournament or event slug from link")
+	}
+	return tournamentSlug, eventSlug, nil
+}
+
+func extractScriptJSON(body []byte) ([]byte, error) {
+	re := regexp.MustCompile(`(?s)<script[^>]+id=["']__NEXT_DATA__["'][^>]*>(.*?)</script>`)
+	matches := re.FindSubmatch(body)
+	if len(matches) < 2 {
+		return nil, fmt.Errorf("could not find embedded JSON in start.gg page")
+	}
+	return matches[1], nil
+}
+
+func findFirstString(data interface{}, key string) string {
+	switch v := data.(type) {
+	case map[string]interface{}:
+		if s, ok := v[key].(string); ok {
+			return s
+		}
+		for _, child := range v {
+			if result := findFirstString(child, key); result != "" {
+				return result
+			}
+		}
+	case []interface{}:
+		for _, item := range v {
+			if result := findFirstString(item, key); result != "" {
+				return result
+			}
+		}
+	}
+	return ""
+}
+
+func findEventId(pageObj interface{}, tournamentSlug, eventSlug string) (string, error) {
+	if props, ok := pageObj.(map[string]interface{})["props"]; ok {
+		if pageProps, ok := props.(map[string]interface{})["pageProps"]; ok {
+			if apollo, ok := pageProps.(map[string]interface{})["__APOLLO_STATE__"]; ok {
+				if apolloMap, ok := apollo.(map[string]interface{}); ok {
+					for key, value := range apolloMap {
+						if strings.HasPrefix(key, "Event:") {
+							if eventMap, ok := value.(map[string]interface{}); ok {
+								if slug, ok := eventMap["slug"].(string); ok && slug == "tournament/"+tournamentSlug+"/event/"+eventSlug {
+									if id, ok := eventMap["id"].(float64); ok {
+										return fmt.Sprintf("%.0f", id), nil
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return "", fmt.Errorf("could not find event id")
+}
+
+func fetchStartGGPageEntrants(pageURL string) (map[string]interface{}, error) {
+	tournamentSlug, eventSlug, err := parseStartGGLink(pageURL)
+	if err != nil {
+		return nil, err
+	}
+
+	// fetch event page to get eventId
+	req, err := http.NewRequest("GET", pageURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("start.gg page returned status %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	jsonData, err := extractScriptJSON(body)
+	if err != nil {
+		return nil, err
+	}
+
+	var pageObj interface{}
+	if err := json.Unmarshal(jsonData, &pageObj); err != nil {
+		return nil, err
+	}
+
+	eventId, err := findEventId(pageObj, tournamentSlug, eventSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	// build attendees URL
+	attendeesURL := fmt.Sprintf("https://www.start.gg/tournament/%s/attendees?filter=%%7B%%22eventIds%%22%%3A%%5B%%22%s%%22%%5D%%7D", tournamentSlug, eventId)
+
+	// fetch attendees page
+	req2, err := http.NewRequest("GET", attendeesURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	req2.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36")
+
+	resp2, err := client.Do(req2)
+	if err != nil {
+		return nil, err
+	}
+	defer resp2.Body.Close()
+
+	if resp2.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("start.gg attendees page returned status %d", resp2.StatusCode)
+	}
+
+	body2, err := io.ReadAll(resp2.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	// parse HTML for names
+	re := regexp.MustCompile(`<a href="/tournament/[^"]*/attendee/[^"]*">([^<]*)</a>`)
+	matches := re.FindAllSubmatch(body2, -1)
+
+	nodes := []interface{}{}
+	for _, match := range matches {
+		if len(match) > 1 {
+			name := strings.TrimSpace(string(match[1]))
+			nodes = append(nodes, map[string]interface{}{
+				"id":           name,
+				"name":         name,
+				"participants": []interface{}{map[string]interface{}{"gamerTag": ""}},
+			})
+		}
+	}
+
+	tournamentName := findFirstString(pageObj, "name")
+	eventName := strings.Replace(eventSlug, "-", " ", -1) // simple
+
+	return map[string]interface{}{
+		"data": map[string]interface{}{
+			"tournament": map[string]interface{}{
+				"name": tournamentName,
+				"events": []map[string]interface{}{
+					{
+						"name":     eventName,
+						"entrants": map[string]interface{}{"nodes": nodes},
+					},
+				},
+			},
+		},
+	}, nil
+}
+
+func (a *App) fetchStartGGGraphQL(tournamentSlug, eventSlug, apiKey string) (map[string]interface{}, error) {
+	query := `query EventEntrants($tournamentSlug:String!,$eventSlug:String!){
+  tournament(slug:$tournamentSlug){
+    name
+    events(query:{slug:$eventSlug}) {
+      id
+      name
+      entrants(query:{perPage:128}) {
+        nodes {
+          id
+          name
+          participants { gamerTag }
+        }
+      }
+    }
+  }
+}`
+
+	payload := map[string]interface{}{
+		"query": query,
+		"variables": map[string]string{
+			"tournamentSlug": tournamentSlug,
+			"eventSlug":      eventSlug,
+		},
+	}
+
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+
+	url := "https://api.start.gg/gql-public"
+	if apiKey != "" {
+		url = "https://api.start.gg/gql/alpha"
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	if apiKey != "" {
+		req.Header.Set("Authorization", "Bearer "+apiKey)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var result map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("start.gg API error %d: %v", resp.StatusCode, result)
+	}
+
+	if errs, ok := result["errors"]; ok {
+		return nil, fmt.Errorf("start.gg returned errors: %v", errs)
+	}
+
+	return result, nil
+}
+
+func (a *App) FetchStartGGEntrants(startggLink, apiKey string) (map[string]interface{}, error) {
+	if startggLink == "" {
+		return nil, fmt.Errorf("start.gg event link is required")
+	}
+
+	return fetchStartGGPageEntrants(startggLink)
 }

@@ -6,6 +6,10 @@ export function DeleteSponsor(arg1) {
   return window['go']['main']['App']['DeleteSponsor'](arg1);
 }
 
+export function FetchStartGGEntrants(arg1, arg2) {
+  return window['go']['main']['App']['FetchStartGGEntrants'](arg1, arg2);
+}
+
 export function GetBracket() {
   return window['go']['main']['App']['GetBracket']();
 }
