@@ -1101,7 +1101,7 @@ body {
 }
 .white_outline #p1-card .player-info .nation-container{
   transform: translateX(-184px) translateY(0px) scale(1.3);
- 
+  outline: 1px solid white;
 }
 
 .white_outline #p2-card .player-info .score-text {
@@ -1113,6 +1113,7 @@ body {
 }
 .white_outline #p2-card .player-info .nation-container{
   transform: translateX(184px) translateY(0px) scale(1.3);
+   outline: 1px solid white;
 }
 .white_outline #p2-card .player-info{
   right: 10px;
@@ -1124,7 +1125,7 @@ body {
  
 .white_outline.sf #p1-card .player-info {
   background-image: url("./img/white_out/p1_bar.png");
-  transform: scale(1.2) translateY(-6px);
+  transform: scale(1.2) translateY(-6px) translateX(8px);
 }
 
 .white_outline.sf #p2-card .score {
