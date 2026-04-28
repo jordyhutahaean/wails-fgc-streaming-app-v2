@@ -81,9 +81,9 @@ function getFlagImg(countryCode) {
   if (!countryCode || countryCode.length !== 2) return '';
   const special = { EN: 'GB' };
   countryCode = (special[countryCode.toUpperCase()] || countryCode).toLowerCase();
-  return `<img src="https://flagcdn.com/w40/${countryCode}.png" 
+  return `<img src="https://flagcdn.com/${countryCode}.svg" 
                alt="${countryCode}" 
-               style="width:32px; height:auto; vertical-align:middle;" />`;
+               />`;
 }
 
 async function loadScoreboard() {
