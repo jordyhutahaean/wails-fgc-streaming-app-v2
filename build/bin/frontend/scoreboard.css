@@ -430,6 +430,10 @@ body {
   background-image: url("./img/tuko/1x/player_left.png");
 }
 
+.minimalist #p1-card .player-info .nation-container{
+  transform: translateY(0px) translateX(-180px) scale(1.5);
+  outline: 1px solid #40297a;
+}
 
 .minimalist #p2-card .score {
   background-image: url("./img/tuko/1x/score_right.png");
@@ -438,6 +442,12 @@ body {
 .minimalist #p2-card .player-info {
   background-image: url("./img/tuko/1x/player_right.png");
 }
+
+.minimalist #p2-card .player-info .nation-container{
+  transform: translateY(0px) translateX(180px) scale(1.5);
+  outline: 1px solid #e6e750;
+}
+
 .minimalist #p3-card .player-info {
   background-image: url("./img/tuko/1x/player_left.png");
 }
@@ -609,7 +619,7 @@ body {
 .arcade #p1-card .player-info {
   background-image: url("./img/tokon/1x/player_left.png");
 }
- 
+
  
 .arcade #p1-card .player-info .score-text{
    margin-left: 22px; 
@@ -625,11 +635,9 @@ body {
   }
 }
  
- 
- 
-
 .arcade #p1-card .player-info .nation-container{
-  transform: translateY(0px) translateX(-182px) scale(2);
+  transform: translateY(0px) translateX(-200px) scale(2);
+  outline: 1px solid #e97029;
 }
 
 .arcade #p2-card .score {
@@ -640,8 +648,9 @@ body {
 }
 
 .arcade #p2-card .player-info .nation-container{
-  transform: translateY(0px) translateX(182px) scale(2);
- }
+  transform: translateY(0px) translateX(200px) scale(2);
+  outline: 1px solid #5094c8;
+}
 
 .arcade #p3-card .player-info {
   background-image: url("./img/tokon/1x/player_left.png");
@@ -664,7 +673,7 @@ body {
   transform: translateX(60%);
  }
 .arcade.sf #p1-card .player-info .nation-container{
-  transform: translateY(-10px) translateX(-260px) scale(2);
+  transform: translateY(-10px) translateX(-270px) scale(2);
 }
 .arcade.sf #p2-card .player-info{
   transform: translateX(-16%);
@@ -673,7 +682,7 @@ body {
   transform: translateX(-60%);
  }
 .arcade.sf #p2-card .player-info .nation-container{
-  transform: translateY(-10px) translateX(260px) scale(2);
+  transform: translateY(-10px) translateX(278px) scale(2);
 }
  
 
@@ -823,7 +832,7 @@ body {
 .futuristic .team{
   font-family: Segoe UI;
   color: #ffffff;
-  font-size: 24px;
+  font-size: 18px;
 }
 
 .futuristic #titlecard{
@@ -854,16 +863,16 @@ body {
 }
 
 .futuristic #p1-card .nation-container {
-  transform: translateX(-180px) translateY(-10px)
+  transform: translateX(-180px) translateY(0px) scale(1.5)
 }
 .futuristic #p2-card .nation-container {
-  transform: translateX(180px) translateY(-10px)
+  transform: translateX(180px) translateY(0px) scale(1.5)
 }
 .futuristic #p3-card .nation-container {
-  transform: translateX(-180px) translateY(-10px)
+  transform: translateX(-180px) translateY(0px) scale(1.5)
 }
 .futuristic #p4-card .nation-container {
-  transform: translateX(180px) translateY(-10px)
+  transform: translateX(180px) translateY(0px) scale(1.5)
 }
 
 .futuristic #p1-card .score {
@@ -887,7 +896,7 @@ body {
 
  
 .futuristic #p1-card .player-info .score-text{
-  margin-left:  0px;
+  margin-left:  46px;
     .name{
       width: 200px;  
   } .team{
@@ -896,7 +905,7 @@ body {
 }
 
 .futuristic #p2-card .player-info .score-text{
-  margin-right: 0px;
+  margin-right: 46px;
     .name{
       width: 200px;  
   } .team{
@@ -934,7 +943,7 @@ body {
 }
 
 .futuristic.dbfz #p1-card .nation-container{
-  transform: translateY(-10px) translateX(-170px);
+  transform: translateY(0px) translateX(-150px) scale(1.5);
 }
 
 .futuristic.dbfz #p2-card .player-info{
@@ -946,7 +955,7 @@ body {
 }
 
 .futuristic.dbfz #p2-card .nation-container{
-  transform: translateY(-10px) translateX(170px);
+  transform: translateY(0px) translateX(150px) scale(1.5);
 }
 
 /* Tekken */
@@ -969,6 +978,10 @@ body {
   transform: translateY(10px) translateX(-50px) ;
 }
 
+.futuristic.tekken #p1-card .nation-container{
+  transform: translateY(0px) translateX(-170px) scale(1.5);
+}
+
 .futuristic.tekken #p2-card .player-info{
   transform: translateY(10px);
 }
@@ -977,17 +990,21 @@ body {
   transform: translateY(10px) translateX(50px);
 }
 
+.futuristic.tekken #p2-card .nation-container{
+  transform: translateY(0px) translateX(170px) scale(1.5);
+}
+
 /* 2xko */
 
 .futuristic #p1-card .player-info .score-text{
-  margin-left:  0px;
+  margin-left:  46px;
     .name{
       width: 200px;  
   }
 }
 
 .futuristic #p2-card .player-info .score-text{
-  margin-right: 0px;
+  margin-right: 46px;
     .name{
       width: 200px;  
   }
@@ -1031,8 +1048,16 @@ body {
 .futuristic.gbvsr #p1-card .score{
   transform: translateX(-50px);
 }
+.futuristic.gbvsr #p1-card .player-info .nation-container{
+  transform: translateX(-160px) translateY(0px) scale(1.5);
+ 
+}
 .futuristic.gbvsr #p2-card .score{
   transform: translateX( 50px);
+}
+
+.futuristic.gbvsr #p2-card .player-info .nation-container{
+  transform: translateX(160px) translateY(0px) scale(1.5);
 }
 
 
@@ -1420,22 +1445,30 @@ body {
  width: 220px; 
 }
 
+.gb_versus._2XKO #p1-card .player-info .nation-container{
+  transform:  translateX(-170px) translateY(4px) scale(1);
+}
+
 .gb_versus._2XKO #p2-card .player-info .score-text {
  width: 220px; 
+}
+
+.gb_versus._2XKO #p2-card .player-info .nation-container{
+  transform: translateX(170px) translateY(6px) scale(1);
 }
 
 .gb_versus._2XKO #p3-card .player-info {
   background-image: url("./img/gbversus/p3_duo_bar.png");
 }
 .gb_versus #p3-card .player-info .nation-container{
-  transform:  translateX(-160px) translateY(0px) scale(1);
+  transform:  translateX(-170px) translateY(-4px) scale(1);
 }
 
 .gb_versus._2XKO #p4-card .player-info {
   background-image: url("./img/gbversus/p4_duo_bar.png");
 }
 .gb_versus #p4-card .player-info .nation-container{
-  transform:  translateX(168px) translateY(0px) scale(1);
+  transform:  translateX(170px) translateY(-4px) scale(1);
 }
 
 .gb_versus._2XKO #p1-card .player-info{
