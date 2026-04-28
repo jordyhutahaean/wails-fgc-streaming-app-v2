@@ -431,7 +431,7 @@ body {
 }
 
 .minimalist #p1-card .player-info .nation-container{
-  transform: translateY(0px) translateX(-180px) scale(1.5);
+  transform: translateY(0px) translateX(-206px) scale(1.5);
   outline: 1px solid #40297a;
 }
 
@@ -444,7 +444,7 @@ body {
 }
 
 .minimalist #p2-card .player-info .nation-container{
-  transform: translateY(0px) translateX(180px) scale(1.5);
+  transform: translateY(0px) translateX(206px) scale(1.5);
   outline: 1px solid #e6e750;
 }
 
@@ -478,10 +478,16 @@ body {
 .minimalist.sf #p1-card .player-info{
   transform:  translateY(-10px) translateX(10px);
 }
+/* .minimalist.sf #p1-card .player-info .nation-container{
+  transform: translateY(0px) translateX(-206px) scale(1.5);
+} */
 
 .minimalist.sf #p2-card .player-info{
   transform:  translateY(-10px) translateX(-10px);
 }
+/* .minimalist.sf #p2-card .player-info .nation-container{
+  transform: translateY(0px) translateX(206px) scale(1.5);
+} */
 
 .minimalist.dbfz #p1-card .player-info{
   transform: translateY(-10px);
@@ -491,19 +497,19 @@ body {
 }
 
 .minimalist #p1-card .player-info .score-text .name{
-   width: 240px; 
+   width: auto; 
 }
 
 .minimalist #p2-card .player-info .score-text .name{
-   width: 240px; 
+   width: auto; 
 }
 
 .minimalist #p3-card .player-info .score-text .name{
-   width: 240px; 
+   width: auto; 
 }
 
 .minimalist #p4-card .player-info .score-text .name{
-   width: 240px; 
+   width: auto; 
 }
 
 
@@ -863,16 +869,20 @@ body {
 }
 
 .futuristic #p1-card .nation-container {
-  transform: translateX(-180px) translateY(0px) scale(1.5)
+  transform: translateX(-180px) translateY(0px) scale(1.5);
+  outline: 1px solid #1ca69c;
 }
 .futuristic #p2-card .nation-container {
-  transform: translateX(180px) translateY(0px) scale(1.5)
+  transform: translateX(180px) translateY(0px) scale(1.5);
+  outline: 1px solid #db3553;
 }
 .futuristic #p3-card .nation-container {
-  transform: translateX(-180px) translateY(0px) scale(1.5)
+  transform: translateX(-180px) translateY(0px) scale(1.5);
+  outline: 1px solid #1ca69c;
 }
 .futuristic #p4-card .nation-container {
-  transform: translateX(180px) translateY(0px) scale(1.5)
+  transform: translateX(180px) translateY(0px) scale(1.5);
+  outline: 1px solid #db3553;
 }
 
 .futuristic #p1-card .score {
