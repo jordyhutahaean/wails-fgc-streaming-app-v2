@@ -4,9 +4,17 @@ import {main} from '../models';
 
 export function DeleteSponsor(arg1:string):Promise<void>;
 
+export function FetchAndStoreSets(arg1:string,arg2:string):Promise<Array<main.BracketSet>>;
+
+export function FetchEventSets(arg1:string,arg2:string):Promise<Array<main.BracketSet>>;
+
+export function FetchTournamentFromStartGG(arg1:string,arg2:string):Promise<Record<string, any>>;
+
 export function GetBracket():Promise<main.Bracket>;
 
 export function GetCommentary():Promise<main.Commentary>;
+
+export function GetLastSets():Promise<Array<main.BracketSet>>;
 
 export function GetScoreboard():Promise<main.Scoreboard>;
 
@@ -15,6 +23,8 @@ export function GetSponsorList():Promise<Array<string>>;
 export function GetSponsors():Promise<Array<string>>;
 
 export function LoadPlayersCSV():Promise<Array<Record<string, string>>>;
+
+export function OpenBracketWindow():Promise<void>;
 
 export function SaveBracketJSON(arg1:main.Bracket):Promise<void>;
 

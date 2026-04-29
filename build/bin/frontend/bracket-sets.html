@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bracket Sets</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      padding: 20px;
+    }
+    h2 {
+      margin-bottom: 14px;
+      color: #e94560;
+      font-size: 1.2rem;
+      letter-spacing: 1px;
+    }
+    input#search {
+      width: 100%;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      background: #16213e;
+      border: 1px solid #0f3460;
+      border-radius: 6px;
+      color: #eee;
+      font-size: 0.9rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    thead th {
+      background: #0f3460;
+      padding: 8px 10px;
+      text-align: left;
+      color: #aad4f5;
+      font-weight: 600;
+    }
+    tbody tr {
+      cursor: pointer;
+      border-bottom: 1px solid #0f3460;
+      transition: background 0.15s;
+    }
+    tbody tr:hover { background: #16213e; }
+    tbody tr.selected { background: #e9456033; border-left: 3px solid #e94560; }
+    tbody td { padding: 7px 10px; }
+    .actions {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      padding: 9px 22px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    #loadBtn {
+      background: #e94560;
+      color: #fff;
+    }
+    #loadBtn:disabled {
+      background: #555;
+      cursor: default;
+    }
+    #status {
+      margin-top: 10px;
+      font-size: 0.82rem;
+      color: #8bc34a;
+      min-height: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h2>📋 Bracket Sets</h2>
+  <input id="search" type="text" placeholder="Search player or round..." oninput="filterTable()" />
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Round</th>
+        <th>Player 1</th>
+        <th>Player 2</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div class="actions">
+    <button id="loadBtn" disabled onclick="loadSelected()">⬆ Load to Scoreboard</button>
+  </div>
+  <div id="status"></div>
+
+  <script>
+    let allSets = [];
+    let selectedSet = null;
+
+    async function fetchSets() {
+      try {
+        const res = await fetch('http://localhost:34115/api/get-sets');
+        allSets = await res.json();
+        renderTable(allSets);
+      } catch (e) {
+        document.getElementById('tableBody').innerHTML =
+          '<tr><td colspan="4" style="color:#e94560;padding:12px">Failed to load sets. Is the app running?</td></tr>';
+      }
+    }
+
+    function renderTable(sets) {
+      const tbody = document.getElementById('tableBody');
+      if (!sets || sets.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="color:#aaa;padding:12px">No sets found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = sets.map((s, i) => `
+        <tr onclick="selectRow(this, ${i})" data-index="${i}">
+          <td>${i + 1}</td>
+          <td>${s.round || '—'}</td>
+          <td>${s.player1 || '—'}</td>
+          <td>${s.player2 || '—'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function selectRow(row, index) {
+      document.querySelectorAll('tbody tr').forEach(r => r.classList.remove('selected'));
+      row.classList.add('selected');
+      selectedSet = allSets[index];
+      document.getElementById('loadBtn').disabled = false;
+    }
+
+    function filterTable() {
+      const q = document.getElementById('search').value.toLowerCase();
+      const filtered = allSets.filter(s =>
+        (s.player1 || '').toLowerCase().includes(q) ||
+        (s.player2 || '').toLowerCase().includes(q) ||
+        (s.round || '').toLowerCase().includes(q)
+      );
+      renderTable(filtered);
+      selectedSet = null;
+      document.getElementById('loadBtn').disabled = true;
+    }
+
+    async function loadSelected() {
+      if (!selectedSet) return;
+
+      // Read current scoreboard, patch player1 and player2, POST back
+      try {
+        const res = await fetch('http://localhost:34115/scoreboard.json');
+        const scoreboard = await res.json();
+
+        scoreboard.player1 = selectedSet.player1;
+        scoreboard.player2 = selectedSet.player2;
+        scoreboard.score1 = 0;
+        scoreboard.score2 = 0;
+
+        await fetch('http://localhost:34115/api/save-scoreboard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(scoreboard)
+        });
+
+        document.getElementById('status').textContent =
+          `✅ Loaded: ${selectedSet.player1} vs ${selectedSet.player2}`;
+      } catch (e) {
+        document.getElementById('status').textContent = '❌ Failed to load to scoreboard.';
+      }
+    }
+
+    fetchSets();
+  </script>
+</body>
+</html>

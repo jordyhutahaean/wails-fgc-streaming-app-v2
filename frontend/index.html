@@ -1313,7 +1313,24 @@
           </label>
   
           <img id="gameIcon" src="./img/game_ico/SF6_Logo.png " alt="Game Icon" >
+
         </div>
+        <!-- start.gg Integration -->
+        <div style="display:grid;gap:10px;margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--graybg);">
+          <h3 style="margin:0 0 8px;font-size:15px;color:var(--accent);">📊 Load from start.gg</h3>
+          <label style="font-size:13px;">Tournament URL
+            <input id="startgg_url" type="text" placeholder="https://start.gg/tournament/evo-2025" style="padding:8px;width:100%;">
+          </label>
+          <label style="font-size:13px;">Optional API Key
+            <input id="startgg_apikey" type="password" placeholder="Leave empty for public access" style="padding:8px;width:100%;">
+          </label>
+          <button class="corner-halftone-btn" onclick="openStartGGBracketPicker()" style="width:auto;">Select Bracket & Load Players</button>
+          <div id="startgg_status" style="font-size:12px;color:var(--muted);"></div>
+        </div>
+        <button id="openBracketBtn" style="display:inline"
+          onclick="window.go.main.App.OpenBracketWindow()">
+          📋 View Bracket Sets
+        </button>
 
       <div class="playerflex">
         <!-- Player 1 -->
@@ -1445,7 +1462,37 @@
   </div>
   </div>
 
-  
+  <!-- start.gg Bracket Picker Modal -->
+  <div id="startggModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:1000;overflow:auto;padding:20px;">
+    <div style="background:var(--card-bg);color:var(--text);max-width:900px;margin:40px auto;border-radius:12px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <h2 style="margin:0;font-size:18px;">📊 Select Bracket from Tournament</h2>
+        <button onclick="closeStartGGModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--text);">✕</button>
+      </div>
+      
+      <div id="startgg_loading" style="text-align:center;padding:20px;display:none;">
+        <p>Loading tournament data...</p>
+      </div>
+      
+      <table id="startgg_table" style="width:100%;border-collapse:collapse;display:none;">
+        <thead>
+          <tr style="background:var(--accent);color:#fff;">
+            <th style="padding:12px;text-align:left;border:1px solid var(--border);">Event Name</th>
+            <th style="padding:12px;text-align:center;border:1px solid var(--border);">Entrants</th>
+            <th style="padding:12px;text-align:center;border:1px solid var(--border);">Action</th>
+          </tr>
+        </thead>
+        <tbody id="startgg_tbody"></tbody>
+      </table>
+      
+      <div id="startgg_error" style="color:#d32f2f;padding:20px;display:none;border:1px solid #d32f2f;border-radius:6px;background:#ffebee;"></div>
+      
+      <div style="margin-top:20px;text-align:right;">
+        <button onclick="closeStartGGModal()" class="corner-halftone-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
 <div id="creatorOverlay" class="creator-overlay">
   <div class="creator-card">
     <p></p>
@@ -1463,7 +1510,212 @@
   </div>
 </div>
 
- 
+<!-- BRACKET MODAL -->
+<div id="bracketModal" style="
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.85);
+  z-index:9999;
+  align-items:center;
+  justify-content:center;
+">
+  <div style="
+    background:#1a1a2e;
+    border:1px solid #0f3460;
+    border-radius:10px;
+    width:680px;
+    max-height:80vh;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    box-shadow:0 8px 40px #000a;
+  ">
+    <!-- Header -->
+    <div style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:14px 18px;
+      background:#0f3460;
+      flex-shrink:0;
+    ">
+      <span style="font-weight:700;color:#aad4f5;font-size:1rem;">📋 Bracket Sets</span>
+      <button onclick="closeBracketModal()" style="
+        background:none;border:none;color:#aaa;
+        font-size:1.3rem;cursor:pointer;line-height:1;
+      ">✕</button>
+    </div>
+
+    <!-- Search -->
+    <div style="padding:12px 18px 0;flex-shrink:0;">
+      <input id="bracketSearch" type="text" placeholder="Search player or round..."
+        oninput="filterBracketTable()"
+        style="
+          width:100%;padding:8px 12px;
+          background:#16213e;border:1px solid #0f3460;
+          border-radius:6px;color:#eee;font-size:0.9rem;
+        "
+      />
+    </div>
+
+    <!-- Table -->
+    <div style="overflow-y:auto;flex:1;padding:12px 18px;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.88rem;">
+        <thead>
+          <tr style="position:sticky;top:0;">
+            <th style="background:#0f3460;padding:8px 10px;text-align:left;color:#aad4f5;">#</th>
+            <th style="background:#0f3460;padding:8px 10px;text-align:left;color:#aad4f5;">Round</th>
+            <th style="background:#0f3460;padding:8px 10px;text-align:left;color:#aad4f5;">Player 1</th>
+            <th style="background:#0f3460;padding:8px 10px;text-align:left;color:#aad4f5;">Player 2</th>
+          </tr>
+        </thead>
+        <tbody id="bracketTableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div style="
+      padding:12px 18px;
+      background:#0f3460;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-shrink:0;
+    ">
+      <button id="bracketLoadBtn" disabled onclick="loadBracketSet()" style="
+        padding:8px 22px;border:none;border-radius:6px;
+        font-size:0.9rem;font-weight:700;cursor:pointer;
+        background:#e94560;color:#fff;
+      ">⬆ Load to Scoreboard</button>
+      <span id="bracketStatus" style="font-size:0.82rem;color:#8bc34a;"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Bracket Modal State ──────────────────────────────────
+  let _bracketSets = [];
+  let _bracketSelected = null;
+  let _bracketFiltered = [];
+
+  // Listen for the event emitted by Go
+  window.runtime.EventsOn("open-bracket-modal", async () => {
+    _bracketSelected = null;
+    document.getElementById('bracketLoadBtn').disabled = true;
+    document.getElementById('bracketStatus').textContent = '';
+    document.getElementById('bracketSearch').value = '';
+
+    // Fetch sets from the Go backend (already stored after FetchAndStoreSets)
+    try {
+      _bracketSets = await window.go.main.App.GetLastSets();
+      _bracketFiltered = _bracketSets;
+      renderBracketTable(_bracketFiltered);
+    } catch(e) {
+      _bracketSets = [];
+      renderBracketTable([]);
+    }
+
+    const modal = document.getElementById('bracketModal');
+    modal.style.display = 'flex';
+  });
+
+  function closeBracketModal() {
+    document.getElementById('bracketModal').style.display = 'none';
+    _bracketSelected = null;
+  }
+
+  // Close on backdrop click
+  document.getElementById('bracketModal').addEventListener('click', function(e) {
+    if (e.target === this) closeBracketModal();
+  });
+
+  function renderBracketTable(sets) {
+    const tbody = document.getElementById('bracketTableBody');
+    if (!sets || sets.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="color:#aaa;padding:14px;">No sets found.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = sets.map((s, i) => `
+      <tr onclick="selectBracketRow(this, '${s.id}')"
+        data-id="${s.id}"
+        style="cursor:pointer;border-bottom:1px solid #0f3460;color:#fff;">
+        <td style="padding:7px 10px;">${i + 1}</td>
+        <td style="padding:7px 10px;">${s.round || '—'}</td>
+        <td style="padding:7px 10px;">
+          ${s.team1 ? `<span style="opacity:0.6;font-size:0.8em;">${s.team1}</span> ` : ''}${s.player1 || '—'}
+        </td>
+        <td style="padding:7px 10px;">
+          ${s.team2 ? `<span style="opacity:0.6;font-size:0.8em;">${s.team2}</span> ` : ''}${s.player2 || '—'}
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function selectBracketRow(row, id) {
+    document.querySelectorAll('#bracketTableBody tr').forEach(r => {
+      r.style.background = '';
+      r.style.borderLeft = '';
+    });
+    row.style.background = '#e9456033';
+    row.style.borderLeft = '3px solid #e94560';
+    _bracketSelected = _bracketFiltered.find(s => s.id === id);
+    document.getElementById('bracketLoadBtn').disabled = false;
+  }
+
+  function filterBracketTable() {
+    const q = document.getElementById('bracketSearch').value.toLowerCase();
+    _bracketFiltered = _bracketSets.filter(s =>
+      (s.player1 || '').toLowerCase().includes(q) ||
+      (s.player2 || '').toLowerCase().includes(q) ||
+      (s.round  || '').toLowerCase().includes(q)
+    );
+    renderBracketTable(_bracketFiltered);
+    _bracketSelected = null;
+    document.getElementById('bracketLoadBtn').disabled = true;
+  }
+
+   async function loadBracketSet() {
+    if (!_bracketSelected) return;
+
+    const p1Input = document.getElementById('p1');
+    const p2Input = document.getElementById('p2');
+    const t1Input = document.getElementById('t1');  // team 1
+    const t2Input = document.getElementById('t2');  // team 2
+    const s1Input = document.getElementById('s1');
+    const s2Input = document.getElementById('s2');
+
+    if (p1Input) p1Input.value = _bracketSelected.player1 || '';
+    if (p2Input) p2Input.value = _bracketSelected.player2 || '';
+    if (t1Input) t1Input.value = _bracketSelected.team1   || '';
+    if (t2Input) t2Input.value = _bracketSelected.team2   || '';
+    if (s1Input) s1Input.value = 0;
+    if (s2Input) s2Input.value = 0;
+
+    try {
+      const current = await window.go.main.App.GetScoreboard();
+      current.player1 = _bracketSelected.player1;
+      current.team1   = _bracketSelected.team1;
+      current.player2 = _bracketSelected.player2;
+      current.team2   = _bracketSelected.team2;
+      current.score1  = 0;
+      current.score2  = 0;
+      await window.go.main.App.SaveScoreboardJSON(current);
+    } catch(e) {
+      console.warn('SaveScoreboardJSON failed:', e);
+    }
+
+    if (typeof updateScoreboard === 'function') {
+      updateScoreboard(`Loaded: ${_bracketSelected.player1} vs ${_bracketSelected.player2}`);
+    }
+
+    document.getElementById('bracketStatus').textContent =
+      `✅ ${_bracketSelected.player1} vs ${_bracketSelected.player2}`;
+
+    setTimeout(closeBracketModal, 1200);
+  }
+</script>
+
 <script>
 /* ---------------------
    Utility + tabs
@@ -2805,9 +3057,268 @@ function finalizeChampion(){
     bracketData.double.winners.gf_reset=champ;
     try{ if(window.go?.main?.App) window.go.main.App.SaveBracketJSON(bracketData); }catch(e){}
     document.getElementById('gf_reset').style.display='none';
+   }
+ }
+ 
+// ============= START.GG INTEGRATION =============
+
+let startggTournamentData = null;
+let _startggURL = '';
+let _startggAPIKey = '';
+
+async function openStartGGBracketPicker() {
+  _startggURL = document.getElementById('startgg_url').value.trim();
+  _startggAPIKey = document.getElementById('startgg_apikey').value.trim();
+
+  if (!_startggURL) { alert('Please paste a tournament URL first'); return; }
+
+  const modal   = document.getElementById('startggModal');
+  const loading = document.getElementById('startgg_loading');
+  const table   = document.getElementById('startgg_table');
+  const tbody   = document.getElementById('startgg_tbody');
+  const error   = document.getElementById('startgg_error');
+
+  modal.style.display = 'block';
+  loading.style.display = 'block';
+  table.style.display = 'none';
+  error.style.display = 'none';
+  tbody.innerHTML = '';
+
+  try {
+    const response = await window.go.main.App.FetchTournamentFromStartGG(_startggURL, _startggAPIKey);
+    const data = response?.data || response;
+
+    // ── EVENT URL: Go returned data.event ──
+    if (data?.event) {
+      const event    = data.event;
+      const entrants = event.entrants?.nodes || [];
+
+      // Build full slug and fetch all sets
+      const tSlug   = extractTournamentSlugJS(_startggURL);
+      const eSlug   = extractEventSlugJS(_startggURL);
+      const fullSlug = `tournament/${tSlug}/event/${eSlug}`;
+
+      error.style.display = 'block';
+      error.textContent = `⏳ Fetching sets for slug: ${fullSlug}`;
+
+      try {
+        const sets = await window.go.main.App.FetchAndStoreSets(fullSlug, _startggAPIKey);
+        error.textContent = `✅ ${sets?.length || 0} sets fetched. Click "View Bracket Sets".`;
+        document.getElementById('openBracketBtn').style.display = 'inline-block';
+      } catch(e) {
+        error.textContent = `⚠ Sets fetch failed: ${e}`;
+      }
+
+      // Show entrants list
+      tbody.innerHTML = entrants.length === 0
+        ? '<tr><td colspan="2" style="padding:12px;color:#aaa;">No entrants found</td></tr>'
+        : entrants.map((ent, idx) => `
+            <tr style="border-bottom:1px solid var(--border);">
+              <td style="padding:12px;border:1px solid var(--border);">${ent.name || '—'}</td>
+              <td style="padding:12px;text-align:center;border:1px solid var(--border);">
+                <button onclick="quickLoadEntrant(${idx})"
+                  style="padding:6px 12px;font-size:12px;">Pick as P1</button>
+              </td>
+            </tr>`).join('');
+
+      loading.style.display = 'none';
+      table.style.display = 'table';
+      return;
+    }
+
+    // ── TOURNAMENT URL: Go returned data.tournament ──
+    if (!data?.tournament) throw new Error('Invalid tournament data received');
+
+    startggTournamentData = data.tournament;
+    const events = data.tournament.events || [];
+
+    if (events.length === 0) {
+      error.textContent = 'No events found in this tournament.';
+      error.style.display = 'block';
+      loading.style.display = 'none';
+      return;
+    }
+
+    tbody.innerHTML = events.map((event, idx) => {
+      const count = event.entrants?.nodes?.length || 0;
+      return `
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:12px;border:1px solid var(--border);">${event.name}</td>
+          <td style="padding:12px;text-align:center;border:1px solid var(--border);">${count}</td>
+          <td style="padding:12px;text-align:center;border:1px solid var(--border);">
+            <button onclick="loadStartGGEventPlayers(${idx})"
+              style="padding:6px 12px;font-size:12px;">Load Players</button>
+            <button onclick="fetchSetsForEvent(${idx})"
+              style="padding:6px 12px;font-size:12px;margin-left:4px;">📋 Get Sets</button>
+          </td>
+        </tr>`;
+    }).join('');
+
+    loading.style.display = 'none';
+    table.style.display = 'table';
+
+  } catch (err) {
+    loading.style.display = 'none';
+    error.textContent = `Error: ${err?.message || err}`;
+    error.style.display = 'block';
   }
 }
- 
+
+// Called from tournament-level event list
+async function fetchSetsForEvent(eventIndex) {
+  if (!startggTournamentData?.events) return;
+  const event = startggTournamentData.events[eventIndex];
+  if (!event) return;
+
+  const fullSlug = `tournament/${startggTournamentData.slug}/event/${event.slug}`;
+  const error = document.getElementById('startgg_error');
+  error.style.display = 'block';
+  error.textContent = `⏳ Fetching sets: ${fullSlug}`;
+
+  try {
+    const sets = await window.go.main.App.FetchAndStoreSets(fullSlug, _startggAPIKey);
+    error.textContent = `✅ ${sets?.length || 0} sets ready. Click "View Bracket Sets".`;
+    document.getElementById('openBracketBtn').style.display = 'inline-block';
+  } catch(e) {
+    error.textContent = `❌ Failed: ${e}`;
+  }
+}
+
+function loadStartGGEventPlayers(eventIndex) {
+  if (!startggTournamentData?.events) { alert('Tournament data not loaded'); return; }
+  const event = startggTournamentData.events[eventIndex];
+  if (!event?.entrants?.nodes) { alert('No entrants found'); return; }
+  const entrants = event.entrants.nodes;
+  if (entrants.length < 2) { alert('Need at least 2 entrants'); return; }
+  const p1 = document.getElementById('p1');
+  const p2 = document.getElementById('p2');
+  if (p1) p1.value = entrants[0].name || '';
+  if (p2) p2.value = entrants[1].name || '';
+  closeStartGGModal();
+  updateScoreboard(`Loaded players from ${event.name}`);
+}
+
+function quickLoadEntrant(idx) {
+  // stub — expand if needed
+}
+
+function closeStartGGModal() {
+  document.getElementById('startggModal').style.display = 'none';
+}
+
+document.addEventListener('click', (e) => {
+  const modal = document.getElementById('startggModal');
+  if (e.target === modal) modal.style.display = 'none';
+});
+
+// ── JS slug helpers ──
+function extractTournamentSlugJS(url) {
+  url = url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/^start\.gg\//, '').replace(/\/$/, '');
+  const parts = url.split('/');
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i] === 'tournament' && parts[i+1]) return parts[i+1];
+  }
+  return parts[0] || '';
+}
+
+function extractEventSlugJS(url) {
+  url = url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/^start\.gg\//, '').replace(/\/$/, '');
+  const parts = url.split('/');
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i] === 'event' && parts[i+1]) return parts[i+1];
+  }
+  return '';
+}
+
+// ── Bracket modal ──
+window.addEventListener('load', () => {
+  let attempts = 0;
+  const tryRegister = setInterval(() => {
+    attempts++;
+    if (window.runtime?.EventsOn) {
+      clearInterval(tryRegister);
+      registerBracketModal();
+    } else if (attempts > 20) {
+      clearInterval(tryRegister);
+    }
+  }, 200);
+});
+
+function registerBracketModal() {
+  window.runtime.EventsOn("open-bracket-modal", async () => {
+    _bracketSelected = null;
+    document.getElementById('bracketLoadBtn').disabled = true;
+    document.getElementById('bracketStatus').textContent = '';
+    document.getElementById('bracketSearch').value = '';
+    document.getElementById('bracketModal').style.display = 'flex';
+
+    document.getElementById('bracketTableBody').innerHTML =
+      '<tr><td colspan="4" style="padding:14px;color:#aaa;">⏳ Loading sets...</td></tr>';
+
+    try {
+      _bracketSets = await window.go.main.App.GetLastSets();
+      _bracketFiltered = _bracketSets;
+
+      const debugEl = document.getElementById('bracketStatus');
+      if (!_bracketSets || _bracketSets.length === 0) {
+        debugEl.style.color = '#e94560';
+        debugEl.textContent = '⚠ GetLastSets() returned 0 sets. Was FetchAndStoreSets called?';
+      } else {
+        debugEl.style.color = '#8bc34a';
+        debugEl.textContent = `✅ ${_bracketSets.length} sets loaded. First: ${_bracketSets[0]?.player1} vs ${_bracketSets[0]?.player2}`;
+      }
+      renderBracketTable(_bracketFiltered);
+    } catch(e) {
+      document.getElementById('bracketStatus').style.color = '#e94560';
+      document.getElementById('bracketStatus').textContent = '❌ GetLastSets() threw: ' + String(e);
+      _bracketSets = [];
+      renderBracketTable([]);
+    }
+  });
+}
+
+// ── Slug helpers (JS mirrors of the Go functions) ──
+function extractTournamentSlugJS(url) {
+  url = url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/^start\.gg\//, '').replace(/\/$/, '');
+  const parts = url.split('/');
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i] === 'tournament' && parts[i+1]) return parts[i+1];
+  }
+  return parts[0] || '';
+}
+
+function extractEventSlugJS(url) {
+  url = url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/^start\.gg\//, '').replace(/\/$/, '');
+  const parts = url.split('/');
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i] === 'event' && parts[i+1]) return parts[i+1];
+  }
+  return '';
+}
+
+// ── Bracket modal (EventsOn set up after runtime ready) ──
+window.addEventListener('load', () => {
+  if (!window.runtime?.EventsOn) return;
+  window.runtime.EventsOn("open-bracket-modal", async () => {
+    _bracketSelected = null;
+    document.getElementById('bracketLoadBtn').disabled = true;
+    document.getElementById('bracketStatus').textContent = '';
+    document.getElementById('bracketSearch').value = '';
+
+    try {
+      _bracketSets = await window.go.main.App.GetLastSets();
+      _bracketFiltered = _bracketSets;
+      renderBracketTable(_bracketFiltered);
+    } catch(e) {
+      _bracketSets = [];
+      renderBracketTable([]);
+    }
+
+    document.getElementById('bracketModal').style.display = 'flex';
+  });
+});
+
+
 </script>
 
 <script>

@@ -6,12 +6,28 @@ export function DeleteSponsor(arg1) {
   return window['go']['main']['App']['DeleteSponsor'](arg1);
 }
 
+export function FetchAndStoreSets(arg1, arg2) {
+  return window['go']['main']['App']['FetchAndStoreSets'](arg1, arg2);
+}
+
+export function FetchEventSets(arg1, arg2) {
+  return window['go']['main']['App']['FetchEventSets'](arg1, arg2);
+}
+
+export function FetchTournamentFromStartGG(arg1, arg2) {
+  return window['go']['main']['App']['FetchTournamentFromStartGG'](arg1, arg2);
+}
+
 export function GetBracket() {
   return window['go']['main']['App']['GetBracket']();
 }
 
 export function GetCommentary() {
   return window['go']['main']['App']['GetCommentary']();
+}
+
+export function GetLastSets() {
+  return window['go']['main']['App']['GetLastSets']();
 }
 
 export function GetScoreboard() {
@@ -28,6 +44,10 @@ export function GetSponsors() {
 
 export function LoadPlayersCSV() {
   return window['go']['main']['App']['LoadPlayersCSV']();
+}
+
+export function OpenBracketWindow() {
+  return window['go']['main']['App']['OpenBracketWindow']();
 }
 
 export function SaveBracketJSON(arg1) {
