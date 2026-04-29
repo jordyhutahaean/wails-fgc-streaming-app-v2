@@ -320,8 +320,8 @@
     text-align: center;
   }
   .scoreboard-panel{padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:10px}
-  .playerflex{display:flex;gap:12px;flex-wrap:nowrap;flex-direction: row;}
-  .player-block{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;flex-direction: column;width: 19%;flex: 1;}
+  .playerflex{display:flex;gap:12px;flex-wrap:nowrap;flex-direction: column;}
+  .player-block{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;flex-direction: column;width: auto;flex: 1;}
   .player-block label{font-weight:700;font-size:13px;min-width:150px ; display: flex; flex-direction: column; width:100%;}
 
     .player-block#p1block{background: #e6f1f5; border:1px solid #0e3d73;}
@@ -979,6 +979,15 @@
     align-content: space-evenly;
 }
 
+.firstflex, .secondflex{
+  display: flex;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.checkbox-wrapper{
+  width: 100%;
+}
 /* === Nation Input with Flag Preview === */
 .nation-input-wrapper {
   display: flex;
@@ -1413,72 +1422,75 @@
           </button>
         </div>
       <div class="playerflex">
-        <!-- Player 1 -->
-          <div class="player-block" id="p1block">
-            <div class="score-group">
-              <button> - </button>
-              <label><input id="s1" type="number" value="0"></label>
-              <button> + </button>
+        <div class="firstflex">
+          <!-- Player 1 -->
+            <div class="player-block" id="p1block">
+              <div class="score-group">
+                <button> - </button>
+                <label><input id="s1" type="number" value="0"></label>
+                <button> + </button>
+              </div>
+              <div class="player-group">
+                <label> <input id="p1" type="text" placeholder="Player 1"></label>
+                <label> <input id="t1" type="text" placeholder="Team 1"></label>
+              </div>
+              <div class="nation-input-wrapper">
+                <input id="n1" type="text" maxlength="2" placeholder="Nation, e.g: US, JP"  style="width: 100%;">
+                <span id="n1-flag" class="nation-flag-preview"></span>
+              </div>            
             </div>
-            <div class="player-group">
-              <label> <input id="p1" type="text" placeholder="Player 1"></label>
-              <label> <input id="t1" type="text" placeholder="Team 1"></label>
+        
+            <!-- Player 2 -->
+            <div class="player-block" id="p2block">
+              <div class="score-group">
+                <button> - </button>
+                <label> <input id="s2" type="number" value="0"></label>
+                <button> + </button>
+              </div>
+              <div class="player-group">
+                <label><input id="p2" type="text" placeholder="Player 2"></label>
+                <label><input id="t2" type="text" placeholder="Team 2"></label>
+              </div>
+              <div class="nation-input-wrapper">
+                <input id="n2" type="text" maxlength="2" placeholder="Nation, e.g: US, JP"  style="width: 100%;">
+                <span id="n2-flag" class="nation-flag-preview"></span>
+              </div>
             </div>
-            <div class="nation-input-wrapper">
-              <input id="n1" type="text" maxlength="2" placeholder="Nation, e.g: US, JP"  style="width: 100%;">
-              <span id="n1-flag" class="nation-flag-preview"></span>
-            </div>            
-          </div>
-      
-          <!-- Player 2 -->
-          <div class="player-block" id="p2block">
-            <div class="score-group">
-              <button> - </button>
-              <label> <input id="s2" type="number" value="0"></label>
-              <button> + </button>
-            </div>
-            <div class="player-group">
-              <label><input id="p2" type="text" placeholder="Player 2"></label>
-              <label><input id="t2" type="text" placeholder="Team 2"></label>
-            </div>
-            <div class="nation-input-wrapper">
-              <input id="n2" type="text" maxlength="2" placeholder="Nation, e.g: US, JP"  style="width: 100%;">
-              <span id="n2-flag" class="nation-flag-preview"></span>
-            </div>
-          </div>
-      
-          <!-- Player 3 (2XKO only) -->
-          <div class="player-block" id="p3block" style="display:none;">
-            <div class="checkbox-wrapper">
-              <input type="checkbox" id="v3" class="toggle toggle-green">
-              <label for="v3" data-tg-on="ON" data-tg-off="OFF"></label>
-            </div>
-            <div class="player-group">
-              <label><input id="p3" type="text" placeholder="Player 3"></label>
-              <label><input id="t3" type="text" placeholder="Team 3"></label>
-            </div>
-            <div class="nation-input-wrapper">
-              <input id="n3" type="text" maxlength="2" placeholder="Nation, e.g: US, JP"  style="width: 100%;">
-              <span id="n3-flag" class="nation-flag-preview"></span>
-            </div>
-          </div>
+        </div>
+      <div class="secondflex">
 
-          <!-- Player 4 (2XKO only) -->
-          <div class="player-block" id="p4block" style="display:none;">
-            <div class="checkbox-wrapper">
-              <input type="checkbox" id="v4" class="toggle toggle-yellow">
-              <label for="v4" data-tg-on="ON" data-tg-off="OFF"> </label>
-            </div>
-            <div class="player-group">
-              <label><input id="p4" type="text" placeholder="Player 4"></label>
-              <label><input id="t4" type="text" placeholder="Team 4"></label>
-            </div>
-            <div class="nation-input-wrapper">
-              <input id="n4" type="text" maxlength="2" placeholder="Nation, e.g: US, JP"  style="width: 100%;">
-              <span id="n4-flag" class="nation-flag-preview"></span>
-            </div>
+        <!-- Player 3 (2XKO only) -->
+        <div class="player-block" id="p3block" style="display:none;">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="v3" class="toggle toggle-green">
+            <label for="v3" data-tg-on="ON" data-tg-off="OFF"></label>
           </div>
+          <div class="player-group">
+            <label><input id="p3" type="text" placeholder="Player 3"></label>
+            <label><input id="t3" type="text" placeholder="Team 3"></label>
+          </div>
+          <div class="nation-input-wrapper">
+            <input id="n3" type="text" maxlength="2" placeholder="Nation, e.g: US, JP"  style="width: 100%;">
+            <span id="n3-flag" class="nation-flag-preview"></span>
+          </div>
+        </div>
 
+        <!-- Player 4 (2XKO only) -->
+        <div class="player-block" id="p4block" style="display:none;">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="v4" class="toggle toggle-yellow">
+            <label for="v4" data-tg-on="ON" data-tg-off="OFF"> </label>
+          </div>
+          <div class="player-group">
+            <label><input id="p4" type="text" placeholder="Player 4"></label>
+            <label><input id="t4" type="text" placeholder="Team 4"></label>
+          </div>
+          <div class="nation-input-wrapper">
+            <input id="n4" type="text" maxlength="2" placeholder="Nation, e.g: US, JP"  style="width: 100%;">
+            <span id="n4-flag" class="nation-flag-preview"></span>
+          </div>
+        </div>
+      </div>
       </div>
       <div class="small">* Player 3 and Player 4 are only used in 2XKO mode.</div>
       <div class="container" style="padding-top: 20px;">
@@ -1827,13 +1839,13 @@ function openInnerTab(name){
 /* ---------------------
    Scoreboard logic (unchanged)
    --------------------- */
-function toggleGameMode(){
-  const game = document.getElementById("game").value;
+function toggleGameMode(game = null){
+  const currentGame = game ?? document.getElementById("game").value;
   const p3 = document.getElementById("p3block");
   const p4 = document.getElementById("p4block");
 
-  if(p3) p3.style.display = (game==="2xko") ? "flex" : "none";
-  if(p4) p4.style.display = (game==="2xko") ? "flex" : "none";
+  if(p3) p3.style.display = (currentGame === "2xko") ? "flex" : "none";
+  if(p4) p4.style.display = (currentGame === "2xko") ? "flex" : "none";
 }
 
 // Custom dropdown logic
@@ -1844,45 +1856,53 @@ document.addEventListener("DOMContentLoaded", () => {
   const selected = dropdown.querySelector(".selected");
   const options = dropdown.querySelector(".options");
   const hiddenInput = document.getElementById("game");
-  
-  hiddenInput.type = "hidden";
-  hiddenInput.id = "game";
-  hiddenInput.value = "sf"; // default game
-  document.body.appendChild(hiddenInput);
 
-  selected.addEventListener("click", () => {
-    options.style.display = options.style.display === "block" ? "none" : "block";
+  if (hiddenInput) {
+    hiddenInput.type = "hidden";
+    hiddenInput.value = "sf"; // default game
+  }
+
+  selected.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = options.style.display === "block";
+    options.style.display = isOpen ? "none" : "block";
+    dropdown.classList.toggle("open", !isOpen);
   });
 
   options.querySelectorAll("div").forEach(opt => {
-    opt.addEventListener("click", () => {
+    opt.addEventListener("click", (e) => {
+      e.stopPropagation();
       const val = opt.getAttribute("data-value");
       const icon = opt.getAttribute("data-icon");
       const text = opt.innerText;
 
-      hiddenInput.value = val;
+      if (hiddenInput) {
+        hiddenInput.value = val;
+      }
       selected.querySelector("img").src = icon;
       selected.querySelector("span").textContent = text;
 
-      // update selected block (img + span)
-      document.getElementById("selectedGameIcon").src = icon;
-      document.getElementById("selectedGameName").textContent = text;
-      document.getElementById("gameIcon").src = icon;
+      const selectedIcon = document.getElementById("selectedGameIcon");
+      const selectedName = document.getElementById("selectedGameName");
+      const gameIcon = document.getElementById("gameIcon");
+      if (selectedIcon) selectedIcon.src = icon;
+      if (selectedName) selectedName.textContent = text;
+      if (gameIcon) gameIcon.src = icon;
 
-      // close dropdown
-      gameDropdown.classList.remove("open");
-
+      dropdown.classList.remove("open");
       options.style.display = "none";
 
-      //Call existing Logic
-      toggleGameMode();
-      handleGameSwitch(val);   // ✅ reset when switching game
+      toggleGameMode(val);
+      handleGameSwitch(val);
     });
   });
 
   // Close dropdown when clicking outside
   document.addEventListener("click", (e) => {
-    if(!dropdown.contains(e.target)) options.style.display = "none";
+    if (!dropdown.contains(e.target)) {
+      options.style.display = "none";
+      dropdown.classList.remove("open");
+    }
   });
 
   // Initialize score buttons
