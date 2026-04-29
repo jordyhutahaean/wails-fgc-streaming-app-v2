@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"embed"
 	"encoding/csv"
 	"encoding/json"
@@ -12,6 +13,7 @@ import (
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	// add these to your existing imports
 )
 
 //go:embed frontend/*
@@ -150,6 +152,7 @@ func main() {
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
+		OnStartup: app.startup,
 		Bind: []interface{}{
 			app,
 		},
@@ -169,6 +172,61 @@ func startOverlayServer() {
 	mux.Handle("/sponsors/", http.StripPrefix("/sponsors/",
 		http.FileServer(http.Dir(sponsorDir)),
 	))
+
+	mux.HandleFunc("/api/debug-sets", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Content-Type", "application/json")
+
+		// Re-run the raw query and return whatever start.gg sends back
+		query := `query EventSets($slug: String!, $page: Int!) {
+  event(slug: $slug) {
+    name
+    sets(perPage: 50, page: $page, filters: {hideEmpty: false}) {
+      pageInfo { totalPages }
+      nodes {
+        id
+        fullRoundText
+        slots {
+          entrant { name }
+        }
+      }
+    }
+  }
+}`
+		payload := map[string]interface{}{
+			"query": query,
+			"variables": map[string]interface{}{
+				"slug": appState.LastEventSlug,
+				"page": 1,
+			},
+		}
+
+		body, _ := json.Marshal(payload)
+		req, _ := http.NewRequest("POST", "https://api.start.gg/gql/alpha", bytes.NewReader(body))
+		req.Header.Set("Content-Type", "application/json")
+		if appState.LastAPIKey != "" {
+			req.Header.Set("Authorization", "Bearer "+appState.LastAPIKey)
+		}
+
+		client := &http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+			return
+		}
+		defer resp.Body.Close()
+
+		// Forward raw response directly
+		var raw interface{}
+		json.NewDecoder(resp.Body).Decode(&raw)
+		enc := json.NewEncoder(w)
+		enc.SetIndent("", "  ")
+		enc.Encode(map[string]interface{}{
+			"slug":   appState.LastEventSlug,
+			"apiKey": appState.LastAPIKey != "",
+			"raw":    raw,
+		})
+	})
 
 	overlayDir := resourcePath("frontend")
 	os.MkdirAll(overlayDir, 0755)
@@ -235,6 +293,12 @@ func startOverlayServer() {
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(players)
+	})
+
+	mux.HandleFunc("/api/get-sets", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(appState.LastSets)
 	})
 
 	ports := []string{":34115", ":34116", ":34117"}

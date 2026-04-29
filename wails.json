@@ -15,7 +15,7 @@
     }
   },
 
-  "assetdir": "frontend/dist",
+  "assetdir": "frontend",
 
   "author": {
     "name": "giogio555",

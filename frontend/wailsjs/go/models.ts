@@ -72,6 +72,28 @@ export namespace main {
 		    return a;
 		}
 	}
+	export class BracketSet {
+	    id: string;
+	    round: string;
+	    player1: string;
+	    team1: string;
+	    player2: string;
+	    team2: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new BracketSet(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.round = source["round"];
+	        this.player1 = source["player1"];
+	        this.team1 = source["team1"];
+	        this.player2 = source["player2"];
+	        this.team2 = source["team2"];
+	    }
+	}
 	export class Commentary {
 	    commentator1: string;
 	    description1: string;
