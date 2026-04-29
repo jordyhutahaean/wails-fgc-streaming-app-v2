@@ -1314,18 +1314,7 @@
   
           <img id="gameIcon" src="./img/game_ico/SF6_Logo.png " alt="Game Icon" >
         </div>
-        <div class="startgg-settings" style="display:grid;gap:10px;margin-top:16px;padding:14px;border:1px solid var(--border);border-radius:12px;background:var(--graybg);">
-          <h3 style="margin:0 0 8px;font-size:15px;color:var(--accent);">start.gg Integration</h3>
-          <label>start.gg event link
-            <input id="startgg_link" type="text" placeholder="https://start.gg/tournament/evo-2025/event/street-fighter-6" style="padding:8px;width:100%;">
-          </label>
-          <label class="small">Optional API key
-            <input id="startgg_api_key" type="password" placeholder="Optional: start.gg API key" style="padding:8px;width:100%;">
-          </label>
-          <button onclick="fetchStartGG()" style="width:auto;">Load start.gg entrants</button>
-          <div class="small" id="startgg-status"></div>
-          <div id="startgg-result" class="small"></div>
-        </div>
+
       <div class="playerflex">
         <!-- Player 1 -->
           <div class="player-block" id="p1block">
@@ -1611,78 +1600,7 @@ function getEntrantDisplayName(entrant) {
   return "Unknown";
 }
 
-function applyStartGGEntrants(entrants) {
-  if (!Array.isArray(entrants) || entrants.length === 0) return;
 
-  const game = document.getElementById("game").value;
-
-  entrants.slice(0, 4).forEach((entrant, index) => {
-    const playerIndex = index + 1;
-    const playerName = getEntrantDisplayName(entrant);
-    const playerInput = document.getElementById(`p${playerIndex}`);
-    const teamInput = document.getElementById(`t${playerIndex}`);
-    const nationInput = document.getElementById(`n${playerIndex}`);
-    const scoreInput = document.getElementById(`s${playerIndex}`);
-    const visibleToggle = document.getElementById(`v${playerIndex}`);
-
-    if (playerInput) playerInput.value = playerName;
-    if (teamInput) teamInput.value = "";
-    if (nationInput) nationInput.value = "";
-    if (scoreInput) scoreInput.value = 0;
-    if (playerIndex > 2 && visibleToggle) {
-      visibleToggle.checked = (game === "2xko");
-    }
-  });
-
-  if (game !== "2xko") {
-    const v3 = document.getElementById("v3");
-    const v4 = document.getElementById("v4");
-    if (v3) v3.checked = false;
-    if (v4) v4.checked = false;
-  }
-}
-
-async function fetchStartGG() {
-  const status = document.getElementById("startgg-status");
-  const result = document.getElementById("startgg-result");
-  status.textContent = "";
-  result.textContent = "";
-
-  const apiKey = document.getElementById("startgg_api_key").value.trim();
-  const startggLink = document.getElementById("startgg_link").value.trim();
-
-  if (!startggLink) {
-    status.textContent = "Paste a start.gg event link first.";
-    return;
-  }
-
-  status.textContent = "Loading start.gg event...";
-
-  try {
-    const response = await window.go.main.App.FetchStartGGEntrants(startggLink, apiKey);
-    const data = response?.data || response;
-    const tournament = data?.tournament;
-    const event = Array.isArray(tournament?.events) ? tournament.events[0] : tournament?.events;
-    const entrants = Array.isArray(event?.entrants?.nodes) ? event.entrants.nodes : [];
-
-    if (!entrants.length) {
-      status.textContent = "No entrants returned from start.gg.";
-      return;
-    }
-
-    const listHtml = entrants.slice(0, 10).map((entrant, index) => {
-      const name = getEntrantDisplayName(entrant);
-      return `<div>${index + 1}. ${name}</div>`;
-    }).join("");
-
-    result.innerHTML = `<strong>${tournament?.name || "Tournament"} › ${event?.name || "Event"}</strong><div>${entrants.length} entrants found.</div>${listHtml}`;
-    applyStartGGEntrants(entrants);
-    updateScoreboard("Imported start.gg entrants");
-    status.textContent = "start.gg entrants loaded successfully.";
-  } catch (err) {
-    status.textContent = "Failed to load start.gg data: " + (err?.message || err);
-  }
-}
 
 function resetScoreboard(){
   // limit reset to scoreboard form inputs only (avoid wiping bracket seeds by accident)

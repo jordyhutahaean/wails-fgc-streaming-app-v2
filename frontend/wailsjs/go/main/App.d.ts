@@ -4,8 +4,6 @@ import {main} from '../models';
 
 export function DeleteSponsor(arg1:string):Promise<void>;
 
-export function FetchStartGGEntrants(arg1:string,arg2:string):Promise<Record<string, any>>;
-
 export function GetBracket():Promise<main.Bracket>;
 
 export function GetCommentary():Promise<main.Commentary>;
