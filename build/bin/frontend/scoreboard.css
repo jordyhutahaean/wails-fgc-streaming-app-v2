@@ -318,11 +318,11 @@ body {
 }
 
 .Battlegrounds #p1-card .score {
-  background-image: url("./img/tuko/1x/score_left.png");
+  background-image: url("./img/tokon/1x/score_left.png");
  
 }
 .Battlegrounds #p1-card .player-info {
-  background-image: url("./img/tuko/1x/player_left.png");
+  background-image: url("./img/tokon/1x/player_left.png");
 }
 
 .Battlegrounds #p1-card .player-info .nation-container{
@@ -331,11 +331,11 @@ body {
 }
 
 .Battlegrounds #p2-card .score {
-  background-image: url("./img/tuko/1x/score_right.png");
+  background-image: url("./img/tokon/1x/score_right.png");
 }
 
 .Battlegrounds #p2-card .player-info {
-  background-image: url("./img/tuko/1x/player_right.png");
+  background-image: url("./img/tokon/1x/player_right.png");
 }
 
 .Battlegrounds #p2-card .player-info .nation-container{
