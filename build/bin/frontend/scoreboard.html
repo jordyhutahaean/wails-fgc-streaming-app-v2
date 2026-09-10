@@ -28,8 +28,8 @@
     <div class="score" id="s2">0</div>
     <div class="player-info">
       <div class="score-text">
-        <div class="name">Player 2</div>
         <div class="team"> </div>
+        <div class="name">Player 2</div>
       </div>
       <div class="nation-container" id="n2"> 
         <span class="nation"></span>
@@ -182,18 +182,16 @@ setInterval(() => {
 }, 1000); // Match the loadScoreboard interval
 
 // Main load
-setInterval(loadScoreboard, 1000);
+setInterval(loadScoreboard, 9000);
 loadScoreboard();
 </script>
 
 <script>
 function autoFitName(element, baseSize, minSize) {
-  const parentWidth = element.parentElement.offsetWidth;
-
   element.style.fontSize = baseSize + "px";
 
-  while (element.scrollWidth > parentWidth && baseSize > minSize) {
-    baseSize--;
+  while (element.scrollWidth > element.clientWidth && baseSize > minSize) {
+    baseSize-= 3;
     element.style.fontSize = baseSize + "px";
   }
 }
@@ -201,13 +199,11 @@ function autoFitName(element, baseSize, minSize) {
 function applyNameAutoFit() {
   document.querySelectorAll(".name").forEach(name => {
     const style = window.getComputedStyle(name);
-    const baseSize = parseInt(style.fontSize) || 22;
-
-    // different themes can change min font size
-    const minSize =
-      document.body.classList.contains("Battlegrounds")
-        ? 16
-      : 16; // default fallback
+    if (!name.dataset.baseFontSize) {
+      name.dataset.baseFontSize = parseFloat(style.fontSize) || 22;
+    }
+    const baseSize = parseFloat(name.dataset.baseFontSize);
+    const minSize = 6;
 
     autoFitName(name, baseSize, minSize);
   });

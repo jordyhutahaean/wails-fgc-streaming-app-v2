@@ -81,10 +81,24 @@ body {
   align-content: center;
 }
 
-.player-info {
+#p1-card .player-info {
   display: flex;
   position: absolute;
-  justify-content: center;
+  justify-content: start;
+  align-items: center;
+
+  width: 400px;
+  height: 60px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  z-index: -1;
+}
+
+#p2-card .player-info {
+  display: flex;
+  position: absolute;
+  justify-content: end;
   align-items: center;
 
   width: 400px;
@@ -97,32 +111,39 @@ body {
 
 .score-text{
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
   align-content: center;
-  width: auto;
-  gap: 4px;
+  max-width: 100%;
+  min-width: 0;
+ 
 }
  
 .name {
- 
-  font-weight: bold;
-  font-size: 24px;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
   color: white;
 }
 
 .team {
-
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
   font-size: 14px;
   color: #aaa;
+}
+#p1-card .team {
+      text-align: left;
+}
+#p2-card .team {
+      text-align: right;
 }
 
 .name, .team {
   overflow: hidden;
   /* text-overflow: ellipsis; */
   white-space: nowrap;
-  max-width: 250px;
 
  
 }
@@ -178,7 +199,7 @@ body {
 
 .tokon .name,
 .tokon .score {
-  font-size: 48px;
+  font-size: 24px;
   font-weight: 800;
   color: rgba(0, 0, 0, 0.8);
   text-align: center;
@@ -191,13 +212,15 @@ body {
   flex-direction: row;
 }
 .tokon #p1-card .name {
-  font-size: 24px;
+
   position: static;
   left: 50%;
   top: 24%;
  
   text-align: center;
   white-space: nowrap;
+
+  margin-top: -6px;
 }
 .tokon #p1-card .score {
   left: -40px;
@@ -223,13 +246,15 @@ body {
   flex-direction: row-reverse;
 }
 .tokon #p2-card .name {
-  font-size: 24px;
+
   position: static;
   right: 50%;
   top: 24%;
  
   text-align: center;
   white-space: nowrap;
+
+  margin-top: -6px;
 }
 .tokon #p2-card .score {
   right: -30px;
@@ -257,7 +282,7 @@ body {
 
 .umvc3 .name,
 .umvc3 .score {
-  font-size: 48px;
+  font-size: 24px;
   font-weight: 800;
   color: rgba(0, 0, 0, 0.8);
   text-align: center;
@@ -265,14 +290,18 @@ body {
 
 /* Player 1 */
 .umvc3 #p1-card { top: 10px; left: 300px; flex-direction: row; }
-.umvc3 #p1-card .name { font-size: 24px; position: static; left: 50%; top: 24%;   text-align: center; white-space: nowrap; }
+.umvc3 #p1-card .name { font-size: 24px; position: static; left: 50%; top: 24%;   text-align: center; white-space: nowrap;
+  margin-top: -6px;
+}
 .umvc3 #p1-card .score { left: -40px; top: -30px; }
 .umvc3 #p1-card .controller-container { top: 88px; left: 30%; transform: skew(20deg); background-color: #EB6F25; box-shadow: -6px 6px rgba(0,0,0,.4); }
 .umvc3 #p1-card .controller { left: 10%; transform: skew(-20deg); }
 
 /* Player 2 */
 .umvc3 #p2-card { top: 10px; right: 300px; flex-direction: row-reverse; }
-.umvc3 #p2-card .name { font-size: 24px; position: static; right: 50%; top: 24%;   text-align: center; white-space: nowrap; }
+.umvc3 #p2-card .name { font-size: 24px; position: static; right: 50%; top: 24%;   text-align: center; white-space: nowrap;
+  margin-top: -6px;
+}
 .umvc3 #p2-card .score { right: -30px; top: -30px; }
 .umvc3 #p2-card .controller-container { top: 88px; right: 30%; transform: skew(-20deg); background-color: #438BBE; box-shadow: 6px 6px rgba(0,0,0,.4); }
 .umvc3 #p2-card .controller { left: 10%; transform: skew(20deg); }
@@ -286,15 +315,17 @@ body {
    /* Minimalist */
 @font-face {
   font-family: Niramit-bold ;
-  src: url(./fonts/Niramit-Bold.ttf);
+  src: url(./fonts/KOMTXTI_.ttf);
 }
 
 .Battlegrounds #titlecard, .Battlegrounds .name, .Battlegrounds .score  {
   font-family: Niramit-bold;
-  color: white;
+  color: black;
 }
+
+
 .Battlegrounds .team{
-  color: #aaa;
+  color: #2b2b2b;
   font-family: Niramit-bold;
   font-size: 14px;
 }
@@ -325,10 +356,7 @@ body {
   background-image: url("./img/tokon/1x/player_left.png");
 }
 
-.Battlegrounds #p1-card .player-info .nation-container{
-  transform: translateY(0px) translateX(-206px) scale(1.5);
-  outline: 1px solid #40297a;
-}
+ 
 
 .Battlegrounds #p2-card .score {
   background-image: url("./img/tokon/1x/score_right.png");
@@ -338,16 +366,8 @@ body {
   background-image: url("./img/tokon/1x/player_right.png");
 }
 
-.Battlegrounds #p2-card .player-info .nation-container{
-  transform: translateY(0px) translateX(206px) scale(1.5);
-  outline: 1px solid #e6e750;
-}
-
+ 
 /* Custom Properties */
-
-.Battlegrounds #p2-card .player-info{
-  right: 10px;
-}
 
 .Battlegrounds.tokon #p1-card .score {
   top: -44px;
@@ -384,20 +404,36 @@ body {
 .Battlegrounds.tokon #p2-card .player-info{
   transform:  translateY(0px) translateX(28%);
 }
- 
+
+.Battlegrounds.tokon #p1-card .player-info .nation-container{
+  transform: translateY(-2px) translateX(-6vw) scale(.6) ; ;
+}
+.Battlegrounds.tokon #p2-card .player-info .nation-container{
+  transform: translateY(-2px) translateX(6vw) scale(.6) ; ;
+}
+
 .Battlegrounds.umvc3 #p1-card .player-info{
   transform: translateY(-16px) translateX(2%);
 }
+
 .Battlegrounds.umvc3 #p2-card .player-info{
   transform: translateY(-16px) translateX(-2%);
 }
 
-.Battlegrounds #p1-card .player-info .score-text .name{
-   width: auto; 
+.Battlegrounds.umvc3 #p1-card .player-info .nation-container{
+  transform: translateY(-2px) translateX(-9vw)  ;
+}
+.Battlegrounds.umvc3 #p2-card .player-info .nation-container{
+  transform: translateY(-2px) translateX(9vw)  ;
 }
 
-.Battlegrounds #p2-card .player-info .score-text .name{
-   width: auto; 
+.Battlegrounds #p1-card .player-info .score-text {
+     transform: translateX(58px);
+   
+}
+
+.Battlegrounds #p2-card .player-info .score-text {
+     transform: translateX(-58px);
 }
 
 .Battlegrounds #p1-card , .Battlegrounds #p2-card{
