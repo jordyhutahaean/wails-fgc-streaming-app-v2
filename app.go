@@ -40,9 +40,9 @@ func NewApp() *App {
 
 	return &App{
 		scoreboard: Scoreboard{
-			Game:      "sf",
-			Style:     "minimalist",
-			Titlecard: "",
+			Game:      "tokon",
+			Style:     "Battlegrounds",
+			Titlecard: "Pools",
 			Visible1:  true,
 			Visible2:  true,
 			Visible3:  false,

@@ -92,10 +92,10 @@ async function loadScoreboard() {
     if (!resp.ok) throw new Error("Failed to fetch scoreboard.json");
     const data = await resp.json();
 
-    const gameClassMap = { sf: "sf", dbfz: "dbfz", tekken: "tekken", "2xko": "_2XKO",   gbvsr: "gbvsr",  };
+    const gameClassMap = { tokon: "tokon", umvc3: "umvc3",  };
 
     // reset all classes
-    document.body.classList.remove("sf","dbfz","tekken","_2XKO","gbvsr","minimalist","arcade","futuristic","white_outline");
+    document.body.classList.remove("tokon", "umvc3","Battlegrounds");
 
     // apply game + style
     if (gameClassMap[data.game]) document.body.classList.add(gameClassMap[data.game]);
@@ -205,16 +205,8 @@ function applyNameAutoFit() {
 
     // different themes can change min font size
     const minSize =
-      document.body.classList.contains("minimalist")
+      document.body.classList.contains("Battlegrounds")
         ? 16
-      : document.body.classList.contains("white_outline")
-        ? 14
-      : document.body.classList.contains("arcade")
-        ? 18
-      : document.body.classList.contains("futuristic")
-        ? 18
-      : document.body.classList.contains("gb_versus")
-        ? 14
       : 16; // default fallback
 
     autoFitName(name, baseSize, minSize);

@@ -1368,39 +1368,26 @@
       </div>
 
         <div class="settings">
-          <input type="hidden" id="game" value="sf">
+          <input type="hidden" id="game" value="tokon">
           <label> Game
           <div class="custom-select" id="gameDropdown">
             <div class="selected">
-              <img id="selectedGameIcon" src="./img/game_ico/SF6_Logo.png" alt="">
-              <span id="selectedGameName">Street Fighter</span>
+              <img id="selectedGameIcon" src="./img/game_ico/MTFS_Logo.png" alt="">
+              <span id="selectedGameName">Marvel Tokon Fighting Souls</span>
             </div>
             <div class="options">
-              <div data-value="sf" data-icon="./img/game_ico/SF6_Logo.png">
-                <img src="./img/game_ico/SF6_Logo.png" alt=""> Street Fighter
+              <div data-value="tokon" data-icon="./img/game_ico/SF6_Logo.png">
+                <img src="./img/game_ico/MTFS_Logo.png" alt=""> Marvel Tokon Fighting Souls
               </div>
-              <div data-value="dbfz" data-icon="./img/game_ico/DBFZ_Logo.png">
-                <img src="./img/game_ico/DBFZ_Logo.png" alt=""> Dragon Ball FighterZ
-              </div>
-              <div data-value="gbvsr" data-icon="./img/game_ico/GBVSR_Logo.png">
-                <img src="./img/game_ico/GBVSR_Logo.png" alt=""> Granblue Fantasy Versus Rising
-              </div>
-              <div data-value="tekken" data-icon="./img/game_ico/Tekken_8_Logo.png">
-                <img src="./img/game_ico/Tekken_8_Logo.png" alt=""> Tekken
-              </div>
-              <div data-value="2xko" data-icon="./img/game_ico/2XKO_Logo.png">
-                <img src="./img/game_ico/2XKO_Logo.png" alt=""> 2XKO
+              <div data-value="umvc3" data-icon="./img/game_ico/DBFZ_Logo.png">
+                <img src="./img/game_ico/UMvC3Logo.png" alt=""> UMVC3
               </div>
             </div>
           </div>
           </label>
           <label style="width: 50%;">Style
             <select id="style" style="padding: 8px; width: 100%;">
-              <option value="minimalist">Minimalist</option>
-              <option value="arcade">Arcade</option>
-              <option value="futuristic">Futuristic</option>
-              <option value="white_outline">White Outline</option>
-              <option value="gb_versus">GranblueVersus Style</option>
+              <option value="Battlegrounds">Battlegrounds</option>
             </select>
           </label>
           <label style="width: 100%;">Titlecard
@@ -1859,7 +1846,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (hiddenInput) {
     hiddenInput.type = "hidden";
-    hiddenInput.value = "sf"; // default game
+    hiddenInput.value = "tokon"; // default game
   }
 
   selected.addEventListener("click", (e) => {
