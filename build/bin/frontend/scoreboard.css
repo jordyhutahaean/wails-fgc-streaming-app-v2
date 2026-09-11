@@ -72,7 +72,7 @@ body {
 .score {
   position: absolute;
   width: 100px;
-  height: 100px;
+  height: auto;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -185,8 +185,8 @@ body {
    ====================== */
 
 @font-face {
-  font-family: Bahnscrift;
-  src: url('./fonts/bahnschrift.ttf');
+  font-family: KomikaText;
+  src: url('./fonts/KOMTXTI_.ttf');
 }
 
 /* --- STREET FIGHTER --- */
@@ -194,7 +194,7 @@ body {
   width: 1920px;
   height: 1080px;
   position: absolute;
-  font-family: Bahnscrift;
+  font-family: KomikaText;
 }
 
 .tokon .name,
@@ -277,7 +277,7 @@ body {
   width: 1920px;
   height: 1080px;
   position: absolute;
-  font-family: Bahnscrift;
+  font-family: KomikaText;
 }
 
 .umvc3 .name,
@@ -318,7 +318,7 @@ body {
   src: url(./fonts/KOMTXTI_.ttf);
 }
 
-.Battlegrounds #titlecard, .Battlegrounds .name, .Battlegrounds .score  {
+.Battlegrounds .name, .Battlegrounds .score  {
   font-family: Niramit-bold;
   color: black;
 }
@@ -331,11 +331,13 @@ body {
 }
 
 .Battlegrounds #titlecard {
+  font-family: Niramit-bold;
+  color: white;
   font-size: 20px;
 }
 
 .Battlegrounds .titlecard {
-  background-image: url("./img/tuko/1x/Asset\ 28.png");
+  background-image: url("./img/battlegrounds/title.png");
   top: -10px;
   left: 50vw;
   transform:translateX(-50%) ;
@@ -349,60 +351,60 @@ body {
 }
 
 .Battlegrounds #p1-card .score {
-  background-image: url("./img/tokon/1x/score_left.png");
+  background-image: url("./img/battlegrounds/p1_score.png");
  
 }
 .Battlegrounds #p1-card .player-info {
-  background-image: url("./img/tokon/1x/player_left.png");
+  background-image: url("./img/battlegrounds/p1_lbar.png");
 }
 
  
 
 .Battlegrounds #p2-card .score {
-  background-image: url("./img/tokon/1x/score_right.png");
+  background-image: url("./img/battlegrounds/p2_score.png");
 }
 
 .Battlegrounds #p2-card .player-info {
-  background-image: url("./img/tokon/1x/player_right.png");
+  background-image: url("./img/battlegrounds/p2_lbar.png");
 }
 
  
 /* Custom Properties */
 
 .Battlegrounds.tokon #p1-card .score {
-  top: -44px;
-  padding: 24px;
-  left: 35%;
+  top: -12px;
+  padding: 12px;
+  left: 46%;
   transform: translateX(34%);
 }
  
 .Battlegrounds.tokon #p2-card .score {
-  top: -44px;
-  padding: 24px;
-  right: 35%;
+  top: -12px;
+  padding: 12px;
+  right: 46%;
   transform: translateX(-34%);
 }
 
 .Battlegrounds.umvc3 #p1-card .score {
-  top: -60px;
-  padding: 24px;
-  left: 55%;
+  top: -14px;
+  padding: 12px;
+  left: 65%;
   transform: translateX(34%);
 }
 
 .Battlegrounds.umvc3 #p2-card .score {
-  top: -60px;
-  padding: 24px;
-  right: 55%;
+  top: -14px;
+  padding: 12px;
+  right: 65%;
   transform: translateX(-34%);
 }
 
 .Battlegrounds.tokon #p1-card .player-info{
-  transform:  translateY(0px) translateX(-28%);
+  transform:  translateY(0px) translateX(-6%);
 }
  
 .Battlegrounds.tokon #p2-card .player-info{
-  transform:  translateY(0px) translateX(28%);
+  transform:  translateY(0px) translateX(6%);
 }
 
 .Battlegrounds.tokon #p1-card .player-info .nation-container{
@@ -413,11 +415,11 @@ body {
 }
 
 .Battlegrounds.umvc3 #p1-card .player-info{
-  transform: translateY(-16px) translateX(2%);
+  transform: translateY(-10px) translateX(22%);
 }
 
 .Battlegrounds.umvc3 #p2-card .player-info{
-  transform: translateY(-16px) translateX(-2%);
+  transform: translateY(-10px) translateX(-22%);
 }
 
 .Battlegrounds.umvc3 #p1-card .player-info .nation-container{
